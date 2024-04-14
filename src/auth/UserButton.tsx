@@ -61,7 +61,7 @@ export const UserButton = async () => {
         hideIcon
         action={async () => {
           'use server'
-          await signIn('discord')
+          await signIn('passkey')
         }}
       >
         Sign In

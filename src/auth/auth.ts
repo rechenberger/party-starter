@@ -3,9 +3,30 @@ import { DrizzleAdapter } from '@auth/drizzle-adapter'
 import NextAuth from 'next-auth'
 import Discord from 'next-auth/providers/discord'
 import Passkey from 'next-auth/providers/passkey'
+import Resend from 'next-auth/providers/resend'
+import { CredentialsProvider } from './CredentialsProvider'
+import { ImpersonateProvider } from './ImpersonateProvider'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: DrizzleAdapter(db), // TODO: Passkey does not work with DrizzleAdapter, yet 😥
-  providers: [Discord, Passkey],
-  experimental: { enableWebAuthn: true },
+  adapter: DrizzleAdapter(db),
+  providers: [
+    Discord,
+    Resend({
+      from: process.env.EMAIL_FROM,
+    }),
+    CredentialsProvider,
+    ImpersonateProvider,
+    Passkey,
+  ],
+  session: {
+    strategy: 'jwt',
+  },
+  callbacks: {
+    session({ session, token }) {
+      if (session?.user) {
+        session.user.id = token.sub as string
+      }
+      return session
+    },
+  },
 })

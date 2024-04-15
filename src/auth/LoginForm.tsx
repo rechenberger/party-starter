@@ -54,6 +54,15 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
             >
               Continue with Discord
             </ActionButton>
+            <ActionButton
+              variant={'outline'}
+              action={async () => {
+                'use server'
+                await signIn('passkey')
+              }}
+            >
+              Continue with Passkey
+            </ActionButton>
             {/* <ActionButton
               variant={'outline'}
               action={async () => {

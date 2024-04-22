@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardDescription, CardTitle } from '@/components/ui/card'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 const Home = ({

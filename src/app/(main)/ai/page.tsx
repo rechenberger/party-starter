@@ -7,16 +7,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 import { Fragment } from 'react'
 import { z } from 'zod'
 import { AiComponent } from './AiComponent'
-import { AiList } from './AiList'
 
 export default async function Page() {
   return (
     <>
-      <h1>AI</h1>
-      <AiList prompt="top 3 programming languages" />
+      <h1 className="text-2xl">AI</h1>
+      {/* <AiList prompt="top 3 programming languages" /> */}
 
       <AiComponent
         prompt="3 Presidents of the United States"
@@ -27,7 +27,7 @@ export default async function Page() {
               lastName: z.string(),
               dateOfBirth: z.string(),
               shortDescription: z.string(),
-              achievements: z.array(z.string()),
+              // achievements: z.array(z.string()),
             }),
           ),
         })}
@@ -50,11 +50,29 @@ export default async function Page() {
                       <CardContent>
                         <CardDescription>
                           <div>{p?.shortDescription}</div>
-                          <ul className="mt-2 list-inside list-disc">
-                            {p?.achievements?.map((a, idx) => {
-                              return <li key={idx}>{a}</li>
-                            })}
-                          </ul>
+                          {done && (
+                            <AiComponent
+                              prompt={`The 3 greatest achievements of the President ${p?.firstName} ${p?.lastName}. 1 word each`}
+                              schema={z.object({ list: z.array(z.string()) })}
+                              render={async ({ data, done }) => {
+                                return (
+                                  <>
+                                    <hr className="my-4" />
+                                    <ul
+                                      className={cn(
+                                        'list-disc list-inside',
+                                        !done && 'animate-pulse',
+                                      )}
+                                    >
+                                      {data?.list?.map((item) => (
+                                        <li key={item}>{item}</li>
+                                      ))}
+                                    </ul>
+                                  </>
+                                )
+                              }}
+                            />
+                          )}
                         </CardDescription>
                       </CardContent>
                     </Card>

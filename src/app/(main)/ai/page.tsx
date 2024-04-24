@@ -1,5 +1,3 @@
-// const Text = createAiComponent()
-
 import {
   Card,
   CardContent,
@@ -16,8 +14,6 @@ export default async function Page() {
   return (
     <>
       <h1 className="text-2xl">AI</h1>
-      {/* <AiList prompt="top 3 programming languages" /> */}
-
       <AiComponent
         prompt="3 Presidents of the United States"
         schema={z.object({
@@ -27,7 +23,6 @@ export default async function Page() {
               lastName: z.string(),
               dateOfBirth: z.string(),
               shortDescription: z.string(),
-              // achievements: z.array(z.string()),
             }),
           ),
         })}
@@ -37,7 +32,7 @@ export default async function Page() {
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 {data?.list?.map((p, idx) => (
                   <Fragment key={idx}>
-                    <Card key={idx}>
+                    <Card>
                       <CardHeader>
                         <CardTitle>
                           <span>{p?.firstName}</span>{' '}

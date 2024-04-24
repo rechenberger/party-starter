@@ -20,6 +20,7 @@ export const CommandsButton = () => {
             key: 'c',
           },
         }}
+        hideButton
         action={async () => {
           'use server'
 
@@ -88,7 +89,7 @@ export const CommandsButton = () => {
           })
         }}
       >
-        Command!
+        streamCommands() Demo
       </ActionButton>
     </>
   )

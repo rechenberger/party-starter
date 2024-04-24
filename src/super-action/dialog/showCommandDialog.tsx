@@ -10,23 +10,21 @@ export const useShowCommandDialog = () => {
   const setRender = useSetAtom(dialogRenderAtom)
   return useCallback(
     (commands: SuperActionCommands) => {
-      const newRender = <CommandDialog commands={commands.commands} />
+      const newRender = <CommandDialog commands={commands} />
       setRender(newRender)
     },
     [setRender],
   )
 }
 
-const CommandDialog = ({
-  commands,
-}: {
-  commands: SuperActionCommands['commands']
-}) => {
+const CommandDialog = ({ commands }: { commands: SuperActionCommands }) => {
   const [open, setOpen] = useState(true)
   const setRender = useSetAtom(dialogRenderAtom)
 
   return (
     <ActionCommandDialog
+      placeholder={commands.placeholder}
+      emptyLabel={commands.emptyLabel}
       open={open}
       setOpen={(o) => {
         setOpen(o)
@@ -35,7 +33,7 @@ const CommandDialog = ({
         }
       }}
     >
-      {commands.map((command, id) => (
+      {commands.commands.map((command, id) => (
         <Fragment key={id}>
           <CommandDialogItem
             command={command}

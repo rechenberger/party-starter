@@ -29,6 +29,8 @@ export type SuperActionRedirect = {
 }
 
 export type SuperActionCommands = {
+  placeholder?: string
+  emptyLabel?: string
   commands: {
     label: ReactNode
     action: () => SuperActionPromise

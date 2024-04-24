@@ -1,11 +1,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   streamCommands,
+  streamToast,
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { redirect } from 'next/navigation'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { z } from 'zod'
+import { Button } from '../ui/button'
 
 export const CommandsButton = () => {
   return (
@@ -43,6 +46,8 @@ export const CommandsButton = () => {
               )
 
             streamCommands({
+              placeholder: 'Find others who like to party...',
+              emptyLabel: 'No party animals found.',
               commands: stargazers.map((stargazer) => ({
                 label: (
                   <>
@@ -63,7 +68,19 @@ export const CommandsButton = () => {
                 action: async () => {
                   'use server'
                   return superAction(async () => {
-                    redirect(stargazer.html_url)
+                    streamToast({
+                      title: `${stargazer.login} likes to party!`,
+                      description: (
+                        <>
+                          <Button asChild>
+                            <Link href={stargazer.html_url} target="blank">
+                              Visit Github Profile
+                              <ExternalLink className="size-4 ml-1" />
+                            </Link>
+                          </Button>
+                        </>
+                      ),
+                    })
                   })
                 },
               })),

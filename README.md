@@ -10,6 +10,7 @@
   - Keyboard-Shortcuts
   - streamToast()
   - streamDialog()
+  - streamCommands()
 
 ## Setup
 

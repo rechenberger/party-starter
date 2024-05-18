@@ -8,4 +8,5 @@ export default {
     url: process.env.DB_URL!,
     authToken: process.env.DB_TOKEN!,
   },
+  dialect: 'sqlite',
 } satisfies Config

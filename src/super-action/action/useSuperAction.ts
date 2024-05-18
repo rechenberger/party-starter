@@ -1,6 +1,7 @@
 'use client'
 
 import { toast } from '@/components/ui/use-toast'
+import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import { useShowDialog } from '../dialog/DialogProvider'
 import { consumeSuperActionResponse } from './consumeSuperActionResponse'
@@ -20,15 +21,16 @@ export const useSuperAction = (options: UseSuperActionOptions) => {
   const { action, disabled, catchToast, askForConfirmation, stopPropagation } =
     options
 
-  const streamDialog = useShowDialog()
+  const router = useRouter()
+  const showDialog = useShowDialog()
 
   const trigger = useCallback(
-    async (evt: MouseEvent) => {
+    async (evt?: MouseEvent) => {
       if (isLoading) return
       if (disabled) return
       if (stopPropagation) {
-        evt.stopPropagation()
-        evt.preventDefault()
+        evt?.stopPropagation()
+        evt?.preventDefault()
       }
       if (askForConfirmation) {
         if (!confirm('Are you sure?')) return
@@ -47,7 +49,14 @@ export const useSuperAction = (options: UseSuperActionOptions) => {
             })
           },
           onDialog: (d) => {
-            streamDialog(d)
+            showDialog(d)
+          },
+          onRedirect: (r) => {
+            if (r.type === 'push') {
+              router.push(r.url)
+            } else {
+              router.replace(r.url)
+            }
           },
           catch: catchToast
             ? (e) => {
@@ -63,12 +72,14 @@ export const useSuperAction = (options: UseSuperActionOptions) => {
       setIsLoading(false)
     },
     [
-      action,
-      askForConfirmation,
-      disabled,
       isLoading,
+      disabled,
       stopPropagation,
+      askForConfirmation,
+      action,
       catchToast,
+      showDialog,
+      router,
     ],
   )
 

@@ -9,8 +9,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { ChevronDown, LogOut } from 'lucide-react'
-import { auth, signIn, signOut } from './auth'
+import { ChevronDown, KeyRound, LogOut } from 'lucide-react'
+import { redirect } from 'next/navigation'
+import { auth, signOut } from './auth'
+import {
+  changePasswordWithRedirect,
+  loginWithRedirect,
+} from './loginWithRedirect'
 
 export const UserButton = async () => {
   const session = await auth()
@@ -21,7 +26,7 @@ export const UserButton = async () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
-              <span>{session.user?.name || 'User'}</span>
+              <span>{session.user?.name ?? session.user?.email ?? 'You'}</span>
               <ChevronDown className="w-4 h-4 ml-2" />
             </Button>
           </DropdownMenuTrigger>
@@ -39,13 +44,33 @@ export const UserButton = async () => {
                 hideIcon
                 className="w-full text-left"
                 size={'sm'}
+                action={changePasswordWithRedirect}
+              >
+                <KeyRound className="w-4 h-4 mr-2" />
+                Change Password
+              </ActionButton>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <ActionButton
+                variant={'ghost'}
+                hideIcon
+                className="w-full text-left"
+                size={'sm'}
                 action={async () => {
                   'use server'
-                  await signOut()
+                  const signOutResponse = await signOut({ redirect: false })
+                  const url = signOutResponse.redirect
+                  const response = await fetch(url)
+                  if (response.ok) {
+                    redirect(url)
+                  } else {
+                    redirect('/')
+                  }
                 }}
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
+                Logout
               </ActionButton>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -56,15 +81,8 @@ export const UserButton = async () => {
 
   return (
     <>
-      <ActionButton
-        variant={'outline'}
-        hideIcon
-        action={async () => {
-          'use server'
-          await signIn('discord')
-        }}
-      >
-        Sign In
+      <ActionButton variant={'outline'} hideIcon action={loginWithRedirect}>
+        Login
       </ActionButton>
     </>
   )

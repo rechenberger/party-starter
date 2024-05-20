@@ -10,15 +10,15 @@ import { atom, useAtomValue, useSetAtom } from 'jotai'
 import { ReactNode, useCallback } from 'react'
 import { SuperActionDialog } from '../action/createSuperAction'
 
-const renderAtom = atom<ReactNode>(null)
+export const dialogRenderAtom = atom<ReactNode>(null)
 
 export const DialogProvider = () => {
-  const render = useAtomValue(renderAtom)
+  const render = useAtomValue(dialogRenderAtom)
   return <>{render}</>
 }
 
 export const useShowDialog = () => {
-  const setRender = useSetAtom(renderAtom)
+  const setRender = useSetAtom(dialogRenderAtom)
   return useCallback(
     (dialog: SuperActionDialog) => {
       const newRender = dialog && <SuperDialog dialog={dialog} />
@@ -33,7 +33,7 @@ const SuperDialog = ({
 }: {
   dialog: NonNullable<SuperActionDialog>
 }) => {
-  const setRender = useSetAtom(renderAtom)
+  const setRender = useSetAtom(dialogRenderAtom)
   return (
     <>
       <Dialog

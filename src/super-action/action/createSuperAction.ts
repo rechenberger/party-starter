@@ -28,6 +28,15 @@ export type SuperActionRedirect = {
   statusCode: number
 }
 
+export type SuperActionCommands = {
+  placeholder?: string
+  emptyLabel?: string
+  commands: {
+    label: ReactNode
+    action: () => SuperActionPromise
+  }[]
+}
+
 export type SuperActionResponse<T> = {
   result?: T
   next?: Promise<SuperActionResponse<T>>
@@ -35,6 +44,7 @@ export type SuperActionResponse<T> = {
   dialog?: SuperActionDialog
   error?: SuperActionError
   redirect?: SuperActionRedirect
+  commands?: SuperActionCommands
 }
 
 type SuperActionContext = {
@@ -106,4 +116,9 @@ export const streamToast = (toast: SuperActionToast) => {
 export const streamDialog = (dialog: SuperActionDialog) => {
   const ctx = serverContext.getOrThrow()
   ctx.chain({ dialog })
+}
+
+export const streamCommands = (commands: SuperActionCommands) => {
+  const ctx = serverContext.getOrThrow()
+  ctx.chain({ commands })
 }

@@ -4,6 +4,7 @@ import { toast } from '@/components/ui/use-toast'
 import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import { useShowDialog } from '../dialog/DialogProvider'
+import { useShowCommandDialog } from '../dialog/showCommandDialog'
 import { consumeSuperActionResponse } from './consumeSuperActionResponse'
 import { SuperAction } from './createSuperAction'
 
@@ -23,6 +24,7 @@ export const useSuperAction = (options: UseSuperActionOptions) => {
 
   const router = useRouter()
   const showDialog = useShowDialog()
+  const showCommands = useShowCommandDialog()
 
   const trigger = useCallback(
     async (evt?: MouseEvent) => {
@@ -50,6 +52,9 @@ export const useSuperAction = (options: UseSuperActionOptions) => {
           },
           onDialog: (d) => {
             showDialog(d)
+          },
+          onCommands: (c) => {
+            showCommands(c)
           },
           onRedirect: (r) => {
             if (r.type === 'push') {

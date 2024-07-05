@@ -1,3 +1,4 @@
+import { CommandsButton } from '@/components/demo/CommandsButton'
 import { PartyButton } from '@/components/demo/PartyButton'
 import { Readme } from '@/components/demo/Readme'
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,7 @@ export default async function Page() {
         <h1 className="text-2xl lg:text-6xl">🎉 Welcome to the Party 🥳</h1>
         <div className="flex flex-col gap-2">
           <PartyButton />
+          <CommandsButton />
           <Link
             href="https://github.com/new?template_name=party-starter&template_owner=rechenberger"
             target="_blank"

@@ -7,7 +7,7 @@ export const ClientComp = () => {
   return (
     <>
       This is a client component
-      <ClientToServerComp action={Readme} className="animate-pulse" />
+      <ClientToServerComp action={Readme} className="bg-green-500/20" />
     </>
   )
 }

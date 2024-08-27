@@ -1,3 +1,5 @@
+'use server'
+
 import { Markdown } from '@/components/demo/Markdown'
 import { Card, CardContent } from '@/components/ui/card'
 import { promises as fs } from 'fs'

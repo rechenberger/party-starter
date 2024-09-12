@@ -1,3 +1,4 @@
+// import '@/components/demo/ClientComp'
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import { Toaster } from '@/components/ui/toaster'
 import { ActionCommandProvider } from '@/super-action/command/ActionCommandProvider'

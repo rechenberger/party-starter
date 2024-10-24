@@ -1,20 +1,5 @@
-import { ClientComp } from './ClientComp'
-import { createSuperState, toPublicState } from './createSuperState'
+import { redirect } from 'next/navigation'
 
-export default function Page() {
-  const superState = createSuperState({
-    publicState: {
-      name: 'John Doe',
-    },
-    secretState: {
-      id: Math.random().toString(),
-    },
-  })
-
-  return (
-    <>
-      <div>Dev</div>
-      <ClientComp superState={toPublicState(superState)} />
-    </>
-  )
+export default async function Page() {
+  redirect('/dev/dialog')
 }

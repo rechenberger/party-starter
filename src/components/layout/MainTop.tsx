@@ -17,6 +17,10 @@ export const MainTop = async () => {
       href: '/',
     },
     {
+      name: 'Dev',
+      href: '/dev',
+    },
+    {
       name: 'Me',
       href: '/auth/me',
       hidden: !isLoggedIn,

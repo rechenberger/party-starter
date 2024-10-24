@@ -5,6 +5,7 @@ import { SuperStateClient } from './SuperStateClient'
 type SuperStateCompProps<State> = {
   state: State
   update: (newState: State) => void
+  kvKey: string
 }
 
 type SuperStateProps<State> = {
@@ -20,14 +21,16 @@ export const SuperState = <State,>(props: SuperStateProps<State>) => {
 
     streamKv({
       key: kvKey,
-      value: <props.comp state={newState} update={update} />,
+      value: <props.comp state={newState} update={update} kvKey={kvKey} />,
     })
   }
 
   return (
     <SuperStateClient
       kvKey={kvKey}
-      fallback={<props.comp state={props.initialState} update={update} />}
+      fallback={
+        <props.comp state={props.initialState} update={update} kvKey={kvKey} />
+      }
     />
   )
 }

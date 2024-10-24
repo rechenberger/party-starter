@@ -1,6 +1,7 @@
 import {
   SuperActionDialog,
   SuperActionError,
+  SuperActionKv,
   SuperActionRedirect,
   SuperActionResponse,
   SuperActionToast,
@@ -12,6 +13,7 @@ export const consumeSuperActionResponse = async <Result, Input>(options: {
   onDialog?: (toast: SuperActionDialog) => void
   onRedirect?: (redirect: SuperActionRedirect) => void
   catch?: (error: SuperActionError) => void
+  onKv?: (kv: SuperActionKv) => void
 }): Promise<Result | undefined> => {
   const r = await options.response
   if (r.toast && options.onToast) {
@@ -22,6 +24,9 @@ export const consumeSuperActionResponse = async <Result, Input>(options: {
   }
   if (r.redirect && options.onRedirect) {
     options.onRedirect(r.redirect)
+  }
+  if (r.kv && options.onKv) {
+    options.onKv(r.kv)
   }
   if (r.error) {
     if (options.catch) {

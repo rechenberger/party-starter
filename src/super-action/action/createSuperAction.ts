@@ -31,6 +31,11 @@ export type SuperActionRedirect = {
   statusCode: number
 }
 
+export type SuperActionKv = {
+  key: string
+  value: any
+}
+
 export type SuperActionResponse<Result, Input> = {
   result?: Result
   next?: Promise<SuperActionResponse<Result, Input>>
@@ -39,6 +44,7 @@ export type SuperActionResponse<Result, Input> = {
   error?: SuperActionError
   redirect?: SuperActionRedirect
   action?: SuperAction<Result, undefined>
+  kv?: SuperActionKv
 }
 
 type SuperActionContext<Result, Input> = {
@@ -133,4 +139,9 @@ export const streamAction = <Result>(
 ) => {
   const ctx = serverContext.getOrThrow()
   ctx.chain({ action })
+}
+
+export const streamKv = (kv: SuperActionKv) => {
+  const ctx = serverContext.getOrThrow()
+  ctx.chain({ kv })
 }

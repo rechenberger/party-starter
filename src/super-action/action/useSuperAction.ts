@@ -1,11 +1,13 @@
 'use client'
 
 import { toast } from '@/components/ui/use-toast'
+import { useSetAtom } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import { useShowDialog } from '../dialog/DialogProvider'
 import { consumeSuperActionResponse } from './consumeSuperActionResponse'
 import { SuperAction, SuperActionDialog } from './createSuperAction'
+import { superActionKvAtom } from './superActionKvAtom'
 
 export type UseSuperActionOptions<Result, Input> = {
   action: SuperAction<Result, Input>
@@ -25,6 +27,7 @@ export const useSuperAction = <Result = undefined, Input = undefined>(
 
   const router = useRouter()
   const showDialog = useShowDialog()
+  const setKv = useSetAtom(superActionKvAtom)
 
   const trigger = useCallback(
     async (input: Input, evt?: MouseEvent) => {
@@ -60,6 +63,9 @@ export const useSuperAction = <Result = undefined, Input = undefined>(
           },
           onDialog: (d) => {
             showDialog(d)
+          },
+          onKv: (kv) => {
+            setKv((prev) => ({ ...prev, [kv.key]: kv.value }))
           },
           onRedirect: (r) => {
             if (r.type === 'push') {

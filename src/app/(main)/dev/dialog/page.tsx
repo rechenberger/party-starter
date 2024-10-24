@@ -1,5 +1,6 @@
 import { SimpleDataCard } from '@/components/simple/SimpleDataCard'
 import { Switch } from '@/components/ui/switch'
+import { db } from '@/db/db'
 import {
   streamDialog,
   streamToast,
@@ -39,10 +40,16 @@ const openMyDialog = async (myData: MyData) => {
   })
 }
 
-const MyDialog = ({ myData }: { myData: MyData }) => {
+const MyDialog = async ({ myData }: { myData: MyData }) => {
+  let users = await db.query.users.findMany()
+  users = users.filter(
+    (user) => myData.name && user.email?.includes(myData.name),
+  )
   return (
     <>
-      <SimpleDataCard data={myData} />
+      <SimpleDataCard
+        data={{ ...myData, users: users.map((user) => user.email) }}
+      />
       <ActionWrapper
         action={async () => {
           'use server'

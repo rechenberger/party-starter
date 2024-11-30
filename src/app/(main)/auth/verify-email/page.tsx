@@ -1,19 +1,25 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+'use client'
+
+import { Card, CardDescription, CardTitle } from '@/components/ui/card'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 const Home = ({
   searchParams: { redirect: redirectUrl },
 }: {
   searchParams: { redirect: string }
 }) => {
+  const router = useRouter()
+  useEffect(() => {
+    if (redirectUrl) {
+      router.replace(redirectUrl)
+    }
+  }, [redirectUrl, router])
+
   return (
     <Card className="self-center w-full max-w-md flex flex-col gap-4">
-      <CardContent className="flex flex-col gap-4 pt-6 items-center">
-        <div>Click to complete email login</div>
-        <a href={redirectUrl}>
-          <Button variant="default">Continue</Button>
-        </a>
-      </CardContent>
+      <CardTitle>Verifying Email</CardTitle>
+      <CardDescription>Redirecting...</CardDescription>
     </Card>
   )
 }

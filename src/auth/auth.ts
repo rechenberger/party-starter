@@ -14,14 +14,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db),
   providers: [
     Discord,
-    ...(hasEmailEnvVars
+    ...((hasEmailEnvVars
       ? [
           Nodemailer({
             from: process.env.EMAIL_FROM,
             server: process.env.SMTP_URL,
 
             sendVerificationRequest: async (params) => {
-              const h = headers()
+              const h = await headers()
               const baseUrl = h.get('Origin')
 
               const url = `${baseUrl}/auth/verify-email?redirect=${encodeURIComponent(
@@ -36,7 +36,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             },
           }),
         ]
-      : []),
+      : []) as any), // TODO: FIXME: looks like a type bug in next-auth
     CredentialsProvider,
     ImpersonateProvider,
   ],

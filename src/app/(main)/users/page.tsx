@@ -16,6 +16,7 @@ import {
   streamToast,
   superAction,
 } from '@/super-action/action/createSuperAction'
+import { streamRevalidatePath } from '@/super-action/action/streamRevalidatePath'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { ActionWrapper } from '@/super-action/button/ActionWrapper'
 import { eq } from 'drizzle-orm'
@@ -29,12 +30,13 @@ export const metadata: Metadata = {
 }
 
 export default async function Page({
-  searchParams: { filter },
+  searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     filter?: 'admins'
-  }
+  }>
 }) {
+  const { filter } = await searchParams
   await notFoundIfNotAdmin({ allowDev: true })
   const users = await db.query.users.findMany({
     with: {
@@ -165,6 +167,7 @@ export default async function Page({
                         return superAction(async () => {
                           await throwIfNotAdmin({ allowDev: true })
                           await impersonate({ userId: user.id })
+                          streamRevalidatePath('/', 'layout') // force refresh
                         })
                       }}
                     >

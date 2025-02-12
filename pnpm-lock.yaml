@@ -106,8 +106,8 @@ importers:
         specifier: 5.0.0-beta.25
         version: 5.0.0-beta.25(next@15.1.7(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nodemailer@6.9.14)(react@19.0.0)
       next-themes:
-        specifier: ^0.3.0
-        version: 0.3.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: ^0.4.4
+        version: 0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       nodemailer:
         specifier: ^6.9.14
         version: 6.9.14
@@ -3030,11 +3030,11 @@ packages:
       nodemailer:
         optional: true
 
-  next-themes@0.3.0:
-    resolution: {integrity: sha512-/QHIrsYpd6Kfk7xakK4svpDI5mmXP0gfvCoJdGpZQ2TOrQZmsW0QxjaiLn8wbIKjtm4BTSqLoix4lxYYOnLJ/w==}
+  next-themes@0.4.4:
+    resolution: {integrity: sha512-LDQ2qIOJF0VnuVrrMSMLrWGjRMkq+0mpgl6e0juCLqdJ+oo8Q84JRWT6Wh11VDQKkMMe+dVzDKLWs5n87T+PkQ==}
     peerDependencies:
-      react: ^16.8 || ^17 || ^18
-      react-dom: ^16.8 || ^17 || ^18
+      react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
 
   next-tick@1.1.0:
     resolution: {integrity: sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==}
@@ -5899,7 +5899,7 @@ snapshots:
       debug: 4.3.4
       enhanced-resolve: 5.15.0
       eslint: 8.49.0
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.18.1(eslint@8.49.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.18.1(eslint@8.49.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@8.49.0))(eslint@8.49.0)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.18.1(eslint@8.49.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.49.0)
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.18.1(eslint@8.49.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1)(eslint@8.49.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.2
@@ -5911,7 +5911,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.18.1(eslint@8.49.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.18.1(eslint@8.49.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@8.49.0))(eslint@8.49.0):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.18.1(eslint@8.49.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.49.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -5933,7 +5933,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.49.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.18.1(eslint@8.49.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.18.1(eslint@8.49.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@8.49.0))(eslint@8.49.0)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.18.1(eslint@8.49.0)(typescript@5.4.5))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.49.0)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -6934,7 +6934,7 @@ snapshots:
     optionalDependencies:
       nodemailer: 6.9.14
 
-  next-themes@0.3.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+  next-themes@0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)

@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="bg-background min-h-[100svh] flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}

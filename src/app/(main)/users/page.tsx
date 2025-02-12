@@ -167,7 +167,7 @@ export default async function Page({
                         return superAction(async () => {
                           await throwIfNotAdmin({ allowDev: true })
                           await impersonate({ userId: user.id })
-                          streamRevalidatePath('/', 'layout')
+                          streamRevalidatePath('/', 'layout') // force refresh
                         })
                       }}
                     >

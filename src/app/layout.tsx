@@ -1,9 +1,9 @@
 import { isDev } from '@/auth/dev'
-import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import { Toaster } from '@/components/ui/toaster'
 import { ActionCommandProvider } from '@/super-action/command/ActionCommandProvider'
 import { DialogProvider } from '@/super-action/dialog/DialogProvider'
 import type { Metadata } from 'next'
+import { ThemeProvider } from 'next-themes'
 import './globals.css'
 
 const titlePrefix = isDev() ? '[DEV] ' : ''

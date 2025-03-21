@@ -60,9 +60,7 @@ const InnerButton = forwardRef<
   return (
     <Button type="button" {...props} ref={ref}>
       {children}
-      {!hideIcon && (
-        <SuperLoadingIcon icon={icon} className="ml-2" isLoading={!!loading} />
-      )}
+      {!hideIcon && <SuperLoadingIcon icon={icon} isLoading={!!loading} />}
     </Button>
   )
 })

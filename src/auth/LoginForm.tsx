@@ -14,6 +14,7 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
             await signIn.email({
               email: data.email,
               password: data.password,
+              callbackURL: redirectUrl,
             })
           } else if (data.type === 'register') {
             // REGISTER
@@ -21,9 +22,10 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
               email: data.email,
               password: data.password,
               name: data.email,
+              callbackURL: redirectUrl,
             })
           } else if (data.type === 'forgotPassword') {
-            // CHANGE PASSWORD
+            // FORGOT PASSWORD
             let redirectTo = '/auth/change-password'
             if (redirectUrl) {
               redirectTo += `?redirect=${encodeURIComponent(redirectUrl)}`

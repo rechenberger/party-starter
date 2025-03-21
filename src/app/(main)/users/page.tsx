@@ -1,7 +1,6 @@
 import { notFoundIfNotAdmin, throwIfNotAdmin } from '@/auth/getIsAdmin'
 import { getMyUserId } from '@/auth/getMyUser'
 import { impersonate } from '@/auth/impersonate'
-import { LocalDateTime } from '@/components/demo/LocalDateTime'
 import { SimpleParamSelect } from '@/components/simple/SimpleParamSelect'
 import {
   Card,
@@ -12,7 +11,7 @@ import {
 } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 import { db } from '@/db/db'
-import { users as usersTable } from '@/db/schema-auth'
+import { user as usersTable } from '@/db/schema-auth'
 import {
   streamToast,
   superAction,
@@ -41,7 +40,7 @@ export default async function Page({
   const { filter } = await searchParams
   await notFoundIfNotAdmin({ allowDev: true })
   const myUserId = await getMyUserId()
-  const users = await db.query.users.findMany({
+  const users = await db.query.user.findMany({
     with: {
       accounts: true,
     },
@@ -66,9 +65,9 @@ export default async function Page({
         {users.map((user) => {
           const isAdmin = !!user.isAdmin
           const tags: string[] = []
-          if (user.passwordHash) tags.push('password')
+          if (user.accounts.some((a) => !!a.password)) tags.push('password')
           for (const account of user.accounts) {
-            tags.push(account.provider)
+            tags.push(account.providerId)
           }
           return (
             <Fragment key={user.id}>
@@ -92,16 +91,7 @@ export default async function Page({
                   <div>
                     <div>{user.email}</div>
                     <div className="text-muted-foreground">
-                      {user.emailVerified ? (
-                        <>
-                          Verified{' '}
-                          <LocalDateTime
-                            datetime={user.emailVerified.toISOString()}
-                          />
-                        </>
-                      ) : (
-                        <>Not verified</>
-                      )}
+                      {user.emailVerified ? <>Verified</> : <>Not verified</>}
                     </div>
                   </div>
                   <label className="">

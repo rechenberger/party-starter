@@ -4,7 +4,7 @@ import { Credentials } from './credentialsSchema'
 import { hashPassword } from './password'
 
 export const registerUser = async (credentials: Credentials) => {
-  const existingUser = await db.query.users.findFirst({
+  const existingUser = await db.query.user.findFirst({
     where: (s, { eq }) => eq(s.email, credentials.email),
   })
   if (existingUser) {
@@ -13,7 +13,7 @@ export const registerUser = async (credentials: Credentials) => {
 
   const passwordHash = await hashPassword({ password: credentials.password })
 
-  await db.insert(schema.users).values({
+  await db.insert(schema.user).values({
     id: crypto.randomUUID(),
     email: credentials.email,
     passwordHash,

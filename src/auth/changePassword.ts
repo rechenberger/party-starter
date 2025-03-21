@@ -12,10 +12,10 @@ export const changePassword = async ({
 }) => {
   const passwordHash = await hashPassword({ password })
   await db
-    .update(schema.users)
+    .update(schema.user)
     .set({
       passwordHash,
     })
-    .where(eq(schema.users.id, userId))
+    .where(eq(schema.user.id, userId))
     .execute()
 }

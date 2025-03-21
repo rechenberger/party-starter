@@ -11,6 +11,7 @@ export const CreateUserButton = () => {
   return (
     <>
       <ActionButton
+        size="sm"
         action={async () => {
           'use server'
           return superAction(async () => {

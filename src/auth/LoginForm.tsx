@@ -1,13 +1,8 @@
-import {
-  streamDialog,
-  superAction,
-} from '@/super-action/action/createSuperAction'
-import { ActionButton } from '@/super-action/button/ActionButton'
-import { CredentialsSignin } from 'next-auth'
-import { EmailNotVerifiedAuthorizeError } from './CredentialsProvider'
+import { superAction } from '@/super-action/action/createSuperAction'
+import { redirect } from 'next/navigation'
 import { LoginFormClient } from './LoginFormClient'
-import { signIn } from './auth'
-import { registerUser } from './registerUser'
+import { LoginSocial } from './LoginSocial'
+import { auth } from './auth'
 
 export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
   return (
@@ -18,51 +13,40 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
           return superAction(async () => {
             if (data.type === 'login') {
               // LOGIN
-              try {
-                await signIn('credentials', data)
-              } catch (error) {
-                if (error instanceof CredentialsSignin) {
-                  throw new Error('Invalid credentials')
-                } else if (error instanceof EmailNotVerifiedAuthorizeError) {
-                  // throw new Error('Email not verified')
-                  streamDialog({
-                    title: 'Email not verified',
-                    content: (
-                      <>
-                        <p>
-                          We sent you another verification email to
-                          {data.email}.
-                        </p>
-                        <p>
-                          Please open the email and click sign in to verify your
-                          email.
-                        </p>
-                      </>
-                    ),
-                  })
-                  await signIn('nodemailer', {
-                    email: data.email,
-                    redirect: false,
-                  })
-                } else {
-                  throw error
-                }
+              await auth.api.signInEmail({
+                body: {
+                  email: data.email,
+                  password: data.password,
+                  callbackURL: redirectUrl,
+                },
+              })
+              if (redirectUrl) {
+                redirect(redirectUrl)
               }
-              return
             } else if (data.type === 'register') {
               // REGISTER
-              await registerUser(data)
-              await signIn('nodemailer', data)
+              await auth.api.signUpEmail({
+                body: {
+                  email: data.email,
+                  password: data.password,
+                  name: data.email,
+                  callbackURL: redirectUrl,
+                },
+              })
+              if (redirectUrl) {
+                redirect(redirectUrl)
+              }
             } else if (data.type === 'forgotPassword') {
-              // CHANGE PASSWORD
+              // FORGOT PASSWORD
               let redirectTo = '/auth/change-password'
               if (redirectUrl) {
                 redirectTo += `?redirect=${encodeURIComponent(redirectUrl)}`
               }
-              await signIn('nodemailer', {
-                email: data.email,
-                redirectTo,
-              })
+              // await signIn('nodemailer', {
+              //   email: data.email,
+              //   redirectTo,
+              // })
+              throw new Error('TODO: forgot password')
             } else {
               const exhaustiveCheck: never = data
             }
@@ -70,15 +54,7 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
         }}
         alternatives={
           <>
-            <ActionButton
-              variant={'outline'}
-              action={async () => {
-                'use server'
-                await signIn('discord')
-              }}
-            >
-              Continue with Discord
-            </ActionButton>
+            <LoginSocial />
             {/* <ActionButton
               variant={'outline'}
               action={async () => {

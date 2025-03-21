@@ -1,12 +1,20 @@
 import { db } from '@/db/db'
-import { users } from '@/db/schema-auth'
+import { schema } from '@/db/schema-export'
 import { eq } from 'drizzle-orm'
 import { omit } from 'lodash-es'
+import { headers } from 'next/headers'
 import { auth } from './auth'
 import { loginWithRedirect } from './loginWithRedirect'
 
+export const getMySession = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+  return session
+}
+
 export const getMyUserId = async () => {
-  const session = await auth()
+  const session = await getMySession()
   return session?.user?.id
 }
 
@@ -26,8 +34,8 @@ export const getIsLoggedIn = async () => {
 export const getMyUser = async () => {
   const userId = await getMyUserId()
   if (!userId) return null
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, userId),
+  const user = await db.query.user.findFirst({
+    where: eq(schema.user.id, userId),
   })
   const parsed = omit(user, ['passwordHash'])
   return parsed

@@ -1,7 +1,6 @@
-import { relations } from 'drizzle-orm'
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
-export const user = sqliteTable('user_v2', {
+export const user = sqliteTable('user', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
@@ -9,12 +8,9 @@ export const user = sqliteTable('user_v2', {
   image: text('image'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
-
-  // Custom:
-  isAdmin: integer('isAdmin', { mode: 'boolean' }),
 })
 
-export const session = sqliteTable('session_v2', {
+export const session = sqliteTable('session', {
   id: text('id').primaryKey(),
   expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
   token: text('token').notNull().unique(),
@@ -27,7 +23,7 @@ export const session = sqliteTable('session_v2', {
     .references(() => user.id, { onDelete: 'cascade' }),
 })
 
-export const account = sqliteTable('account_v2', {
+export const account = sqliteTable('account', {
   id: text('id').primaryKey(),
   accountId: text('account_id').notNull(),
   providerId: text('provider_id').notNull(),
@@ -49,7 +45,7 @@ export const account = sqliteTable('account_v2', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 })
 
-export const verification = sqliteTable('verification_v2', {
+export const verification = sqliteTable('verification', {
   id: text('id').primaryKey(),
   identifier: text('identifier').notNull(),
   value: text('value').notNull(),
@@ -57,14 +53,3 @@ export const verification = sqliteTable('verification_v2', {
   createdAt: integer('created_at', { mode: 'timestamp' }),
   updatedAt: integer('updated_at', { mode: 'timestamp' }),
 })
-
-// CUSTOM:
-export const userRelations = relations(user, ({ many }) => ({
-  accounts: many(account),
-}))
-export const accountsRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
-  }),
-}))

@@ -132,6 +132,7 @@ export default async function Page({
                   </label>
                   <div className="flex flex-row gap-2 items-center justify-end">
                     <ActionButton
+                      size="sm"
                       variant={'outline'}
                       askForConfirmation={{
                         title: 'Really delete?',
@@ -161,6 +162,7 @@ export default async function Page({
                       Delete
                     </ActionButton>
                     <ActionButton
+                      size="sm"
                       variant={'outline'}
                       action={async () => {
                         'use server'

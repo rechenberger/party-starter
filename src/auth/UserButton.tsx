@@ -25,9 +25,9 @@ export const UserButton = async () => {
       <>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">
+            <Button variant="outline" size="sm">
               <span>{session.user?.name ?? session.user?.email ?? 'You'}</span>
-              <ChevronDown className="w-4 h-4 ml-2" />
+              <ChevronDown className="size-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
@@ -81,7 +81,12 @@ export const UserButton = async () => {
 
   return (
     <>
-      <ActionButton variant={'outline'} hideIcon action={loginWithRedirect}>
+      <ActionButton
+        size="sm"
+        variant={'outline'}
+        hideIcon
+        action={loginWithRedirect}
+      >
         Login
       </ActionButton>
     </>

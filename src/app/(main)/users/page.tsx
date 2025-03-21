@@ -64,11 +64,7 @@ export default async function Page({
       <div className="grid lg:grid-cols-3 gap-4">
         {users.map((user) => {
           const isAdmin = !!user.isAdmin
-          const tags: string[] = []
-          if (user.accounts.some((a) => !!a.password)) tags.push('password')
-          for (const account of user.accounts) {
-            tags.push(account.providerId)
-          }
+          const tags = user.accounts.map((a) => a.providerId)
           return (
             <Fragment key={user.id}>
               <Card>

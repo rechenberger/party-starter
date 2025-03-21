@@ -41,7 +41,7 @@ export const SimpleDataCard = (props: SimpleDataCardProps) => {
     return (
       <div
         className={cn(
-          'rounded-lg border text-card-foreground shadow-sm',
+          'rounded-lg border text-card-foreground shadow-xs',
           'font-mono rounded-md bg-border/50 text-xs',
           className,
         )}

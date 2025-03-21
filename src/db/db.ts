@@ -3,7 +3,7 @@ import { drizzle } from 'drizzle-orm/libsql'
 import * as schema from './schema'
 
 const client = createClient({
-  url: process.env.DB_URL!,
+  url: process.env.DB_URL! ?? 'file:./db.sqlite',
   authToken: process.env.DB_TOKEN!,
 })
 

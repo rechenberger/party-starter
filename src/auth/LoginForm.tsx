@@ -2,11 +2,10 @@ import {
   streamDialog,
   superAction,
 } from '@/super-action/action/createSuperAction'
-import { ActionButton } from '@/super-action/button/ActionButton'
 import { CredentialsSignin } from 'next-auth'
 import { EmailNotVerifiedAuthorizeError } from './CredentialsProvider'
 import { LoginFormClient } from './LoginFormClient'
-import { auth } from './betterAuth'
+import { LoginSocial } from './LoginSocial'
 import { signIn } from './betterAuthClient'
 import { registerUser } from './registerUser'
 
@@ -77,22 +76,7 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
         }}
         alternatives={
           <>
-            <ActionButton
-              variant={'outline'}
-              action={async () => {
-                'use server'
-                await auth.api.signInSocial({
-                  body: {
-                    provider: 'discord',
-                  },
-                })
-                // await signIn.social({
-                //   provider: 'discord',
-                // })
-              }}
-            >
-              Continue with Discord
-            </ActionButton>
+            <LoginSocial />
             {/* <ActionButton
               variant={'outline'}
               action={async () => {

@@ -16,7 +16,7 @@
     "@auth/core": "^0.37.2",
     "@auth/drizzle-adapter": "^0.9.0",
     "@hookform/resolvers": "^3.9.0",
-    "@libsql/client": "^0.6.0",
+    "@libsql/client": "^0.15.0",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-aspect-ratio": "^1.1.2",
@@ -55,8 +55,8 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^4.1.0",
-    "drizzle-orm": "^0.30.8",
-    "drizzle-zod": "^0.5.1",
+    "drizzle-orm": "^0.40.1",
+    "drizzle-zod": "^0.7.0",
     "embla-carousel-react": "^8.5.2",
     "eslint": "8.49.0",
     "eslint-config-next": "15.1.7",
@@ -92,7 +92,7 @@
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
     "dotenv-flow": "^4.1.0",
-    "drizzle-kit": "^0.21.2",
+    "drizzle-kit": "^0.30.5",
     "prettier": "^3.1.1"
   },
   "pnpm": {

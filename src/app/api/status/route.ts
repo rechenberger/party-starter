@@ -10,7 +10,7 @@ const checks = [
   {
     name: 'Database',
     test: async () => {
-      await db.query.users.findFirst()
+      await db.query.user.findFirst()
     },
   },
 ]

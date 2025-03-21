@@ -1,7 +1,5 @@
-import { db } from '@/db/db'
-import { schema } from '@/db/schema-export'
-import { eq } from 'drizzle-orm'
-import { hashPassword } from './password'
+import { headers } from 'next/headers'
+import { auth } from './betterAuth'
 
 export const changePassword = async ({
   userId,
@@ -10,12 +8,10 @@ export const changePassword = async ({
   userId: string
   password: string
 }) => {
-  const passwordHash = await hashPassword({ password })
-  await db
-    .update(schema.user)
-    .set({
-      passwordHash,
-    })
-    .where(eq(schema.user.id, userId))
-    .execute()
+  await auth.api.setPassword({
+    body: {
+      newPassword: password,
+    },
+    headers: await headers(),
+  })
 }

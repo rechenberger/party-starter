@@ -1,7 +1,6 @@
 import { db } from '@/db/db'
-import { schema } from '@/db/schema-export'
+import { auth } from './betterAuth'
 import { Credentials } from './credentialsSchema'
-import { hashPassword } from './password'
 
 export const registerUser = async (credentials: Credentials) => {
   const existingUser = await db.query.user.findFirst({
@@ -11,11 +10,11 @@ export const registerUser = async (credentials: Credentials) => {
     throw new Error('Email already taken')
   }
 
-  const passwordHash = await hashPassword({ password: credentials.password })
-
-  await db.insert(schema.user).values({
-    id: crypto.randomUUID(),
-    email: credentials.email,
-    passwordHash,
+  await auth.api.signUpEmail({
+    body: {
+      email: credentials.email,
+      password: credentials.password,
+      name: credentials.email,
+    },
   })
 }

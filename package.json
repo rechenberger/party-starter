@@ -79,6 +79,7 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "4.0.15",
     "tailwindcss-animate": "^1.0.7",
+    "tw-animate-css": "^1.2.4",
     "typescript": "5.4.5",
     "vaul": "^1.1.2",
     "zod": "^3.22.4"

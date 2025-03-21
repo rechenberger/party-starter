@@ -155,6 +155,7 @@ export default async function Page({
                       variant={'outline'}
                       disabled={myUserId === user.id}
                       icon={myUserId === user.id ? <Check /> : undefined}
+                      catchToast
                       action={async () => {
                         'use server'
                         return superAction(async () => {

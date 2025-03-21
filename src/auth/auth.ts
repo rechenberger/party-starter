@@ -3,6 +3,7 @@ import { schema } from '@/db/schema-export'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { nextCookies } from 'better-auth/next-js'
+import { loginAsPlugin } from './loginAsPlugin'
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -18,5 +19,5 @@ export const auth = betterAuth({
       clientSecret: process.env.AUTH_DISCORD_SECRET!,
     },
   },
-  plugins: [nextCookies()],
+  plugins: [loginAsPlugin(), nextCookies()],
 })

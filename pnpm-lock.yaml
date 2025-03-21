@@ -107,19 +107,19 @@ importers:
         version: 1.1.8(@types/react-dom@19.0.3(@types/react@19.0.8))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@sodefa/next-server-context':
         specifier: ^0.0.2
-        version: 0.0.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(zod@3.22.4)
+        version: 0.0.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(zod@3.24.2)
       '@tailwindcss/postcss':
         specifier: ^4.0.15
         version: 4.0.15
       '@teampilot/sdk':
         specifier: ^0.0.32
-        version: 0.0.32(zod@3.22.4)
+        version: 0.0.32(zod@3.24.2)
       '@types/node':
         specifier: 20.6.3
         version: 20.6.3
       ai:
         specifier: ^3.0.22
-        version: 3.0.22(react@19.0.0)(solid-js@1.8.16)(svelte@4.2.14)(vue@3.4.21(typescript@5.4.5))(zod@3.22.4)
+        version: 3.0.22(react@19.0.0)(solid-js@1.8.16)(svelte@4.2.14)(vue@3.4.21(typescript@5.4.5))(zod@3.24.2)
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -143,7 +143,7 @@ importers:
         version: 0.40.1(@libsql/client@0.15.0)(gel@2.0.1)(kysely@0.27.6)
       drizzle-zod:
         specifier: ^0.7.0
-        version: 0.7.0(drizzle-orm@0.40.1(@libsql/client@0.15.0)(gel@2.0.1)(kysely@0.27.6))(zod@3.22.4)
+        version: 0.7.0(drizzle-orm@0.40.1(@libsql/client@0.15.0)(gel@2.0.1)(kysely@0.27.6))(zod@3.24.2)
       embla-carousel-react:
         specifier: ^8.5.2
         version: 8.5.2(react@19.0.0)
@@ -220,8 +220,8 @@ importers:
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@19.0.3(@types/react@19.0.8))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       zod:
-        specifier: ^3.22.4
-        version: 3.22.4
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@tailwindcss/typography':
         specifier: ^0.5.12
@@ -3203,7 +3203,6 @@ packages:
 
   libsql@0.5.1:
     resolution: {integrity: sha512-ePnm5zj6T//GKiTY/v5b0a272NX73hqdRORmD8gzz1nUui9051dtTt6t0XCrIqxwJAHSmQiZcfAx3YSASn9Y+A==}
-    cpu: [x64, arm64, wasm32]
     os: [darwin, linux, win32]
 
   lightningcss-darwin-arm64@1.29.2:
@@ -4308,9 +4307,6 @@ packages:
     peerDependencies:
       zod: ^3.22.4
 
-  zod@3.22.4:
-    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
-
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
 
@@ -4321,14 +4317,14 @@ snapshots:
 
   '@aashutoshrathi/word-wrap@1.2.6': {}
 
-  '@ai-sdk/provider-utils@0.0.0(zod@3.22.4)':
+  '@ai-sdk/provider-utils@0.0.0(zod@3.24.2)':
     dependencies:
       '@ai-sdk/provider': 0.0.0
       eventsource-parser: 1.1.2
       nanoid: 3.3.6
       secure-json-parse: 2.7.0
     optionalDependencies:
-      zod: 3.22.4
+      zod: 3.24.2
 
   '@ai-sdk/provider@0.0.0':
     dependencies:
@@ -5682,11 +5678,11 @@ snapshots:
       '@peculiar/asn1-schema': 2.3.15
       '@peculiar/asn1-x509': 2.3.15
 
-  '@sodefa/next-server-context@0.0.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(zod@3.22.4)':
+  '@sodefa/next-server-context@0.0.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(zod@3.24.2)':
     dependencies:
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
-      zod: 3.22.4
+      zod: 3.24.2
 
   '@swc/counter@0.1.3': {}
 
@@ -5764,10 +5760,10 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 4.0.15
 
-  '@teampilot/sdk@0.0.32(zod@3.22.4)':
+  '@teampilot/sdk@0.0.32(zod@3.24.2)':
     dependencies:
       rpc-anywhere: 1.7.0
-      zod: 3.22.4
+      zod: 3.24.2
 
   '@types/bcrypt@5.0.2':
     dependencies:
@@ -6042,10 +6038,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  ai@3.0.22(react@19.0.0)(solid-js@1.8.16)(svelte@4.2.14)(vue@3.4.21(typescript@5.4.5))(zod@3.22.4):
+  ai@3.0.22(react@19.0.0)(solid-js@1.8.16)(svelte@4.2.14)(vue@3.4.21(typescript@5.4.5))(zod@3.24.2):
     dependencies:
       '@ai-sdk/provider': 0.0.0
-      '@ai-sdk/provider-utils': 0.0.0(zod@3.22.4)
+      '@ai-sdk/provider-utils': 0.0.0(zod@3.24.2)
       eventsource-parser: 1.1.2
       json-schema: 0.4.0
       jsondiffpatch: 0.6.0
@@ -6056,13 +6052,13 @@ snapshots:
       swr: 2.2.0(react@19.0.0)
       swr-store: 0.10.6
       swrv: 1.0.4(vue@3.4.21(typescript@5.4.5))
-      zod-to-json-schema: 3.22.5(zod@3.22.4)
+      zod-to-json-schema: 3.22.5(zod@3.24.2)
     optionalDependencies:
       react: 19.0.0
       solid-js: 1.8.16
       svelte: 4.2.14
       vue: 3.4.21(typescript@5.4.5)
-      zod: 3.22.4
+      zod: 3.24.2
 
   ajv@6.12.6:
     dependencies:
@@ -6488,10 +6484,10 @@ snapshots:
       gel: 2.0.1
       kysely: 0.27.6
 
-  drizzle-zod@0.7.0(drizzle-orm@0.40.1(@libsql/client@0.15.0)(gel@2.0.1)(kysely@0.27.6))(zod@3.22.4):
+  drizzle-zod@0.7.0(drizzle-orm@0.40.1(@libsql/client@0.15.0)(gel@2.0.1)(kysely@0.27.6))(zod@3.24.2):
     dependencies:
       drizzle-orm: 0.40.1(@libsql/client@0.15.0)(gel@2.0.1)(kysely@0.27.6)
-      zod: 3.22.4
+      zod: 3.24.2
 
   embla-carousel-react@8.5.2(react@19.0.0):
     dependencies:
@@ -8646,11 +8642,9 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod-to-json-schema@3.22.5(zod@3.22.4):
+  zod-to-json-schema@3.22.5(zod@3.24.2):
     dependencies:
-      zod: 3.22.4
-
-  zod@3.22.4: {}
+      zod: 3.24.2
 
   zod@3.24.2: {}
 

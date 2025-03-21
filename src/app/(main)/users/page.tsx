@@ -1,4 +1,5 @@
 import { notFoundIfNotAdmin, throwIfNotAdmin } from '@/auth/getIsAdmin'
+import { getMyUserId } from '@/auth/getMyUser'
 import { impersonate } from '@/auth/impersonate'
 import { LocalDateTime } from '@/components/demo/LocalDateTime'
 import { SimpleParamSelect } from '@/components/simple/SimpleParamSelect'
@@ -20,6 +21,7 @@ import { streamRevalidatePath } from '@/super-action/action/streamRevalidatePath
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { ActionWrapper } from '@/super-action/button/ActionWrapper'
 import { eq } from 'drizzle-orm'
+import { Check } from 'lucide-react'
 import { Metadata } from 'next'
 import { revalidatePath } from 'next/cache'
 import { Fragment } from 'react'
@@ -38,6 +40,7 @@ export default async function Page({
 }) {
   const { filter } = await searchParams
   await notFoundIfNotAdmin({ allowDev: true })
+  const myUserId = await getMyUserId()
   const users = await db.query.users.findMany({
     with: {
       accounts: true,
@@ -132,6 +135,7 @@ export default async function Page({
                   </label>
                   <div className="flex flex-row gap-2 items-center justify-end">
                     <ActionButton
+                      size="sm"
                       variant={'outline'}
                       askForConfirmation={{
                         title: 'Really delete?',
@@ -161,7 +165,10 @@ export default async function Page({
                       Delete
                     </ActionButton>
                     <ActionButton
+                      size="sm"
                       variant={'outline'}
+                      disabled={myUserId === user.id}
+                      icon={myUserId === user.id ? <Check /> : undefined}
                       action={async () => {
                         'use server'
                         return superAction(async () => {

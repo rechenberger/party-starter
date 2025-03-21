@@ -1,4 +1,4 @@
-import { Suspense, type ReactNode } from "react";
+import { Suspense, type ReactNode } from 'react'
 
 export const SuspenseLoader = ({ children }: { children?: ReactNode }) => {
   return (
@@ -11,5 +11,5 @@ export const SuspenseLoader = ({ children }: { children?: ReactNode }) => {
     >
       {children}
     </Suspense>
-  );
-};
+  )
+}

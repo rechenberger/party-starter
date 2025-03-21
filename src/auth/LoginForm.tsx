@@ -6,6 +6,7 @@ import { ActionButton } from '@/super-action/button/ActionButton'
 import { CredentialsSignin } from 'next-auth'
 import { EmailNotVerifiedAuthorizeError } from './CredentialsProvider'
 import { LoginFormClient } from './LoginFormClient'
+import { auth } from './betterAuth'
 import { signIn } from './betterAuthClient'
 import { registerUser } from './registerUser'
 
@@ -80,9 +81,14 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
               variant={'outline'}
               action={async () => {
                 'use server'
-                await signIn.social({
-                  provider: 'discord',
+                await auth.api.signInSocial({
+                  body: {
+                    provider: 'discord',
+                  },
                 })
+                // await signIn.social({
+                //   provider: 'discord',
+                // })
               }}
             >
               Continue with Discord

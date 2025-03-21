@@ -3,7 +3,7 @@ import { schema } from '@/db/schema-export'
 import { eq } from 'drizzle-orm'
 import { omit } from 'lodash-es'
 import { headers } from 'next/headers'
-import { auth } from './betterAuth'
+import { auth } from './auth'
 import { loginWithRedirect } from './loginWithRedirect'
 
 export const getMySession = async () => {

@@ -1,5 +1,5 @@
 import { headers } from 'next/headers'
-import { auth } from './betterAuth'
+import { auth } from './auth'
 
 export const changePassword = async ({
   userId,

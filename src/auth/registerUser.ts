@@ -1,5 +1,5 @@
 import { db } from '@/db/db'
-import { auth } from './betterAuth'
+import { auth } from './auth'
 import { Credentials } from './credentialsSchema'
 
 export const registerUser = async (credentials: Credentials) => {

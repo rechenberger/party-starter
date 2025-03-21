@@ -12,7 +12,7 @@ import { ActionButton } from '@/super-action/button/ActionButton'
 import { ChevronDown, KeyRound, LogOut } from 'lucide-react'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { auth } from './betterAuth'
+import { auth } from './auth'
 import { getMySession } from './getMyUser'
 import {
   changePasswordWithRedirect,

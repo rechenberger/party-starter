@@ -2,11 +2,19 @@ import { db } from '@/db/db'
 import { users } from '@/db/schema-auth'
 import { eq } from 'drizzle-orm'
 import { omit } from 'lodash-es'
-import { auth } from './auth'
+import { headers } from 'next/headers'
+import { auth } from './betterAuth'
 import { loginWithRedirect } from './loginWithRedirect'
 
+export const getMySession = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+  return session
+}
+
 export const getMyUserId = async () => {
-  const session = await auth()
+  const session = await getMySession()
   return session?.user?.id
 }
 

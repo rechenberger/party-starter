@@ -6,7 +6,7 @@ import { ActionButton } from '@/super-action/button/ActionButton'
 import { CredentialsSignin } from 'next-auth'
 import { EmailNotVerifiedAuthorizeError } from './CredentialsProvider'
 import { LoginFormClient } from './LoginFormClient'
-import { signIn } from './auth'
+import { signIn } from './betterAuthClient'
 import { registerUser } from './registerUser'
 
 export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
@@ -19,7 +19,10 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
             if (data.type === 'login') {
               // LOGIN
               try {
-                await signIn('credentials', data)
+                await signIn.email({
+                  email: data.email,
+                  password: data.password,
+                })
               } catch (error) {
                 if (error instanceof CredentialsSignin) {
                   throw new Error('Invalid credentials')
@@ -40,10 +43,11 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
                       </>
                     ),
                   })
-                  await signIn('nodemailer', {
-                    email: data.email,
-                    redirect: false,
-                  })
+                  // await signIn('nodemailer', {
+                  //   email: data.email,
+                  //   redirect: false,
+                  // })
+                  throw new Error('TODO: send verification email')
                 } else {
                   throw error
                 }
@@ -52,17 +56,19 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
             } else if (data.type === 'register') {
               // REGISTER
               await registerUser(data)
-              await signIn('nodemailer', data)
+              // await signIn('nodemailer', data)
+              throw new Error('TODO: signup')
             } else if (data.type === 'forgotPassword') {
               // CHANGE PASSWORD
               let redirectTo = '/auth/change-password'
               if (redirectUrl) {
                 redirectTo += `?redirect=${encodeURIComponent(redirectUrl)}`
               }
-              await signIn('nodemailer', {
-                email: data.email,
-                redirectTo,
-              })
+              // await signIn('nodemailer', {
+              //   email: data.email,
+              //   redirectTo,
+              // })
+              throw new Error('TODO: forgot password')
             } else {
               const exhaustiveCheck: never = data
             }
@@ -74,7 +80,9 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
               variant={'outline'}
               action={async () => {
                 'use server'
-                await signIn('discord')
+                await signIn.social({
+                  provider: 'discord',
+                })
               }}
             >
               Continue with Discord

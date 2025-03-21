@@ -50,6 +50,7 @@
     "@types/node": "20.6.3",
     "ai": "^3.0.22",
     "bcrypt": "^5.1.1",
+    "better-auth": "^1.2.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",

@@ -8,7 +8,7 @@ export const impersonate = async ({ userId }: { userId: string }) => {
   // })
 
   try {
-    await auth.api.loginAsUser({
+    await auth.api.impersonate({
       body: {
         userId,
       },

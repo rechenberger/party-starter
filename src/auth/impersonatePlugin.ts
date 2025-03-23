@@ -6,12 +6,12 @@ import { deleteSessionCookie, setSessionCookie } from 'better-auth/cookies'
 import { z } from 'zod'
 import { throwIfNotAdmin } from './getIsAdmin'
 
-export const loginAsPlugin = () => {
+export const impersonatePlugin = () => {
   return {
-    id: 'login-as',
+    id: 'impersonate',
     endpoints: {
-      loginAsUser: createAuthEndpoint(
-        '/login-as/impersonate-user',
+      impersonate: createAuthEndpoint(
+        '/impersonate/impersonate-user',
         {
           method: 'POST',
           body: z.object({

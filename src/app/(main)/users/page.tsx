@@ -71,7 +71,7 @@ export default async function Page({
                 <CardHeader>
                   <CardTitle>{user.name ?? user.email}</CardTitle>
                   <CardDescription>{user.id}</CardDescription>
-                  {tags.length && (
+                  {!!tags.length && (
                     <div className="flex flex-row gap-2">
                       {tags.map((tag) => (
                         <Fragment key={tag}>

@@ -1,32 +1,34 @@
 import { ChangePasswordForm } from '@/auth/ChangePasswordForm'
-import { getIsLoggedIn } from '@/auth/getMyUser'
-import { loginWithRedirect } from '@/auth/loginWithRedirect'
 import { Card, CardContent } from '@/components/ui/card'
 import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 
 export const metadata: Metadata = {
-  title: 'Change Password',
+  title: 'Reset Password',
 }
 
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ redirect?: string }>
+  searchParams: Promise<{ redirect?: string; token?: string }>
 }) {
-  const { redirect } = await searchParams
-
-  const isLoggedIn = await getIsLoggedIn()
-  if (!isLoggedIn) {
-    await loginWithRedirect()
-  }
+  const { redirect, token } = await searchParams
 
   const redirectUrl = redirect && decodeURIComponent(redirect)
+
+  if (!token) {
+    notFound()
+  }
 
   return (
     <>
       <Card className="self-center w-full max-w-md flex flex-col gap-4">
         <CardContent className="flex flex-col gap-4 pt-6">
-          <ChangePasswordForm variant="change" redirectUrl={redirectUrl} />
+          <ChangePasswordForm
+            redirectUrl={redirectUrl}
+            variant="reset"
+            token={token}
+          />
         </CardContent>
       </Card>
     </>

@@ -1,7 +1,12 @@
 import { LoginForm } from '@/auth/LoginForm'
 import { getIsLoggedIn } from '@/auth/getMyUser'
 import { Card, CardContent } from '@/components/ui/card'
+import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+
+export const metadata: Metadata = {
+  title: 'Login',
+}
 
 export default async function Page({
   searchParams,

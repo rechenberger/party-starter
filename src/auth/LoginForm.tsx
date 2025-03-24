@@ -38,15 +38,16 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
               }
             } else if (data.type === 'forgotPassword') {
               // FORGOT PASSWORD
-              let redirectTo = '/auth/change-password'
-              if (redirectUrl) {
-                redirectTo += `?redirect=${encodeURIComponent(redirectUrl)}`
-              }
-              // await signIn('nodemailer', {
-              //   email: data.email,
-              //   redirectTo,
-              // })
-              throw new Error('TODO: forgot password')
+              let redirectTo = '/auth/reset-password'
+              // if (redirectUrl) {
+              //   redirectTo += `?redirect=${encodeURIComponent(redirectUrl)}`
+              // }
+              await auth.api.forgetPassword({
+                body: {
+                  email: data.email,
+                  redirectTo,
+                },
+              })
             } else {
               const exhaustiveCheck: never = data
             }

@@ -8,6 +8,7 @@ export const changePassword = async ({
   userId: string
   password: string
 }) => {
+  // TODO: does not work when user already has a password
   await auth.api.setPassword({
     body: {
       newPassword: password,

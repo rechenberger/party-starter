@@ -1,24 +1,19 @@
 // FROM: https://authjs.dev/getting-started/providers/resend#customization
 
-import { Theme } from '@auth/core/types'
-
-export const getDefaultSignInEmailHtml = (params: {
-  url: string
-  theme: Theme
-}) => {
-  const { url, theme } = params
+export const getDefaultSignInEmailHtml = (params: { url: string }) => {
+  const { url } = params
   const host = new URL(url).host
 
   const escapedHost = host.replace(/\./g, '&#8203;.')
 
-  const brandColor = theme.brandColor || '#346df1'
+  const brandColor = '#346df1'
   const color = {
     background: '#f9f9f9',
     text: '#444',
     mainBackground: '#fff',
     buttonBackground: brandColor,
     buttonBorder: brandColor,
-    buttonText: theme.buttonText || '#fff',
+    buttonText: '#fff',
   }
 
   return `

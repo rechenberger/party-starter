@@ -4,6 +4,7 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { nextCookies } from 'better-auth/next-js'
 import { impersonatePlugin } from './impersonatePlugin'
+import { sendVerificationRequestEmail } from './sendVerificationRequestEmail'
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -12,6 +13,16 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
+    sendResetPassword: async (data) => {},
+  },
+  emailVerification: {
+    sendVerificationEmail: async (data) => {
+      await sendVerificationRequestEmail({
+        email: data.user.email,
+        url: data.url,
+      })
+    },
   },
   socialProviders: {
     discord: {

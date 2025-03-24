@@ -19,36 +19,9 @@ export const ChangePasswordForm = async (props: {
       <ChangePasswordFormClient
         action={async (data) => {
           'use server'
-          const { redirectUrl, variant, token } = props
-          return superAction(async () => {
-            if (variant === 'change') {
-              const userId = await getMyUserIdOrThrow()
-              await changePassword({
-                password: data.password,
-                userId,
-              })
-
-              const description = redirectUrl
-                ? 'Redirecting...'
-                : 'Your password has been changed'
-
-              streamToast({
-                title: 'Password Changed!',
-                description,
-              })
-            } else if (variant === 'reset') {
-              await authClient.resetPassword({
-                newPassword: data.password,
-                token,
-              })
-            } else {
-              const _exhaustiveCheck: never = variant
-            }
-
-            if (redirectUrl) {
-              await new Promise((res) => setTimeout(res, 2000))
-            }
-            redirect(redirectUrl || '/')
+          return changePasswordAction({
+            ...props,
+            newPassword: data.password,
           })
         }}
         email={user?.email}
@@ -56,4 +29,50 @@ export const ChangePasswordForm = async (props: {
       />
     </>
   )
+}
+
+const changePasswordAction = ({
+  redirectUrl,
+  variant,
+  token,
+  newPassword,
+}: {
+  redirectUrl?: string
+  variant: 'reset' | 'change'
+  token?: string
+  newPassword: string
+}) => {
+  return superAction(async () => {
+    if (variant === 'change') {
+      const userId = await getMyUserIdOrThrow()
+      await changePassword({
+        password: newPassword,
+        userId,
+      })
+    } else if (variant === 'reset') {
+      await authClient.resetPassword({
+        newPassword,
+        token,
+      })
+      if (!redirectUrl) {
+        redirectUrl = '/'
+      }
+    } else {
+      const _exhaustiveCheck: never = variant
+    }
+
+    const description = redirectUrl
+      ? 'Redirecting...'
+      : 'Your password has been changed'
+
+    streamToast({
+      title: 'Password Changed!',
+      description,
+    })
+
+    if (redirectUrl) {
+      await new Promise((res) => setTimeout(res, 2000))
+      redirect(redirectUrl)
+    }
+  })
 }

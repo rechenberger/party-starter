@@ -5,7 +5,7 @@ import {
 import { redirect } from 'next/navigation'
 import { ChangePasswordFormClient } from './ChangePasswordFormClient'
 import { authClient } from './betterAuthClient'
-import { changePassword } from './changePassword'
+import { changeMyPassword } from './changeMyPassword'
 import { getMyUser, getMyUserIdOrThrow } from './getMyUser'
 
 export const ChangePasswordForm = async (props: {
@@ -45,7 +45,7 @@ const changePasswordAction = ({
   return superAction(async () => {
     if (variant === 'change') {
       const userId = await getMyUserIdOrThrow()
-      await changePassword({
+      await changeMyPassword({
         password: newPassword,
         userId,
       })

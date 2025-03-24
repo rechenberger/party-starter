@@ -4,7 +4,7 @@ import { and, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { auth } from './auth'
 
-export const changePassword = async ({
+export const changeMyPassword = async ({
   userId,
   password,
 }: {

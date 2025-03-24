@@ -39,9 +39,10 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
             } else if (data.type === 'forgotPassword') {
               // FORGOT PASSWORD
               let redirectTo = '/auth/reset-password'
-              // if (redirectUrl) {
-              //   redirectTo += `?redirect=${encodeURIComponent(redirectUrl)}`
-              // }
+              if (redirectUrl) {
+                // we have to base64 encode because better-auth cannot handle encoded urls
+                redirectTo += `?redirect=${btoa(redirectUrl)}`
+              }
               await auth.api.forgetPassword({
                 body: {
                   email: data.email,

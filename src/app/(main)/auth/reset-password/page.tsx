@@ -14,7 +14,8 @@ export default async function Page({
 }) {
   const { redirect, token } = await searchParams
 
-  const redirectUrl = redirect && decodeURIComponent(redirect)
+  // we have to base64 decode because better-auth cannot handle encoded urls
+  const redirectUrl = redirect && atob(redirect)
 
   if (!token) {
     notFound()

@@ -50,10 +50,13 @@ const changePasswordAction = ({
         userId,
       })
     } else if (variant === 'reset') {
-      await authClient.resetPassword({
+      const result = await authClient.resetPassword({
         newPassword,
         token,
       })
+      if (result.error) {
+        throw result.error
+      }
       if (!redirectUrl) {
         redirectUrl = '/'
       }

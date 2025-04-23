@@ -172,7 +172,7 @@ export async function AppSidebar({
       <SidebarContent>{/* <NavMain items={data.navMain} /> */}</SidebarContent>
       <SidebarFooter>
         {isAdminOrDev && <NavAdmin items={adminNavMenu} />}
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

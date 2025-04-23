@@ -1,5 +1,3 @@
-import { type LucideIcon } from 'lucide-react'
-
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -7,16 +5,17 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { Users } from 'lucide-react'
 
-export function NavAdmin({
-  items,
-}: {
-  items: {
-    title: string
-    url: string
-    icon?: LucideIcon
-  }[]
-}) {
+const items = [
+  {
+    title: 'Users',
+    url: '/users',
+    icon: Users,
+  },
+]
+
+export function NavAdmin() {
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Admin</SidebarGroupLabel>

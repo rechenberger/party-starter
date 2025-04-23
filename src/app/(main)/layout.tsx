@@ -7,7 +7,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="group/topheader">
+        <SidebarInset className="group/topheader flex flex-col gap-4 px-4">
           <TopHeader disableSeparator hideIfSecondTopHeaderExists></TopHeader>
           {children}
         </SidebarInset>

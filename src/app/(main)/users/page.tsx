@@ -3,6 +3,7 @@ import { getMyUserId } from '@/auth/getMyUser'
 import { impersonate } from '@/auth/impersonate'
 import { LocalDateTime } from '@/components/demo/LocalDateTime'
 import { SimpleParamSelect } from '@/components/simple/SimpleParamSelect'
+import { TopHeader } from '@/components/TopHeader'
 import {
   Card,
   CardContent,
@@ -50,18 +51,23 @@ export default async function Page({
 
   return (
     <>
-      <div className="flex flex-col md:flex-row gap-2 items-center">
-        <CardTitle className="flex-1">Users</CardTitle>
-        <SimpleParamSelect
-          paramKey="filter"
-          component="tabs"
-          options={[
-            { value: null, label: 'All Users' },
-            { value: 'admins', label: 'Admins' },
-          ]}
-        />
-        <CreateUserButton />
-      </div>
+      <TopHeader>
+        <div className="flex flex-1 flex-row justify-between gap-2 items-center">
+          <CardTitle className="flex-1">Users</CardTitle>
+          <div className="flex flex-col md:flex-row gap-2 items-center">
+            <SimpleParamSelect
+              paramKey="filter"
+              component="tabs"
+              options={[
+                { value: null, label: 'All Users' },
+                { value: 'admins', label: 'Admins' },
+              ]}
+            />
+          </div>
+          <CreateUserButton />
+        </div>
+      </TopHeader>
+
       <div className="grid lg:grid-cols-3 gap-4">
         {users.map((user) => {
           const isAdmin = !!user.isAdmin

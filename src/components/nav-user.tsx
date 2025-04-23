@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/sidebar'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { redirect } from 'next/navigation'
-import { UserDropdownMenuContent } from './UserDropdownMenuContent'
+import { ResponsiveDropdownMenuContent } from './ResponsiveDropdownMenuContent'
 
 export const NavUser = async () => {
   const user = await getMyUser()
@@ -68,7 +68,10 @@ export const NavUser = async () => {
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <UserDropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg">
+          <ResponsiveDropdownMenuContent
+            align="end"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+          >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
@@ -134,7 +137,7 @@ export const NavUser = async () => {
                 Logout
               </ActionButton>
             </DropdownMenuItem>
-          </UserDropdownMenuContent>
+          </ResponsiveDropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>

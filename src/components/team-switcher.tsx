@@ -1,39 +1,48 @@
-"use client"
+import { ChevronsUpDown, Plus } from 'lucide-react'
 
-import * as React from "react"
-import { ChevronsUpDown, Plus } from "lucide-react"
-
+import { getMyUser } from '@/auth/getMyUser'
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar'
+import { db } from '@/db/db'
+import { organizationMembershipsTable } from '@/db/schema'
+import { eq } from 'drizzle-orm'
+import { ResponsiveDropdownMenuContent } from './ResponsiveDropdownMenuContent'
+import SeededAvatar from './seeded-avatar'
 
-export function TeamSwitcher({
-  teams,
-}: {
-  teams: {
-    name: string
-    logo: React.ElementType
-    plan: string
-  }[]
-}) {
-  const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+export async function TeamSwitcher() {
+  // const { isMobile } = useSidebar()
+  // const [activeTeam, setActiveTeam] = React.useState(teams[0])
 
-  if (!activeTeam) {
+  // if (!activeTeam) {
+  //   return null
+  // }
+
+  // TODO: Maybe extract this into getMyMemberships()
+
+  const user = await getMyUser()
+  if (!user) {
     return null
   }
+  const memberships = await db.query.organizationMembershipsTable.findMany({
+    where: eq(organizationMembershipsTable.userId, user.id),
+    with: {
+      organization: true,
+    },
+  })
+
+  // const selectedMembership = memberships.find(
+  //   (membership) => membership.organization.slug === organizationSlug,
+  // )
 
   return (
     <SidebarMenu>
@@ -45,35 +54,38 @@ export function TeamSwitcher({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <activeTeam.logo className="size-4" />
+                {/* <activeTeam.logo className="size-4" /> */}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{activeTeam.name}</span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
+                <span className="truncate font-medium">
+                  {'activeTeam.name'}
+                </span>
+                <span className="truncate text-xs">{'activeTeam.plan'}</span>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+          <ResponsiveDropdownMenuContent
             align="start"
-            side={isMobile ? "bottom" : "right"}
-            sideOffset={4}
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">
               Teams
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            {memberships.map((membership, index) => (
               <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
+                key={membership.organization.id}
+                // onClick={() => setActiveTeam(memberships)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
-                  <team.logo className="size-3.5 shrink-0" />
+                  <SeededAvatar
+                    size={20}
+                    style="shape"
+                    value={membership.organization.slug}
+                  />
                 </div>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                {membership.organization.name}
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
@@ -83,7 +95,7 @@ export function TeamSwitcher({
               </div>
               <div className="text-muted-foreground font-medium">Add team</div>
             </DropdownMenuItem>
-          </DropdownMenuContent>
+          </ResponsiveDropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>

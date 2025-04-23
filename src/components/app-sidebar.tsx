@@ -1,15 +1,3 @@
-import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-} from 'lucide-react'
 import * as React from 'react'
 
 import { getIsAdmin } from '@/auth/getIsAdmin'
@@ -22,7 +10,10 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar'
+import { Suspense } from 'react'
 import { NavMain } from './nav-main'
+import { TeamSwitcher } from './team-switcher'
+import { Skeleton } from './ui/skeleton'
 
 export async function AppSidebar({
   ...props
@@ -30,13 +21,19 @@ export async function AppSidebar({
   const isAdminOrDev = await getIsAdmin({ allowDev: true })
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>{/* <TeamSwitcher teams={data.teams} /> */}</SidebarHeader>
+      <SidebarHeader>
+        <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
+          <TeamSwitcher />
+        </Suspense>
+      </SidebarHeader>
       <SidebarContent>
         <NavMain />
       </SidebarContent>
       <SidebarFooter>
         {isAdminOrDev && <NavAdmin />}
-        <NavUser />
+        <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
+          <NavUser />
+        </Suspense>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

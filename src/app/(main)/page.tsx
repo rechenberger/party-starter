@@ -1,5 +1,6 @@
 import { PartyButton } from '@/components/demo/PartyButton'
 import { Readme } from '@/components/demo/Readme'
+import { TopHeader } from '@/components/TopHeader'
 import { Button } from '@/components/ui/button'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
@@ -7,6 +8,7 @@ import Link from 'next/link'
 export default async function Page() {
   return (
     <>
+      <TopHeader>Hi was geht? </TopHeader>
       <div className="flex-1 flex flex-col items-center justify-center gap-12 py-8">
         <h1 className="text-2xl lg:text-6xl">🎉 Welcome to the Party 🥳</h1>
         <div className="flex flex-col gap-2">

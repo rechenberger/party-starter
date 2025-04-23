@@ -13,10 +13,11 @@
     "ts:check": "tsc --noEmit"
   },
   "dependencies": {
-    "@auth/core": "^0.37.2",
-    "@auth/drizzle-adapter": "^0.9.0",
+    "@auth/core": "^0.39.0",
+    "@auth/drizzle-adapter": "^1.9.0",
     "@hookform/resolvers": "^3.9.0",
-    "@libsql/client": "^0.6.0",
+    "@neondatabase/serverless": "^1.0.0",
+    "@node-rs/argon2": "^2.0.2",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-aspect-ratio": "^1.1.2",
@@ -49,12 +50,11 @@
     "@teampilot/sdk": "^0.0.32",
     "@types/node": "20.6.3",
     "ai": "^3.0.22",
-    "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^4.1.0",
-    "drizzle-orm": "^0.30.8",
+    "drizzle-orm": "^0.42.0",
     "drizzle-zod": "^0.5.1",
     "embla-carousel-react": "^8.5.2",
     "eslint": "8.49.0",
@@ -63,6 +63,7 @@
     "jotai": "^2.8.0",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.483.0",
+    "nanoid": "^5.1.5",
     "next": "15.1.7",
     "next-auth": "5.0.0-beta.25",
     "next-themes": "^0.4.4",
@@ -81,6 +82,7 @@
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.4.5",
     "vaul": "^1.1.2",
+    "ws": "^8.18.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -90,8 +92,9 @@
     "@types/nodemailer": "^6.4.15",
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
+    "@types/ws": "^8.18.1",
     "dotenv-flow": "^4.1.0",
-    "drizzle-kit": "^0.21.2",
+    "drizzle-kit": "^0.31.0",
     "prettier": "^3.1.1"
   },
   "pnpm": {

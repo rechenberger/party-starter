@@ -1,10 +1,18 @@
-import { createClient } from '@libsql/client'
-import { drizzle } from 'drizzle-orm/libsql'
-import * as schema from './schema'
+import { Client, neon, neonConfig } from '@neondatabase/serverless'
+import { drizzle as drizzleHttp } from 'drizzle-orm/neon-http'
+import { drizzle as drizzleServerless } from 'drizzle-orm/neon-serverless'
+import ws from 'ws'
+import { schema } from './schema-export'
 
-const client = createClient({
-  url: process.env.DB_URL!,
-  authToken: process.env.DB_TOKEN!,
+neonConfig.webSocketConstructor = ws
+
+const sql = neon(process.env.DATABASE_URL!)
+export const db = drizzleHttp(sql, {
+  schema,
 })
 
-export const db = drizzle(client, { schema })
+export const createClient = async () => {
+  const client = new Client(process.env.DATABASE_URL!)
+  await client.connect()
+  return { db: drizzleServerless(client, { schema }), client }
+}

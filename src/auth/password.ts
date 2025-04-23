@@ -1,7 +1,7 @@
-import bcrypt from 'bcrypt'
+import { hash, verify } from '@node-rs/argon2'
 
 export const hashPassword = async ({ password }: { password: string }) => {
-  return bcrypt.hash(password, 10)
+  return hash(password)
 }
 
 export const comparePasswords = async ({
@@ -11,5 +11,5 @@ export const comparePasswords = async ({
   password: string
   hash: string
 }) => {
-  return bcrypt.compare(password, hash)
+  return verify(hash, password)
 }

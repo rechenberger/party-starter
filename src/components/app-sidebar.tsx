@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import { getIsAdmin } from '@/auth/getIsAdmin'
 import { NavAdmin } from '@/components/nav-admin'
 import { NavUser } from '@/components/nav-user'
@@ -13,9 +11,11 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar'
 import Link from 'next/link'
+import * as React from 'react'
 import { Suspense } from 'react'
 import { NavMain } from './nav-main'
-import { OrgSwitcher } from './OrgSwitchter'
+import { NavSelectOrgs } from './NavSelectOrgs'
+import { OrgSwitcher } from './OrgSwitcher'
 import { Skeleton } from './ui/skeleton'
 
 export async function AppSidebar({
@@ -44,12 +44,16 @@ export async function AppSidebar({
           </SidebarMenuItem>
         </SidebarMenu>
 
-        <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
-          <OrgSwitcher orgSlug={orgSlug} />
-        </Suspense>
+        {!!orgSlug && (
+          <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
+            <OrgSwitcher orgSlug={orgSlug} />
+          </Suspense>
+        )}
       </SidebarHeader>
       <SidebarContent>
-        <NavMain />
+        <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
+          {!!orgSlug ? <NavMain /> : <NavSelectOrgs />}
+        </Suspense>
       </SidebarContent>
       <SidebarFooter>
         {isAdminOrDev && <NavAdmin />}

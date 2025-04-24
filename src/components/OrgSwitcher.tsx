@@ -1,6 +1,5 @@
 import { ChevronsUpDown, Plus } from 'lucide-react'
 
-import { getMyUser } from '@/auth/getMyUser'
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -13,31 +12,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { db } from '@/db/db'
-import { organizationMembershipsTable } from '@/db/schema'
+import { getMyMemberships } from '@/organization/getMyMembershipts'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 import { ResponsiveDropdownMenuContent } from './ResponsiveDropdownMenuContent'
 import SeededAvatar from './seeded-avatar'
 
 export const OrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
-  // TODO: Maybe extract this into getMyMemberships()
-  const user = await getMyUser()
-  if (!user) {
-    return null
-  }
-
-  // TODO: Rename Table Stuff: No Table at the end
-  const memberships = await db.query.organizationMembershipsTable.findMany({
-    where: eq(organizationMembershipsTable.userId, user.id),
-    with: {
-      organization: true,
-    },
-  })
-
-  let selectedMembership = memberships.find(
+  const memberships = await getMyMemberships()
+  const selectedMembership = memberships.find(
     (membership) => membership.organization.slug === orgSlug,
   )
 

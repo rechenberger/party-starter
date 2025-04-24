@@ -10,7 +10,6 @@ export default async function Layout({
   params: Promise<{ orgSlug: string }>
 }) {
   const { orgSlug } = await params
-  console.log(await params)
   return (
     <>
       <SidebarProvider>

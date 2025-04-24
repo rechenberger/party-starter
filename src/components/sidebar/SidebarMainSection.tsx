@@ -33,7 +33,7 @@ const items = [
   },
 ]
 
-export function NavMain() {
+export const SidebarMainSection = () => {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>

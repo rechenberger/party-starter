@@ -1,30 +1,28 @@
-import { getIsAdmin } from '@/auth/getIsAdmin'
-import { NavAdmin } from '@/components/nav-admin'
-import { NavUser } from '@/components/nav-user'
+import { SidebarAdminSection } from '@/components/sidebar/SidebarAdminSection'
+import { SidebarUserSection } from '@/components/sidebar/SidebarUserSection'
 import {
-  Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarRail,
+  Sidebar as UiSidebar,
 } from '@/components/ui/sidebar'
 import Link from 'next/link'
 import * as React from 'react'
 import { Suspense } from 'react'
-import { NavMain } from './nav-main'
-import { NavSelectOrgs } from './NavSelectOrgs'
-import { OrgSwitcher } from './OrgSwitcher'
-import { Skeleton } from './ui/skeleton'
+import { Skeleton } from '../ui/skeleton'
+import { SidebarMainSection } from './SidebarMainSection'
+import { SidebarOrgsSelectSection } from './SidebarOrgsSelectSection'
+import { SidebarOrgSwitcher } from './SidebarOrgSwitcher'
 
-export async function AppSidebar({
+export const Sidebar = ({
   orgSlug,
   ...props
-}: React.ComponentProps<typeof Sidebar> & { orgSlug?: string }) {
-  const isAdminOrDev = await getIsAdmin({ allowDev: true })
+}: React.ComponentProps<typeof UiSidebar> & { orgSlug?: string }) => {
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <UiSidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex flex-row gap-2 items-center p-2">
@@ -46,22 +44,24 @@ export async function AppSidebar({
 
         {!!orgSlug && (
           <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
-            <OrgSwitcher orgSlug={orgSlug} />
+            <SidebarOrgSwitcher orgSlug={orgSlug} />
           </Suspense>
         )}
       </SidebarHeader>
       <SidebarContent>
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
-          {!!orgSlug ? <NavMain /> : <NavSelectOrgs />}
+          {!!orgSlug ? <SidebarMainSection /> : <SidebarOrgsSelectSection />}
         </Suspense>
       </SidebarContent>
       <SidebarFooter>
-        {isAdminOrDev && <NavAdmin />}
+        <Suspense>
+          <SidebarAdminSection />
+        </Suspense>
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
-          <NavUser />
+          <SidebarUserSection />
         </Suspense>
       </SidebarFooter>
       <SidebarRail />
-    </Sidebar>
+    </UiSidebar>
   )
 }

@@ -1,5 +1,5 @@
 import { getMyUser } from '@/auth/getMyUser'
-import SeededAvatar from '@/components/seeded-avatar'
+import SeededAvatar from '@/components/SeededAvatar'
 import { Button } from '@/components/ui/button'
 import {
   Command,

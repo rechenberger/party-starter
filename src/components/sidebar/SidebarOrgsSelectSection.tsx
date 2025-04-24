@@ -1,15 +1,15 @@
 import { getMyMemberships } from '@/organization/getMyMembershipts'
 import Link from 'next/link'
 import { Fragment } from 'react'
-import SeededAvatar from './seeded-avatar'
+import SeededAvatar from '../SeededAvatar'
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
-} from './ui/sidebar'
+} from '../ui/sidebar'
 
-export const NavSelectOrgs = async () => {
+export const SidebarOrgsSelectSection = async () => {
   const memberships = await getMyMemberships()
 
   return (

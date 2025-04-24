@@ -1,3 +1,4 @@
+import { getIsAdmin } from '@/auth/getIsAdmin'
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -15,7 +16,9 @@ const items = [
   },
 ]
 
-export function NavAdmin() {
+export const SidebarAdminSection = async () => {
+  const isAdminOrDev = await getIsAdmin({ allowDev: true })
+  if (!isAdminOrDev) return null
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Admin</SidebarGroupLabel>

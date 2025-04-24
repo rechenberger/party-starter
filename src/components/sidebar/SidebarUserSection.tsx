@@ -23,9 +23,9 @@ import {
 } from '@/components/ui/sidebar'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { redirect } from 'next/navigation'
-import { ResponsiveDropdownMenuContent } from './ResponsiveDropdownMenuContent'
+import { ResponsiveDropdownMenuContent } from '../ResponsiveDropdownMenuContent'
 
-export const NavUser = async () => {
+export const SidebarUserSection = async () => {
   const user = await getMyUser()
 
   if (!user) {

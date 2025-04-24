@@ -1,4 +1,4 @@
-import { SidebarLayout } from '@/components/SidebarLayout'
+import { SidebarLayout } from '@/components/sidebar/SidebarLayout'
 
 export default async function Layout({
   children,

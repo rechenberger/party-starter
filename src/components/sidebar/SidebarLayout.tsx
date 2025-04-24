@@ -1,6 +1,6 @@
-import { AppSidebar } from './app-sidebar'
-import { TopHeader } from './TopHeader'
-import { SidebarInset, SidebarProvider } from './ui/sidebar'
+import { TopHeader } from '../TopHeader'
+import { SidebarInset, SidebarProvider } from '../ui/sidebar'
+import { Sidebar } from './Sidebar'
 
 export const SidebarLayout = async ({
   children,
@@ -13,7 +13,7 @@ export const SidebarLayout = async ({
   return (
     <>
       <SidebarProvider>
-        <AppSidebar orgSlug={orgSlug} />
+        <Sidebar orgSlug={orgSlug} />
         <SidebarInset className="group/topheader flex flex-col gap-4 px-4">
           <TopHeader disableSeparator hideIfSecondTopHeaderExists></TopHeader>
           {children}

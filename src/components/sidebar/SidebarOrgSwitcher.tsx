@@ -16,10 +16,10 @@ import { getMyMemberships } from '@/organization/getMyMembershipts'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { redirect } from 'next/navigation'
-import { ResponsiveDropdownMenuContent } from './ResponsiveDropdownMenuContent'
-import SeededAvatar from './seeded-avatar'
+import { ResponsiveDropdownMenuContent } from '../ResponsiveDropdownMenuContent'
+import SeededAvatar from '../SeededAvatar'
 
-export const OrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
+export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
   const memberships = await getMyMemberships()
   const selectedMembership = memberships.find(
     (membership) => membership.organization.slug === orgSlug,

@@ -1,4 +1,4 @@
-import { ChevronsUpDown, Globe, Plus } from 'lucide-react'
+import { ChevronsUpDown, Plus } from 'lucide-react'
 
 import { getMyUser } from '@/auth/getMyUser'
 import {
@@ -41,31 +41,6 @@ export const OrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
     (membership) => membership.organization.slug === orgSlug,
   )
 
-  const membershipData = {
-    orgName: selectedMembership?.organization.name ?? 'GLOBAL',
-    orgSlug: selectedMembership?.organization.slug ?? 'global',
-    isGlobal: !selectedMembership,
-  }
-
-  if (!selectedMembership) {
-    selectedMembership = {
-      organization: {
-        name: 'GLOBAL',
-        id: 'global',
-        slug: 'global',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      id: 'global',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: user.id,
-      organizationId: 'global',
-      role: 'member',
-      invitationCodeId: null,
-    }
-  }
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -76,19 +51,16 @@ export const OrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-                {membershipData.isGlobal ? (
-                  <Globe className="size-5" />
-                ) : (
-                  <SeededAvatar
-                    size={32}
-                    style="shape"
-                    value={membershipData.orgSlug}
-                  />
-                )}
+                <SeededAvatar
+                  size={32}
+                  style="shape"
+                  value={selectedMembership?.organization.slug ?? ''}
+                />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
-                  {membershipData.orgName}
+                  {selectedMembership?.organization.name ??
+                    'Select an organization'}
                 </span>
                 {/* <span className="truncate text-xs">{'activeTeam.plan'}</span> */}
               </div>
@@ -100,7 +72,7 @@ export const OrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Teams
+              Organizations
             </DropdownMenuLabel>
             {memberships.map((membership, index) => (
               <DropdownMenuItem

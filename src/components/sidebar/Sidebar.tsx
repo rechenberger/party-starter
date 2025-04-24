@@ -50,7 +50,11 @@ export const Sidebar = ({
       </SidebarHeader>
       <SidebarContent>
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
-          {!!orgSlug ? <SidebarOrgSection /> : <SidebarMainSection />}
+          {!!orgSlug ? (
+            <SidebarOrgSection orgSlug={orgSlug} />
+          ) : (
+            <SidebarMainSection />
+          )}
         </Suspense>
       </SidebarContent>
       <SidebarFooter>

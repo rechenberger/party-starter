@@ -15,7 +15,10 @@ import {
 } from '@/components/ui/sidebar'
 import { db } from '@/db/db'
 import { organizationMembershipsTable } from '@/db/schema'
+import { superAction } from '@/super-action/action/createSuperAction'
+import { ActionButton } from '@/super-action/button/ActionButton'
 import { eq } from 'drizzle-orm'
+import { redirect } from 'next/navigation'
 import { ResponsiveDropdownMenuContent } from './ResponsiveDropdownMenuContent'
 import SeededAvatar from './seeded-avatar'
 
@@ -102,17 +105,29 @@ export const OrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
             {memberships.map((membership, index) => (
               <DropdownMenuItem
                 key={membership.organization.id}
-                // onClick={() => setActiveTeam(memberships)}
                 className="gap-2 p-2"
+                asChild
               >
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  <SeededAvatar
-                    size={20}
-                    style="shape"
-                    value={membership.organization.slug}
-                  />
-                </div>
-                {membership.organization.name}
+                <ActionButton
+                  variant="ghost"
+                  className="w-full justify-start hocus:outline-none"
+                  hideIcon
+                  action={async () => {
+                    'use server'
+                    return superAction(async () => {
+                      redirect(`/org/${membership.organization.slug}`)
+                    })
+                  }}
+                >
+                  <div className="flex size-6 items-center justify-center rounded-md border">
+                    <SeededAvatar
+                      size={20}
+                      style="shape"
+                      value={membership.organization.slug}
+                    />
+                  </div>
+                  {membership.organization.name}
+                </ActionButton>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />

@@ -19,8 +19,9 @@ import { OrgSwitcher } from './OrgSwitchter'
 import { Skeleton } from './ui/skeleton'
 
 export async function AppSidebar({
+  orgSlug,
   ...props
-}: React.ComponentProps<typeof Sidebar>) {
+}: React.ComponentProps<typeof Sidebar> & { orgSlug?: string }) {
   const isAdminOrDev = await getIsAdmin({ allowDev: true })
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -44,7 +45,7 @@ export async function AppSidebar({
         </SidebarMenu>
 
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
-          <OrgSwitcher />
+          <OrgSwitcher orgSlug={orgSlug} />
         </Suspense>
       </SidebarHeader>
       <SidebarContent>

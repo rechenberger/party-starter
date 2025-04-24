@@ -12,6 +12,10 @@ import {
 export const SidebarMainSection = async () => {
   const memberships = await getMyMemberships()
 
+  if (memberships.length === 0) {
+    return null
+  }
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Organizations</SidebarGroupLabel>

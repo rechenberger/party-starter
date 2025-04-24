@@ -15,7 +15,7 @@ import {
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { NavMain } from './nav-main'
-import { TeamSwitcher } from './team-switcher'
+import { OrgSwitcher } from './OrgSwitchter'
 import { Skeleton } from './ui/skeleton'
 
 export async function AppSidebar({
@@ -44,7 +44,7 @@ export async function AppSidebar({
         </SidebarMenu>
 
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
-          <TeamSwitcher />
+          <OrgSwitcher />
         </Suspense>
       </SidebarHeader>
       <SidebarContent>

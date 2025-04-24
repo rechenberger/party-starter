@@ -1,4 +1,4 @@
-import { ChevronsUpDown, Plus } from 'lucide-react'
+import { ChevronsUpDown, Globe, Plus } from 'lucide-react'
 
 import { getMyUser } from '@/auth/getMyUser'
 import {
@@ -19,20 +19,14 @@ import { eq } from 'drizzle-orm'
 import { ResponsiveDropdownMenuContent } from './ResponsiveDropdownMenuContent'
 import SeededAvatar from './seeded-avatar'
 
-export async function TeamSwitcher() {
-  // const { isMobile } = useSidebar()
-  // const [activeTeam, setActiveTeam] = React.useState(teams[0])
-
-  // if (!activeTeam) {
-  //   return null
-  // }
-
+export const OrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
   // TODO: Maybe extract this into getMyMemberships()
-
   const user = await getMyUser()
   if (!user) {
     return null
   }
+
+  // TODO: Rename Table Stuff: No Table at the end
   const memberships = await db.query.organizationMembershipsTable.findMany({
     where: eq(organizationMembershipsTable.userId, user.id),
     with: {
@@ -40,9 +34,34 @@ export async function TeamSwitcher() {
     },
   })
 
-  // const selectedMembership = memberships.find(
-  //   (membership) => membership.organization.slug === organizationSlug,
-  // )
+  let selectedMembership = memberships.find(
+    (membership) => membership.organization.slug === orgSlug,
+  )
+
+  const membershipData = {
+    orgName: selectedMembership?.organization.name ?? 'GLOBAL',
+    orgSlug: selectedMembership?.organization.slug ?? 'global',
+    isGlobal: !selectedMembership,
+  }
+
+  if (!selectedMembership) {
+    selectedMembership = {
+      organization: {
+        name: 'GLOBAL',
+        id: 'global',
+        slug: 'global',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      id: 'global',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      userId: user.id,
+      organizationId: 'global',
+      role: 'member',
+      invitationCodeId: null,
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -53,14 +72,22 @@ export async function TeamSwitcher() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                {/* <activeTeam.logo className="size-4" /> */}
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                {membershipData.isGlobal ? (
+                  <Globe className="size-5" />
+                ) : (
+                  <SeededAvatar
+                    size={32}
+                    style="shape"
+                    value={membershipData.orgSlug}
+                  />
+                )}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
-                  {'activeTeam.name'}
+                  {membershipData.orgName}
                 </span>
-                <span className="truncate text-xs">{'activeTeam.plan'}</span>
+                {/* <span className="truncate text-xs">{'activeTeam.plan'}</span> */}
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>

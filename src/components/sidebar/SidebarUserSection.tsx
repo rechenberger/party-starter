@@ -1,4 +1,10 @@
-import { ChevronsUpDown, KeyRound, LogOut, UserRound } from 'lucide-react'
+import {
+  ChevronsUpDown,
+  KeyRound,
+  LogIn,
+  LogOut,
+  UserRound,
+} from 'lucide-react'
 
 import { signOut } from '@/auth/auth'
 import { getMyUser } from '@/auth/getMyUser'
@@ -37,7 +43,8 @@ export const SidebarUserSection = async () => {
           hideIcon
           action={loginWithRedirect}
         >
-          Login
+          <LogIn className="size-4" />
+          <span className="group-data-[collapsible=icon]:hidden">Login</span>
         </ActionButton>
       </>
     )

@@ -1,73 +1,30 @@
-'use client'
-
-import { ChevronRight, PartyPopperIcon } from 'lucide-react'
-
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+import { getMyMemberships } from '@/organization/getMyMembershipts'
+import Link from 'next/link'
+import { Fragment } from 'react'
+import SeededAvatar from '../SeededAvatar'
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-} from '@/components/ui/sidebar'
+} from '../ui/sidebar'
 
-const items = [
-  {
-    title: 'Party Starter',
-    url: '#',
-    icon: PartyPopperIcon,
-    isActive: true, // TODO: Code this
-    items: [
-      {
-        title: 'Welcome',
-        url: '/',
-      },
-    ],
-  },
-]
+export const SidebarMainSection = async () => {
+  const memberships = await getMyMemberships()
 
-export const SidebarMainSection = () => {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>Organizations</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
-          <Collapsible
-            key={item.title}
-            asChild
-            defaultOpen={item.isActive}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
-                        <a href={subItem.url}>
-                          <span>{subItem.title}</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
+        {memberships.map((membership) => (
+          <Fragment key={membership.organization.id}>
+            <SidebarMenuButton tooltip={membership.organization.id} asChild>
+              <Link href={`/org/${membership.organization.slug}`}>
+                <SeededAvatar size={20} value={membership.organization.slug} />
+                <span>{membership.organization.name}</span>
+              </Link>
+            </SidebarMenuButton>
+          </Fragment>
         ))}
       </SidebarMenu>
     </SidebarGroup>

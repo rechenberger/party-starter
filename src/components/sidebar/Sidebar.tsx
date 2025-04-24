@@ -14,7 +14,7 @@ import * as React from 'react'
 import { Suspense } from 'react'
 import { Skeleton } from '../ui/skeleton'
 import { SidebarMainSection } from './SidebarMainSection'
-import { SidebarOrgsSelectSection } from './SidebarOrgsSelectSection'
+import { SidebarOrgSection } from './SidebarOrgSection'
 import { SidebarOrgSwitcher } from './SidebarOrgSwitcher'
 
 export const Sidebar = ({
@@ -50,7 +50,7 @@ export const Sidebar = ({
       </SidebarHeader>
       <SidebarContent>
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
-          {!!orgSlug ? <SidebarMainSection /> : <SidebarOrgsSelectSection />}
+          {!!orgSlug ? <SidebarOrgSection /> : <SidebarMainSection />}
         </Suspense>
       </SidebarContent>
       <SidebarFooter>

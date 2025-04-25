@@ -12,7 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { getMyMemberships } from '@/organization/getMyMembershipts'
+import { getMyMemberships } from '@/organization/getMyMemberships'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { redirect } from 'next/navigation'

@@ -1,4 +1,4 @@
-import { getMyMemberships } from '@/organization/getMyMembershipts'
+import { getMyMemberships } from '@/organization/getMyMemberships'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import SeededAvatar from '../SeededAvatar'

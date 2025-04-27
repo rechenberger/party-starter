@@ -12,15 +12,21 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { getMyMemberships } from '@/organization/getMyMemberships'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ResponsiveDropdownMenuContent } from '../ResponsiveDropdownMenuContent'
 import SeededAvatar from '../SeededAvatar'
 
 export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
-  const memberships = await getMyMemberships()
+  const [memberships, userCanCreateOrg] = await Promise.all([
+    getMyMemberships(),
+    canUserCreateOrg(),
+  ])
+
   const selectedMembership = memberships.find(
     (membership) => membership.organization.slug === orgSlug,
   )
@@ -86,13 +92,21 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
                 </ActionButton>
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <Plus className="size-4" />
-              </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
-            </DropdownMenuItem>
+            {userCanCreateOrg && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="gap-2 p-2" asChild>
+                  <Link href="/create-org">
+                    <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
+                      <Plus className="size-4" />
+                    </div>
+                    <div className="text-muted-foreground font-medium">
+                      Add organization
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+              </>
+            )}
           </ResponsiveDropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

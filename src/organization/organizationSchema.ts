@@ -12,7 +12,7 @@ import {
 import { z } from 'zod'
 
 export const OrganizationRole = z.enum(['admin', 'member'])
-type OrganizationRole = z.infer<typeof OrganizationRole>
+export type OrganizationRole = z.infer<typeof OrganizationRole>
 
 const organizationRoleType = customType<{
   data: OrganizationRole

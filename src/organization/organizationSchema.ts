@@ -55,9 +55,9 @@ export const inviteCodesTable = pgTable('invite_code', {
   organizationId: text('organizationId')
     .notNull()
     .references(() => organizationsTable.id, { onDelete: 'cascade' }),
-  createdById: text('createdById')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+  createdById: text('createdById').references(() => users.id, {
+    onDelete: 'set null',
+  }),
   role: organizationRoleType('role').notNull(),
   comment: text('comment'),
   expiresAt: timestamp('expiresAt'),

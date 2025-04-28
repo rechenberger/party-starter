@@ -1,12 +1,12 @@
 import { TopHeader } from '@/components/TopHeader'
-import { getMyCurrentMembershipOrNotFound } from '@/organization/getMyCurrentMembership'
+import { getMyMembershipOrNotFound } from '@/organization/getMyMembership'
 
 export default async function OrgSettingsPage({
   params,
 }: {
   params: { orgSlug: string }
 }) {
-  await getMyCurrentMembershipOrNotFound({
+  await getMyMembershipOrNotFound({
     allowedRoles: ['admin'],
   })
   return <TopHeader>Organization Settings for {params.orgSlug}</TopHeader>

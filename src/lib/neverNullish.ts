@@ -1,9 +1,9 @@
-export const neverNullish = <T, Options>(
-  fn: (options: Options) => Promise<T | null | undefined>,
+export const neverNullish = <T extends (...args: any[]) => Promise<any>>(
+  fn: T,
   fallbackFn: () => Promise<never> | never,
-): ((options: Options) => Promise<T>) => {
-  return async (options: Options) => {
-    const result = await fn(options)
+): ((...options: Parameters<T>) => Promise<ReturnType<T>>) => {
+  return async (...options: Parameters<T>) => {
+    const result = await fn(...options)
     if (result === null || result === undefined) {
       return await fallbackFn()
     }

@@ -4,12 +4,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
 } from '@/components/ui/sidebar'
-import { getMyCurrentMembership } from '@/organization/getMyCurrentMembership'
+import { getMyMembershipOrNotFound } from '@/organization/getMyMembership'
 import { Building2, Laugh } from 'lucide-react'
 import Link from 'next/link'
 
 export const SidebarOrgSection = async ({ orgSlug }: { orgSlug: string }) => {
-  const membership = await getMyCurrentMembership()
+  const membership = await getMyMembershipOrNotFound()
 
   const items = [
     {

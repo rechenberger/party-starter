@@ -7,7 +7,7 @@ import { notFound } from 'next/navigation'
 import { getCurrentOrgSlug } from './getCurrentOrgSlug'
 import { OrganizationRole } from './organizationSchema'
 
-export const getMyCurrentMembership = async ({
+export const getMyMembership = async ({
   allowedRoles,
 }: {
   allowedRoles?: OrganizationRole[]
@@ -35,12 +35,9 @@ export const getMyCurrentMembership = async ({
   return org?.memberships.at(0)
 }
 
-export const getMyCurrentMembershipOrThrow = neverNullish(
-  getMyCurrentMembership,
+export const getMyMembershipOrThrow = neverNullish(
+  getMyMembership,
   throwError('Membership not found'),
 )
 
-export const getMyCurrentMembershipOrNotFound = neverNullish(
-  getMyCurrentMembership,
-  notFound,
-)
+export const getMyMembershipOrNotFound = neverNullish(getMyMembership, notFound)

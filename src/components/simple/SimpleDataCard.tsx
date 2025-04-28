@@ -9,8 +9,20 @@ export type SimpleDataCardProps = {
   classNameCell?: string
   formatKey?: (key: string) => string
   ignoreEmpty?: boolean
-}
-
+} & (
+  | {
+      truncate?: false
+      breakAll?: true
+    }
+  | {
+      truncate?: true
+      breakAll?: false
+    }
+  | {
+      truncate?: false
+      breakAll?: false
+    }
+)
 export const SimpleDataCard = (props: SimpleDataCardProps) => {
   const {
     data,
@@ -19,6 +31,8 @@ export const SimpleDataCard = (props: SimpleDataCardProps) => {
     classNameCell,
     formatKey = (key) => key,
     ignoreEmpty,
+    truncate = false,
+    breakAll = false,
   } = props
   if (depth === 0) {
     if (Array.isArray(data)) {
@@ -42,7 +56,9 @@ export const SimpleDataCard = (props: SimpleDataCardProps) => {
       <div
         className={cn(
           'rounded-lg border text-card-foreground shadow-xs',
-          'font-mono rounded-md bg-border/50 text-xs',
+          'font-mono rounded-md bg-border/50 text-xs overflow-auto',
+          truncate && 'whitespace-nowrap',
+          breakAll && 'break-all',
           className,
         )}
       >
@@ -51,8 +67,18 @@ export const SimpleDataCard = (props: SimpleDataCardProps) => {
     )
   }
 
-  const classNameCellDefault = cn('border p-2', classNameCell)
-  const classNameCellNullish = cn(classNameCellDefault, 'opacity-50')
+  const classNameCellDefault = cn(
+    'border p-2',
+    truncate && 'overflow-hidden text-ellipsis min-w-50',
+    breakAll && 'min-w-50',
+    classNameCell,
+  )
+  const classNameCellNullish = cn(
+    classNameCellDefault,
+    'opacity-50',
+    breakAll && 'break-normal min-w-fit',
+    truncate && 'min-w-fit',
+  )
 
   if (data === null) {
     return <div className={classNameCellNullish}>null</div>
@@ -67,12 +93,20 @@ export const SimpleDataCard = (props: SimpleDataCardProps) => {
   }
 
   if (typeof data === 'string' || typeof data === 'number') {
-    return <div className={classNameCellDefault}>{data}</div>
+    return (
+      <div className={classNameCellDefault} title={data.toString()}>
+        {data}
+      </div>
+    )
   }
 
   // is Date
   if (data instanceof Date) {
-    return <div className={classNameCellDefault}>{data.toISOString()}</div>
+    return (
+      <div className={classNameCellDefault} title={data.toISOString()}>
+        {data.toISOString()}
+      </div>
+    )
   }
 
   if (typeof data === 'object') {

@@ -18,14 +18,14 @@ export const getMyMembership = async ({
     return null
   }
 
-  const org = await db.query.organizationsTable.findFirst({
-    where: eq(schema.organizationsTable.slug, orgSlug),
+  const org = await db.query.organizations.findFirst({
+    where: eq(schema.organizations.slug, orgSlug),
     with: {
       memberships: {
         where: and(
-          eq(schema.organizationMembershipsTable.userId, user.id),
+          eq(schema.organizationMemberships.userId, user.id),
           allowedRoles
-            ? inArray(schema.organizationMembershipsTable.role, allowedRoles)
+            ? inArray(schema.organizationMemberships.role, allowedRoles)
             : undefined,
         ),
       },

@@ -41,14 +41,14 @@ export default async function CreateOrg() {
             const userId = await getMyUserIdOrThrow()
 
             const [org] = await db
-              .insert(schema.organizationsTable)
+              .insert(schema.organizations)
               .values({
                 name,
                 slug: slugify(name),
               })
               .returning()
 
-            await db.insert(schema.organizationMembershipsTable).values({
+            await db.insert(schema.organizationMemberships).values({
               userId,
               organizationId: org.id,
               role: 'admin',

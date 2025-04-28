@@ -50,8 +50,8 @@ async function OrganizationPickerInside({
   if (!user) {
     return null
   }
-  const memberships = await db.query.organizationMembershipsTable.findMany({
-    where: eq(schema.organizationMembershipsTable.userId, user.id),
+  const memberships = await db.query.organizationMemberships.findMany({
+    where: eq(schema.organizationMemberships.userId, user.id),
     with: {
       organization: true,
     },
@@ -135,7 +135,7 @@ async function OrganizationPickerInside({
                                 'use server'
                                 return superAction(async () => {
                                   const newOrg = await db
-                                    .insert(schema.organizationsTable)
+                                    .insert(schema.organizations)
                                     .values({
                                       name: data.name,
                                       slug: slugify(data.name),
@@ -143,7 +143,7 @@ async function OrganizationPickerInside({
                                     .returning()
 
                                   await db
-                                    .insert(schema.organizationMembershipsTable)
+                                    .insert(schema.organizationMemberships)
                                     .values({
                                       userId: user.id,
                                       organizationId: newOrg[0].id,

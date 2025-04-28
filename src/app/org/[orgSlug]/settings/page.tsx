@@ -54,8 +54,8 @@ export default async function OrgSettingsPage({
                     })
 
                     await db
-                      .delete(schema.organizationsTable)
-                      .where(eq(schema.organizationsTable.slug, params.orgSlug))
+                      .delete(schema.organizations)
+                      .where(eq(schema.organizations.slug, params.orgSlug))
 
                     redirect('/')
                   }}

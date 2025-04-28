@@ -12,8 +12,8 @@ export const getMyMemberships = async () => {
   }
 
   // TODO: Rename Table Stuff: No Table at the end
-  const memberships = await db.query.organizationMembershipsTable.findMany({
-    where: eq(schema.organizationMembershipsTable.userId, user.id),
+  const memberships = await db.query.organizationMemberships.findMany({
+    where: eq(schema.organizationMemberships.userId, user.id),
     with: {
       organization: true,
     },

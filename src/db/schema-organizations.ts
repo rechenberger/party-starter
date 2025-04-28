@@ -29,7 +29,7 @@ const organizationRoleType = customType<{
   },
 })
 
-export const organizationsTable = pgTable('organization', {
+export const organizations = pgTable('organization', {
   id: idColumn(),
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
@@ -38,15 +38,12 @@ export const organizationsTable = pgTable('organization', {
   slug: varchar('slug', { length: 255 }).notNull().unique(),
 })
 
-export const organizationsRelations = relations(
-  organizationsTable,
-  ({ many }) => ({
-    memberships: many(organizationMembershipsTable),
-    inviteCodes: many(inviteCodesTable),
-  }),
-)
+export const organizationsRelations = relations(organizations, ({ many }) => ({
+  memberships: many(organizationMemberships),
+  inviteCodes: many(inviteCodes),
+}))
 
-export const inviteCodesTable = pgTable('invite_code', {
+export const inviteCodes = pgTable('invite_code', {
   id: idColumn(),
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
@@ -54,7 +51,7 @@ export const inviteCodesTable = pgTable('invite_code', {
 
   organizationId: text('organizationId')
     .notNull()
-    .references(() => organizationsTable.id, { onDelete: 'cascade' }),
+    .references(() => organizations.id, { onDelete: 'cascade' }),
   createdById: text('createdById').references(() => users.id, {
     onDelete: 'set null',
   }),
@@ -65,22 +62,19 @@ export const inviteCodesTable = pgTable('invite_code', {
   currentUses: integer('currentUses'),
 })
 
-export const inviteCodesRelations = relations(
-  inviteCodesTable,
-  ({ one, many }) => ({
-    organization: one(organizationsTable, {
-      fields: [inviteCodesTable.organizationId],
-      references: [organizationsTable.id],
-    }),
-    createdBy: one(users, {
-      fields: [inviteCodesTable.createdById],
-      references: [users.id],
-    }),
-    memberships: many(organizationMembershipsTable),
+export const inviteCodesRelations = relations(inviteCodes, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [inviteCodes.organizationId],
+    references: [organizations.id],
   }),
-)
+  createdBy: one(users, {
+    fields: [inviteCodes.createdById],
+    references: [users.id],
+  }),
+  memberships: many(organizationMemberships),
+}))
 
-export const organizationMembershipsTable = pgTable('organization_membership', {
+export const organizationMemberships = pgTable('organization_membership', {
   id: idColumn(),
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
@@ -90,28 +84,27 @@ export const organizationMembershipsTable = pgTable('organization_membership', {
     .references(() => users.id, { onDelete: 'cascade' }),
   organizationId: text('organizationId')
     .notNull()
-    .references(() => organizationsTable.id, { onDelete: 'cascade' }),
+    .references(() => organizations.id, { onDelete: 'cascade' }),
   role: organizationRoleType('role').notNull(),
-  invitationCodeId: text('invitationCodeId').references(
-    () => inviteCodesTable.id,
-    { onDelete: 'cascade' },
-  ),
+  invitationCodeId: text('invitationCodeId').references(() => inviteCodes.id, {
+    onDelete: 'cascade',
+  }),
 })
 
 export const organizationMembershipsRelations = relations(
-  organizationMembershipsTable,
+  organizationMemberships,
   ({ one }) => ({
     user: one(users, {
-      fields: [organizationMembershipsTable.userId],
+      fields: [organizationMemberships.userId],
       references: [users.id],
     }),
-    organization: one(organizationsTable, {
-      fields: [organizationMembershipsTable.organizationId],
-      references: [organizationsTable.id],
+    organization: one(organizations, {
+      fields: [organizationMemberships.organizationId],
+      references: [organizations.id],
     }),
-    invitationCode: one(inviteCodesTable, {
-      fields: [organizationMembershipsTable.invitationCodeId],
-      references: [inviteCodesTable.id],
+    invitationCode: one(inviteCodes, {
+      fields: [organizationMemberships.invitationCodeId],
+      references: [inviteCodes.id],
     }),
   }),
 )

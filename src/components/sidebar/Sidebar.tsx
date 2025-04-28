@@ -9,6 +9,7 @@ import {
   SidebarRail,
   Sidebar as UiSidebar,
 } from '@/components/ui/sidebar'
+import { ORGS } from '@/lib/starter.config'
 import Link from 'next/link'
 import * as React from 'react'
 import { Suspense } from 'react'
@@ -42,7 +43,7 @@ export const Sidebar = ({
           </SidebarMenuItem>
         </SidebarMenu>
 
-        {!!orgSlug && (
+        {!!orgSlug && ORGS.isActive && (
           <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
             <SidebarOrgSwitcher orgSlug={orgSlug} />
           </Suspense>
@@ -50,7 +51,7 @@ export const Sidebar = ({
       </SidebarHeader>
       <SidebarContent>
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
-          {!!orgSlug ? (
+          {!!orgSlug && ORGS.isActive ? (
             <SidebarOrgSection orgSlug={orgSlug} />
           ) : (
             <SidebarMainSection />

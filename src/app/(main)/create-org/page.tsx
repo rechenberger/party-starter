@@ -2,6 +2,7 @@ import { getMyUserIdOrThrow } from '@/auth/getMyUser'
 import { db } from '@/db/db'
 import * as schema from '@/db/schema'
 import { slugify } from '@/lib/slugify'
+import { ORGS } from '@/lib/starter.config'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { revalidatePath } from 'next/cache'
@@ -9,6 +10,10 @@ import { notFound, redirect } from 'next/navigation'
 import { CreateOrgFormClient } from './CreateOrgFormClient'
 
 export default async function CreateOrg() {
+  if (!ORGS.isActive) {
+    redirect('/')
+  }
+
   const userCanCreateOrg = await canUserCreateOrg()
 
   if (!userCanCreateOrg) {

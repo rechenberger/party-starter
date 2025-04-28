@@ -1,2 +1,17 @@
 export * from '@/components/sidebar/SidebarLayout'
-export { default } from '@/components/sidebar/SidebarLayout'
+import SidebarLayout from '@/components/sidebar/SidebarLayout'
+import { ORGS } from '@/lib/starter.config'
+import { redirect } from 'next/navigation'
+
+export default async function Layout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params?: Promise<{ orgSlug: string }>
+}) {
+  if (!ORGS.isActive) {
+    redirect('/')
+  }
+  return <SidebarLayout params={params}>{children}</SidebarLayout>
+}

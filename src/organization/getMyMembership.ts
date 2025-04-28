@@ -4,8 +4,8 @@ import { schema } from '@/db/schema-export'
 import { neverNullish, throwError } from '@/lib/neverNullish'
 import { and, eq, inArray } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
+import { OrganizationRole } from '../db/schema-organizations'
 import { getCurrentOrgSlug } from './getCurrentOrgSlug'
-import { OrganizationRole } from './organizationSchema'
 
 export const getMyMembership = async ({
   allowedRoles,

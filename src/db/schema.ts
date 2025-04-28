@@ -1,2 +1,2 @@
-export * from '../organization/organizationSchema'
 export * from './schema-auth'
+export * from './schema-organizations'

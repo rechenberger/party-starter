@@ -9,10 +9,20 @@ export type SimpleDataCardProps = {
   classNameCell?: string
   formatKey?: (key: string) => string
   ignoreEmpty?: boolean
-  truncate?: boolean
-  noWrap?: boolean
-}
-
+} & (
+  | {
+      truncate?: false
+      breakAll?: true
+    }
+  | {
+      truncate?: true
+      breakAll?: false
+    }
+  | {
+      truncate?: false
+      breakAll?: false
+    }
+)
 export const SimpleDataCard = (props: SimpleDataCardProps) => {
   const {
     data,
@@ -22,7 +32,7 @@ export const SimpleDataCard = (props: SimpleDataCardProps) => {
     formatKey = (key) => key,
     ignoreEmpty,
     truncate = false,
-    noWrap = false,
+    breakAll = false,
   } = props
   if (depth === 0) {
     if (Array.isArray(data)) {
@@ -47,7 +57,8 @@ export const SimpleDataCard = (props: SimpleDataCardProps) => {
         className={cn(
           'rounded-lg border text-card-foreground shadow-xs',
           'font-mono rounded-md bg-border/50 text-xs overflow-auto',
-          noWrap && 'whitespace-nowrap',
+          truncate && 'whitespace-nowrap',
+          breakAll && 'break-all',
           className,
         )}
       >
@@ -59,11 +70,13 @@ export const SimpleDataCard = (props: SimpleDataCardProps) => {
   const classNameCellDefault = cn(
     'border p-2',
     truncate && 'overflow-hidden text-ellipsis min-w-50',
+    breakAll && 'min-w-50',
     classNameCell,
   )
   const classNameCellNullish = cn(
     classNameCellDefault,
     'opacity-50',
+    breakAll && 'break-normal min-w-fit',
     truncate && 'min-w-fit',
   )
 

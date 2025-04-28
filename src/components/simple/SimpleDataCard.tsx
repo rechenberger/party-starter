@@ -42,7 +42,7 @@ export const SimpleDataCard = (props: SimpleDataCardProps) => {
       <div
         className={cn(
           'rounded-lg border text-card-foreground shadow-xs',
-          'font-mono rounded-md bg-border/50 text-xs',
+          'font-mono rounded-md bg-border/50 text-xs overflow-auto max-w-fit',
           className,
         )}
       >

@@ -61,7 +61,7 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
             <DropdownMenuLabel className="text-muted-foreground text-xs">
               Organizations
             </DropdownMenuLabel>
-            {memberships.map((membership, index) => (
+            {memberships.map((membership) => (
               <DropdownMenuItem
                 key={membership.organization.id}
                 className="gap-2 p-2"

@@ -9,6 +9,7 @@ export type SimpleDataCardProps = {
   classNameCell?: string
   formatKey?: (key: string) => string
   ignoreEmpty?: boolean
+  truncate?: boolean
 }
 
 export const SimpleDataCard = (props: SimpleDataCardProps) => {
@@ -19,6 +20,7 @@ export const SimpleDataCard = (props: SimpleDataCardProps) => {
     classNameCell,
     formatKey = (key) => key,
     ignoreEmpty,
+    truncate = true,
   } = props
   if (depth === 0) {
     if (Array.isArray(data)) {
@@ -52,10 +54,15 @@ export const SimpleDataCard = (props: SimpleDataCardProps) => {
   }
 
   const classNameCellDefault = cn(
-    'border p-2 overflow-hidden text-ellipsis min-w-50',
+    'border p-2',
+    truncate && 'overflow-hidden text-ellipsis min-w-50',
     classNameCell,
   )
-  const classNameCellNullish = cn(classNameCellDefault, 'opacity-50 min-w-fit')
+  const classNameCellNullish = cn(
+    classNameCellDefault,
+    'opacity-50',
+    truncate && 'min-w-fit',
+  )
 
   if (data === null) {
     return <div className={classNameCellNullish}>null</div>

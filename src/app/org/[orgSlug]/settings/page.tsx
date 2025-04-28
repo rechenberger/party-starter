@@ -1,5 +1,18 @@
 import { TopHeader } from '@/components/TopHeader'
-import { getMyMembershipOrNotFound } from '@/organization/getMyMembership'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { db } from '@/db/db'
+import { schema } from '@/db/schema-export'
+import {
+  getMyMembershipOrNotFound,
+  getMyMembershipOrThrow,
+} from '@/organization/getMyMembership'
+import { ActionButton } from '@/super-action/button/ActionButton'
+import { eq } from 'drizzle-orm'
+import { AlertTriangle } from 'lucide-react'
+import { redirect } from 'next/navigation'
+
+const allowedRoles: schema.OrganizationRole[] = ['admin']
 
 export default async function OrgSettingsPage({
   params,
@@ -7,7 +20,59 @@ export default async function OrgSettingsPage({
   params: { orgSlug: string }
 }) {
   await getMyMembershipOrNotFound({
-    allowedRoles: ['admin'],
+    allowedRoles,
   })
-  return <TopHeader>Organization Settings for {params.orgSlug}</TopHeader>
+
+  return (
+    <>
+      <TopHeader>Organization Settings for {params.orgSlug}</TopHeader>
+
+      <div className="flex flex-row gap-4 justify-center">
+        <div className="flex flex-col gap-4 max-w-2xl">
+          <h2 className="text-lg font-semibold">Danger Zone</h2>
+          <Card className="border-destructive">
+            <CardHeader>
+              <CardTitle className="text-destructive flex items-center gap-2">
+                <AlertTriangle className="size-5" />
+                Delete Organization
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <Alert variant="destructive">
+                <AlertDescription>
+                  This action cannot be undone. This will permanently delete the
+                  organization and remove all access for all team members.
+                </AlertDescription>
+              </Alert>
+              <div className="flex justify-end">
+                <ActionButton
+                  variant="destructive"
+                  action={async () => {
+                    'use server'
+                    await getMyMembershipOrThrow({
+                      allowedRoles,
+                    })
+
+                    await db
+                      .delete(schema.organizationsTable)
+                      .where(eq(schema.organizationsTable.slug, params.orgSlug))
+
+                    redirect('/')
+                  }}
+                  askForConfirmation={{
+                    title: 'Delete Organization',
+                    content: `Are you sure you want to delete ${params.orgSlug}? This action cannot be undone.`,
+                    confirm: 'Delete Organization',
+                    cancel: 'Cancel',
+                  }}
+                >
+                  Delete Organization
+                </ActionButton>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </>
+  )
 }

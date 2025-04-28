@@ -1,6 +1,7 @@
 import { getMyUser } from '@/auth/getMyUser'
 import { db } from '@/db/db'
-import { organizationMembershipsTable } from '@/db/schema'
+import { schema } from '@/db/schema-export'
+
 import { eq } from 'drizzle-orm'
 
 export const getMyMemberships = async () => {
@@ -12,7 +13,7 @@ export const getMyMemberships = async () => {
 
   // TODO: Rename Table Stuff: No Table at the end
   const memberships = await db.query.organizationMembershipsTable.findMany({
-    where: eq(organizationMembershipsTable.userId, user.id),
+    where: eq(schema.organizationMembershipsTable.userId, user.id),
     with: {
       organization: true,
     },

@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
 import { db } from '@/db/db'
-import { organizationMembershipsTable, organizationsTable } from '@/db/schema'
+import { schema } from '@/db/schema-export'
 import { slugify } from '@/lib/slugify'
 import { cn } from '@/lib/utils'
 import {
@@ -51,7 +51,7 @@ async function OrganizationPickerInside({
     return null
   }
   const memberships = await db.query.organizationMembershipsTable.findMany({
-    where: eq(organizationMembershipsTable.userId, user.id),
+    where: eq(schema.organizationMembershipsTable.userId, user.id),
     with: {
       organization: true,
     },
@@ -135,7 +135,7 @@ async function OrganizationPickerInside({
                                 'use server'
                                 return superAction(async () => {
                                   const newOrg = await db
-                                    .insert(organizationsTable)
+                                    .insert(schema.organizationsTable)
                                     .values({
                                       name: data.name,
                                       slug: slugify(data.name),
@@ -143,7 +143,7 @@ async function OrganizationPickerInside({
                                     .returning()
 
                                   await db
-                                    .insert(organizationMembershipsTable)
+                                    .insert(schema.organizationMembershipsTable)
                                     .values({
                                       userId: user.id,
                                       organizationId: newOrg[0].id,

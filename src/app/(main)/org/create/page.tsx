@@ -1,6 +1,6 @@
 import { getMyUserIdOrThrow } from '@/auth/getMyUser'
 import { db } from '@/db/db'
-import * as schema from '@/db/schema'
+import { schema } from '@/db/schema-export'
 import { slugify } from '@/lib/slugify'
 import { ORGS } from '@/lib/starter.config'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'

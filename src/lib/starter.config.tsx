@@ -1,3 +1,3 @@
-export const orgs = {
+export const ORGS = {
   onlyAdminsCanCreateOrgs: false,
 }

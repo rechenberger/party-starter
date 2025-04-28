@@ -14,10 +14,7 @@ import {
 } from '@/components/ui/sidebar'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { getMyMemberships } from '@/organization/getMyMemberships'
-import { superAction } from '@/super-action/action/createSuperAction'
-import { ActionButton } from '@/super-action/button/ActionButton'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 import { ResponsiveDropdownMenuContent } from '../ResponsiveDropdownMenuContent'
 import SeededAvatar from '../SeededAvatar'
 
@@ -70,17 +67,7 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
                 className="gap-2 p-2"
                 asChild
               >
-                <ActionButton
-                  variant="ghost"
-                  className="w-full justify-start hocus:outline-none"
-                  hideIcon
-                  action={async () => {
-                    'use server'
-                    return superAction(async () => {
-                      redirect(`/org/${membership.organization.slug}`)
-                    })
-                  }}
-                >
+                <Link href={`/org/${membership.organization.slug}`}>
                   <div className="flex size-6 items-center justify-center rounded-md border">
                     <SeededAvatar
                       size={20}
@@ -89,7 +76,7 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
                     />
                   </div>
                   {membership.organization.name}
-                </ActionButton>
+                </Link>
               </DropdownMenuItem>
             ))}
             {userCanCreateOrg && (

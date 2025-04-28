@@ -46,7 +46,7 @@ export const SidebarMainSection = async () => {
             ))}
             {userCanCreateOrg && (
               <SidebarMenuButton tooltip="Create Organization" asChild>
-                <Link href={`/create-org`}>
+                <Link href={`/org/create`}>
                   <Plus size={20} />
                   <span>Create Organization</span>
                 </Link>

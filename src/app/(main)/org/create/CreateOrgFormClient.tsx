@@ -15,9 +15,10 @@ import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { z } from 'zod'
+import { NameSchema } from './NameSchema'
 
 const CreateOrgSchema = z.object({
-  name: z.string().min(1, 'Organization name is required'),
+  name: NameSchema,
 })
 
 type CreateOrgSchema = z.infer<typeof CreateOrgSchema>

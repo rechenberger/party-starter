@@ -1,4 +1,4 @@
 export const ORGS = {
-  isActive: false,
+  isActive: true,
   onlyAdminsCanCreateOrgs: false,
 }

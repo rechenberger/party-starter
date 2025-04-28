@@ -8,6 +8,7 @@ import { superAction } from '@/super-action/action/createSuperAction'
 import { revalidatePath } from 'next/cache'
 import { notFound, redirect } from 'next/navigation'
 import { CreateOrgFormClient } from './CreateOrgFormClient'
+import { NameSchema } from './NameSchema'
 
 export default async function CreateOrg() {
   if (!ORGS.isActive) {
@@ -26,9 +27,15 @@ export default async function CreateOrg() {
         action={async (data) => {
           'use server'
           return superAction(async () => {
+            const parsed = NameSchema.safeParse(data.name)
+            if (!parsed.success) {
+              throw new Error(parsed.error.message)
+            }
+            const name = parsed.data
+
             const userCanCreateOrg = await canUserCreateOrg()
             if (!userCanCreateOrg) {
-              throw new Error('User cannot create org')
+              throw new Error('User cannot create an organization')
             }
 
             const userId = await getMyUserIdOrThrow()
@@ -36,8 +43,8 @@ export default async function CreateOrg() {
             const [org] = await db
               .insert(schema.organizationsTable)
               .values({
-                name: data.name,
-                slug: slugify(data.name),
+                name,
+                slug: slugify(name),
               })
               .returning()
 

@@ -8,7 +8,8 @@ import {
 } from '@/organization/getMyMembership'
 import { InvitationCodesList } from '@/organization/InvitationCodesList'
 import { MemberList } from '@/organization/MemberList'
-import { desc, eq } from 'drizzle-orm'
+import { superAction } from '@/super-action/action/createSuperAction'
+import { and, desc, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -49,10 +50,6 @@ export default async function OrgSettingsPage({
           userId: true,
           // invitationCodeId: true,
         },
-        orderBy: [
-          desc(schema.organizationMemberships.role),
-          desc(schema.organizationMemberships.createdAt),
-        ],
         with: {
           // invitationCode: true,
           user: {
@@ -75,37 +72,84 @@ export default async function OrgSettingsPage({
   }) => {
     'use server'
 
-    await getMyMembershipOrThrow({
-      allowedRoles: allowedRolesEdit,
-    })
-    await db
-      .update(schema.organizationMemberships)
-      .set({
-        role: data.role,
+    return superAction(async () => {
+      await getMyMembershipOrThrow({
+        allowedRoles: allowedRolesEdit,
       })
-      .where(eq(schema.organizationMemberships.userId, data.userId))
 
-    revalidatePath(`/org/${orgSlug}/settings/members`)
+      if (!organization) {
+        throw new Error('Organization not found')
+      }
+
+      const currentAdmins = await db
+        .select()
+        .from(schema.organizationMemberships)
+        .where(
+          and(
+            eq(schema.organizationMemberships.role, 'admin'),
+            eq(schema.organizationMemberships.organizationId, organization.id),
+          ),
+        )
+      if (
+        currentAdmins.length === 1 &&
+        data.role === 'member' &&
+        data.userId === currentAdmins[0].userId
+      ) {
+        throw new Error('Cannot remove last admin')
+      }
+
+      await db
+        .update(schema.organizationMemberships)
+        .set({
+          role: data.role,
+        })
+        .where(eq(schema.organizationMemberships.userId, data.userId))
+
+      revalidatePath(`/org/${orgSlug}/settings/members`)
+    })
   }
   const kickUserAction = async (data: { userId: string }) => {
     'use server'
 
-    const myUserId = await getMyUserId()
+    return superAction(async () => {
+      const myUserId = await getMyUserId()
 
-    if (myUserId !== data.userId) {
-      await getMyMembershipOrThrow({
-        allowedRoles: allowedRolesEdit,
-      })
-    }
+      if (myUserId !== data.userId) {
+        await getMyMembershipOrThrow({
+          allowedRoles: allowedRolesEdit,
+        })
+      }
 
-    await db
-      .delete(schema.organizationMemberships)
-      .where(eq(schema.organizationMemberships.userId, data.userId))
+      if (!organization) {
+        throw new Error('Organization not found')
+      }
 
-    revalidatePath(`/org/${orgSlug}/settings/members`)
-    if (myUserId === data.userId) {
-      redirect(`/`)
-    }
+      const currentAdmins = await db
+        .select()
+        .from(schema.organizationMemberships)
+        .where(
+          and(
+            eq(schema.organizationMemberships.role, 'admin'),
+            eq(schema.organizationMemberships.organizationId, organization.id),
+          ),
+        )
+
+      if (
+        currentAdmins.length === 1 &&
+        data.userId === currentAdmins[0].userId
+      ) {
+        throw new Error('Cannot remove last admin')
+      }
+
+      await db
+        .delete(schema.organizationMemberships)
+        .where(eq(schema.organizationMemberships.userId, data.userId))
+
+      revalidatePath(`/org/${orgSlug}/settings/members`)
+      if (myUserId === data.userId) {
+        redirect(`/`)
+      }
+    })
   }
 
   return (

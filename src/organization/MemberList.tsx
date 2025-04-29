@@ -30,6 +30,7 @@ import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { formatDistanceToNow } from 'date-fns'
+import { orderBy } from 'lodash-es'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
@@ -80,12 +81,14 @@ export const MemberList = ({
   const { data: session } = useSession()
   const myUserId = session?.user?.id
 
-  const { trigger, isLoading } = useSuperAction({
+  const { trigger, isLoading: isChangeRoleLoading } = useSuperAction({
     action: changeRoleAction,
+    catchToast: true,
   })
   const { trigger: triggerKickUser, isLoading: isKickUserLoading } =
     useSuperAction({
       action: kickUserAction,
+      catchToast: true,
     })
 
   // State for search query
@@ -120,7 +123,9 @@ export const MemberList = ({
       return userName.includes(query) || userEmail.includes(query)
     })
 
-    setFilteredMemberships(filtered)
+    const ordered = orderBy(filtered, [(f) => f.createdAt], ['desc'])
+
+    setFilteredMemberships(ordered)
   }, [organization, searchQuery])
 
   return (
@@ -215,6 +220,8 @@ export const MemberList = ({
                               role: value as schema.OrganizationRole,
                             })
                           }
+                          disabled={isChangeRoleLoading}
+                          value={membership.role}
                         >
                           <SelectTrigger className="w-[110px]">
                             <SelectValue placeholder="Select role" />

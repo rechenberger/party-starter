@@ -15,6 +15,7 @@
   "dependencies": {
     "@auth/core": "^0.39.0",
     "@auth/drizzle-adapter": "^1.9.0",
+    "@formatjs/intl-localematcher": "^0.6.1",
     "@hookform/resolvers": "^3.9.0",
     "@neondatabase/serverless": "^1.0.0",
     "@node-rs/argon2": "^2.0.2",
@@ -65,6 +66,7 @@
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.483.0",
     "nanoid": "^5.1.5",
+    "negotiator": "^1.0.0",
     "next": "15.3.1",
     "next-auth": "5.0.0-beta.25",
     "next-themes": "^0.4.4",
@@ -91,6 +93,7 @@
     "@tailwindcss/typography": "^0.5.12",
     "@types/bcrypt": "^5.0.2",
     "@types/lodash-es": "^4.17.12",
+    "@types/negotiator": "^0.6.3",
     "@types/nodemailer": "^6.4.15",
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",

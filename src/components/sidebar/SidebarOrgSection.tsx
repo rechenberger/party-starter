@@ -24,7 +24,7 @@ export const SidebarOrgSection = async ({ orgSlug }: { orgSlug: string }) => {
       title: 'Organization',
       url: `/org/${orgSlug}/settings`,
       icon: Building2,
-      show: membership?.role === 'admin',
+      show: membership.role === 'admin',
     },
     {
       title: 'Members',

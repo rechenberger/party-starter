@@ -1,4 +1,5 @@
 import { CopyToClipboardButton } from '@/components/CopyToClipboardButton'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -22,6 +23,7 @@ import { eq } from 'drizzle-orm'
 import { PlusCircle, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
+import { getMyMembershipOrThrow } from './getMyMembership'
 
 // Define the invitation code type
 type InvitationCode = {
@@ -31,9 +33,14 @@ type InvitationCode = {
   maxUses: number | null
   currentUses: number | null
   createdAt: Date
+  createdBy: {
+    name: string | null
+    image: string | null
+    email: string
+  } | null
 }
 
-export const InvitationCodesList = ({
+export const InvitationCodesList = async ({
   organization,
 }: {
   organization: {
@@ -42,33 +49,15 @@ export const InvitationCodesList = ({
     slug: string
   }
 }) => {
+  const myMembership = await getMyMembershipOrThrow({
+    allowedRoles: ['admin'],
+  })
+
   const {
     inviteCodes,
     id: organizationId,
     slug: organizationSlug,
   } = organization
-  // Mock function to copy code to clipboard
-  const copyCodeToClipboard = (code: string) => {
-    navigator.clipboard
-      .writeText(code)
-      .then(() => {
-        console.log(`Copied code: ${code}`)
-        // In a real app, you would show a toast notification here
-      })
-      .catch((err) => {
-        console.error('Failed to copy code: ', err)
-      })
-  }
-
-  // // Mock function to delete an invitation code
-  // const deleteInvitationCode = (id: string) => {
-  //   setInvitationCodes((prevCodes) =>
-  //     prevCodes.filter((code) => code.id !== id),
-  //   )
-  //   // In a real app, you would make an API call here
-  // }
-
-  // Mock function to create a new invitation code
 
   return (
     <>
@@ -105,6 +94,8 @@ export const InvitationCodesList = ({
                             role: data.role,
                             expiresAt: expiresAtResolved,
                             maxUses: data.maxUses,
+                            // TODO: fix this
+                            createdById: myMembership!.userId,
                           })
                           revalidatePath(
                             `/org/${organizationId}/settings/members`,
@@ -129,6 +120,7 @@ export const InvitationCodesList = ({
                 <TableHead>Role</TableHead>
                 <TableHead>Expires At</TableHead>
                 <TableHead>Uses</TableHead>
+                <TableHead>Created By</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -183,6 +175,35 @@ export const InvitationCodesList = ({
                           <div className="h-2"></div>
                         )}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {code.createdBy && (
+                        <div className="flex items-center gap-3">
+                          <Avatar>
+                            <AvatarImage
+                              src={code.createdBy?.image || ''}
+                              alt={code.createdBy?.name || 'Member'}
+                            />
+                            <AvatarFallback>
+                              {code.createdBy?.name
+                                ?.split(' ')
+                                .map((n) => n[0])
+                                .join('') || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">
+                              {code.createdBy?.name}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {code.createdBy?.email}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {code.createdBy === null && (
+                        <span className="text-muted-foreground">Unknown</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">

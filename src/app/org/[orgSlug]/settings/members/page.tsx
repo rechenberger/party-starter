@@ -26,6 +26,15 @@ export default async function OrgSettingsPage({
     where: eq(schema.organizations.slug, orgSlug),
     with: {
       inviteCodes: {
+        with: {
+          createdBy: {
+            columns: {
+              name: true,
+              image: true,
+              email: true,
+            },
+          },
+        },
         orderBy: [desc(schema.inviteCodes.expiresAt)],
       },
       memberships: {
@@ -80,19 +89,6 @@ export default async function OrgSettingsPage({
       .where(eq(schema.organizationMemberships.userId, data.userId))
 
     revalidatePath(`/org/${orgSlug}/settings/members`)
-  }
-
-  const deleteInvitationCodeAction = async (data: {
-    invitationCodeId: string
-  }) => {
-    'use server'
-
-    await getMyMembershipOrThrow({
-      allowedRoles,
-    })
-    await db
-      .delete(schema.inviteCodes)
-      .where(eq(schema.inviteCodes.id, data.invitationCodeId))
   }
 
   return (

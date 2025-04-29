@@ -1,3 +1,4 @@
+import { getMyUserId } from '@/auth/getMyUser'
 import { TopHeader } from '@/components/TopHeader'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
@@ -9,8 +10,10 @@ import { InvitationCodesList } from '@/organization/InvitationCodesList'
 import { MemberList } from '@/organization/MemberList'
 import { desc, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
-const allowedRoles: schema.OrganizationRole[] = ['admin', 'member']
+const allowedRolesView: schema.OrganizationRole[] = ['admin', 'member']
+const allowedRolesEdit: schema.OrganizationRole[] = ['admin']
 
 export default async function OrgSettingsPage({
   params,
@@ -18,9 +21,11 @@ export default async function OrgSettingsPage({
   params: Promise<{ orgSlug: string }>
 }) {
   const orgSlug = (await params).orgSlug
-  await getMyMembershipOrNotFound({
-    allowedRoles,
+  const myMembership = await getMyMembershipOrNotFound({
+    allowedRoles: allowedRolesView,
   })
+
+  const isAdmin = myMembership.role === 'admin'
 
   const organization = await db.query.organizations.findFirst({
     where: eq(schema.organizations.slug, orgSlug),
@@ -67,7 +72,7 @@ export default async function OrgSettingsPage({
     'use server'
 
     await getMyMembershipOrThrow({
-      allowedRoles,
+      allowedRoles: allowedRolesEdit,
     })
     await db
       .update(schema.organizationMemberships)
@@ -81,14 +86,22 @@ export default async function OrgSettingsPage({
   const kickUserAction = async (data: { userId: string }) => {
     'use server'
 
-    await getMyMembershipOrThrow({
-      allowedRoles,
-    })
+    const myUserId = await getMyUserId()
+
+    if (myUserId !== data.userId) {
+      await getMyMembershipOrThrow({
+        allowedRoles: allowedRolesEdit,
+      })
+    }
+
     await db
       .delete(schema.organizationMemberships)
       .where(eq(schema.organizationMemberships.userId, data.userId))
 
     revalidatePath(`/org/${orgSlug}/settings/members`)
+    if (myUserId === data.userId) {
+      redirect(`/`)
+    }
   }
 
   return (
@@ -100,8 +113,9 @@ export default async function OrgSettingsPage({
             organization={organization}
             changeRoleAction={changeRoleAction}
             kickUserAction={kickUserAction}
+            isAdmin={isAdmin}
           />
-          <InvitationCodesList organization={organization} />
+          {isAdmin && <InvitationCodesList organization={organization} />}
         </>
       )}
     </>

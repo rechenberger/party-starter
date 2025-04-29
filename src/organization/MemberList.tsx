@@ -30,7 +30,8 @@ import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { formatDistanceToNow } from 'date-fns'
-import { Search, Trash2, X } from 'lucide-react'
+import { LogOut, Search, Trash2, X } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 
 type User = {
@@ -61,6 +62,7 @@ export const MemberList = ({
   organization,
   changeRoleAction,
   kickUserAction,
+  isAdmin,
 }: {
   organization: Organization
   changeRoleAction: (data: {
@@ -73,7 +75,11 @@ export const MemberList = ({
   kickUserAction: (data: {
     userId: string
   }) => SuperActionPromise<void, { userId: string }>
+  isAdmin: boolean
 }) => {
+  const { data: session } = useSession()
+  const myUserId = session?.user?.id
+
   const { trigger, isLoading } = useSuperAction({
     action: changeRoleAction,
   })
@@ -166,6 +172,7 @@ export const MemberList = ({
                   <TableHead>Member</TableHead>
                   <TableHead>Joined</TableHead>
                   <TableHead>Role</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -199,45 +206,58 @@ export const MemberList = ({
                       })}
                     </TableCell>
                     <TableCell>
-                      <Select
-                        defaultValue={membership.role}
-                        onValueChange={(value: 'admin' | 'member') =>
-                          trigger({
-                            userId: membership.userId,
-                            role: value as schema.OrganizationRole,
-                          })
-                        }
-                      >
-                        <SelectTrigger className="w-[110px]">
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="member">Member</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <ActionButton
-                          variant="ghost"
-                          size="icon"
-                          // disabled={isDeleting}
-                          catchToast
-                          hideIcon
-                          askForConfirmation
-                          action={async () =>
-                            triggerKickUser({
+                      {isAdmin && (
+                        <Select
+                          defaultValue={membership.role}
+                          onValueChange={(value: 'admin' | 'member') =>
+                            trigger({
                               userId: membership.userId,
+                              role: value as schema.OrganizationRole,
                             })
                           }
-                          title="Kick user"
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                          <span className="sr-only">Kick user</span>
-                        </ActionButton>
-                      </div>
+                          <SelectTrigger className="w-[110px]">
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="member">Member</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                      {!isAdmin && (
+                        <Badge variant="outline" className="text-xs">
+                          {membership.role}
+                        </Badge>
+                      )}
                     </TableCell>
+                    {(isAdmin || membership.userId === myUserId) && (
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <ActionButton
+                            variant="ghost"
+                            size="icon"
+                            // disabled={isDeleting}
+                            catchToast
+                            hideIcon
+                            askForConfirmation
+                            action={async () =>
+                              triggerKickUser({
+                                userId: membership.userId,
+                              })
+                            }
+                            title="Kick user"
+                          >
+                            {membership.userId === myUserId ? (
+                              <LogOut className="h-4 w-4 text-destructive" />
+                            ) : (
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            )}
+                            <span className="sr-only">Kick user</span>
+                          </ActionButton>
+                        </div>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

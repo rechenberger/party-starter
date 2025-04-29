@@ -206,7 +206,9 @@ export const InvitationCodesList = async ({
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <CopyToClipboardButton text={code.id} />
+                        <CopyToClipboardButton
+                          text={`${process.env.BASE_URL}/join/${organizationSlug}/${code.id}`}
+                        />
                         <ActionButton
                           variant="ghost"
                           size="icon"

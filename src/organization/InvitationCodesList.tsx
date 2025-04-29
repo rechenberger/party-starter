@@ -26,7 +26,6 @@ import { revalidatePath } from 'next/cache'
 import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
 import { getMyMembershipOrThrow } from './getMyMembership'
 
-// Define the invitation code type
 type InvitationCode = {
   id: string
   role: 'admin' | 'member'

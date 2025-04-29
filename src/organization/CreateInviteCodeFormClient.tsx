@@ -25,10 +25,6 @@ import { z } from 'zod'
 const CreateInviteCodeSchema = z.object({
   role: z.enum(['admin', 'member']),
   expiresAt: z.enum(['never', '1d', '1w', '1m', '1y']),
-  // maxUses: z.preprocess((value) => {
-  //   if (value === '') return undefined
-  //   return Number(value)
-  // }, z.number().int().positive().min(1).optional()),
   maxUses: z.coerce.number().optional(),
 })
 
@@ -83,7 +79,7 @@ export const CreateInviteCodeFormClient = ({
                       field.onChange(value)
                     }}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
@@ -111,7 +107,7 @@ export const CreateInviteCodeFormClient = ({
                       field.onChange(value)
                     }}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select expires at" />
                     </SelectTrigger>
                     <SelectContent>
@@ -134,20 +130,7 @@ export const CreateInviteCodeFormClient = ({
               <FormItem>
                 <FormLabel>Max Uses</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    {...field}
-                    placeholder="unlimited"
-
-                    // onChange={(e) => {
-                    //   const value = e.target.value
-                    //   if (value !== '') {
-                    //     field.onChange(Number(value))
-                    //   } else {
-                    //     field.onChange('')
-                    //   }
-                    // }}
-                  />
+                  <Input type="number" {...field} placeholder="unlimited" />
                 </FormControl>
                 <FormMessage />
               </FormItem>

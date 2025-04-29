@@ -40,17 +40,21 @@ export default async function OrgSettingsPage({
             },
           },
         },
-        orderBy: [desc(schema.inviteCodes.expiresAt)],
+        orderBy: [desc(schema.inviteCodes.createdAt)],
       },
       memberships: {
         columns: {
           createdAt: true,
           role: true,
           userId: true,
-          invitationCodeId: true,
+          // invitationCodeId: true,
         },
+        orderBy: [
+          desc(schema.organizationMemberships.role),
+          desc(schema.organizationMemberships.createdAt),
+        ],
         with: {
-          invitationCode: true,
+          // invitationCode: true,
           user: {
             columns: {
               id: true,

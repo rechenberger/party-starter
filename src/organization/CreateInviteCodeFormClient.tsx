@@ -75,7 +75,14 @@ export const CreateInviteCodeFormClient = ({
               <FormItem>
                 <FormLabel>Role</FormLabel>
                 <FormControl>
-                  <Select {...field} name="role" value={field.value}>
+                  <Select
+                    {...field}
+                    name="role"
+                    value={field.value}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                    }}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
@@ -96,7 +103,14 @@ export const CreateInviteCodeFormClient = ({
               <FormItem>
                 <FormLabel>Expires At</FormLabel>
                 <FormControl>
-                  <Select {...field} name="expiresAt" value={field.value}>
+                  <Select
+                    {...field}
+                    name="expiresAt"
+                    value={field.value}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                    }}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select expires at" />
                     </SelectTrigger>

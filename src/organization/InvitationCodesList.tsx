@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { cn } from '@/lib/utils'
 import {
   streamDialog,
   superAction,
@@ -80,14 +81,21 @@ export const InvitationCodesList = async ({
                           switch (data.expiresAt) {
                             case 'never':
                               expiresAtResolved = null
+                              break
                             case '1d':
                               expiresAtResolved = addDays(new Date(), 1)
+                              break
                             case '1w':
                               expiresAtResolved = addDays(new Date(), 7)
+                              break
                             case '1m':
                               expiresAtResolved = addMonths(new Date(), 1)
+                              break
                             case '1y':
                               expiresAtResolved = addYears(new Date(), 1)
+                              break
+                            default:
+                              throw new Error('Invalid expires at')
                           }
                           await db.insert(schema.inviteCodes).values({
                             organizationId: organizationId,
@@ -96,9 +104,11 @@ export const InvitationCodesList = async ({
                             maxUses: data.maxUses,
                             createdById: myMembership.userId,
                           })
+
                           revalidatePath(
                             `/org/${organizationId}/settings/members`,
                           )
+                          streamDialog(null)
                         })
                       }}
                     />
@@ -155,20 +165,28 @@ export const InvitationCodesList = async ({
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
-                        <div className="flex justify-between text-xs">
-                          <span>{code.currentUses ?? 0}</span>
+                        <div className="flex text-xs">
                           {code.maxUses ? (
-                            <span className="text-muted-foreground">
-                              of {code.maxUses}
-                            </span>
+                            <div className="flex justify-between flex-1">
+                              <span>{code.currentUses ?? 0}</span>
+                              <span className="text-muted-foreground">
+                                of {code.maxUses}
+                              </span>
+                            </div>
                           ) : (
-                            <span className="text-muted-foreground">∞</span>
+                            <div className="flex justify-center flex-1">
+                              <span className="text-muted-foreground">∞</span>
+                            </div>
                           )}
                         </div>
                         {code.maxUses ? (
                           <Progress
                             value={(code.currentUses ?? 0 / code.maxUses) * 100}
-                            className="h-2"
+                            className={cn('h-2')}
+                            indicatorClassName={cn(
+                              code.currentUses === code.maxUses &&
+                                'bg-destructive',
+                            )}
                           />
                         ) : (
                           <div className="h-2"></div>

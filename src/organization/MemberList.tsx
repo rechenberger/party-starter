@@ -165,6 +165,8 @@ export const MemberList = ({
                       <TableCell className="text-muted-foreground">
                         <ActionButton
                           askForConfirmation
+                          catchToast
+                          hideIcon
                           action={async () =>
                             triggerKickUser({
                               userId: membership.userId,

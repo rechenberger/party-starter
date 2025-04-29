@@ -2,7 +2,6 @@ import { CopyToClipboardButton } from '@/components/CopyToClipboardButton'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
 import {
   Table,
   TableBody,
@@ -19,7 +18,14 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { addDays, addMonths, addYears, format } from 'date-fns'
+import {
+  addDays,
+  addMonths,
+  addYears,
+  format,
+  formatDistanceToNow,
+  isPast,
+} from 'date-fns'
 import { eq } from 'drizzle-orm'
 import { PlusCircle, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
@@ -127,7 +133,7 @@ export const InvitationCodesList = async ({
                 <TableHead>Code</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Expires At</TableHead>
-                <TableHead>Uses</TableHead>
+                <TableHead>Uses left</TableHead>
                 <TableHead>Created By</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -143,116 +149,116 @@ export const InvitationCodesList = async ({
                   </TableCell>
                 </TableRow>
               ) : (
-                inviteCodes.map((code) => (
-                  <TableRow key={code.id}>
-                    <TableCell className="font-mono">{code.id}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          code.role === 'admin' ? 'default' : 'secondary'
+                inviteCodes.map((code) => {
+                  const isExpired =
+                    (code.expiresAt && isPast(code.expiresAt)) ||
+                    (code.maxUses && code.currentUses === code.maxUses)
+                  return (
+                    <TableRow key={code.id}>
+                      <TableCell
+                        className={cn('font-mono', isExpired && 'line-through')}
+                      >
+                        {code.id}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            code.role === 'admin' ? 'default' : 'secondary'
+                          }
+                        >
+                          {code.role}
+                        </Badge>
+                      </TableCell>
+                      <TableCell
+                        title={
+                          code.expiresAt
+                            ? format(code.expiresAt, 'MMM d, yyyy HH:mm')
+                            : 'Never'
                         }
                       >
-                        {code.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {code.expiresAt ? (
-                        format(code.expiresAt, 'MMM d, yyyy HH:mm')
-                      ) : (
-                        <span className="text-muted-foreground">Never</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="flex text-xs">
-                          {code.maxUses ? (
-                            <div className="flex justify-between flex-1">
-                              <span>{code.currentUses ?? 0}</span>
-                              <span className="text-muted-foreground">
-                                of {code.maxUses}
-                              </span>
-                            </div>
-                          ) : (
-                            <div className="flex justify-center flex-1">
-                              <span className="text-muted-foreground">∞</span>
-                            </div>
-                          )}
-                        </div>
-                        {code.maxUses ? (
-                          <Progress
-                            value={(code.currentUses ?? 0 / code.maxUses) * 100}
-                            className={cn('h-2')}
-                            indicatorClassName={cn(
-                              code.currentUses === code.maxUses &&
-                                'bg-destructive',
-                            )}
-                          />
+                        {code.expiresAt ? (
+                          formatDistanceToNow(new Date(code.expiresAt), {
+                            addSuffix: true,
+                          })
                         ) : (
-                          <div className="h-2"></div>
+                          <span className="text-muted-foreground">Never</span>
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {code.createdBy && (
-                        <div className="flex items-center gap-3">
-                          <Avatar>
-                            <AvatarImage
-                              src={code.createdBy?.image || ''}
-                              alt={code.createdBy?.name || 'Member'}
-                            />
-                            <AvatarFallback>
-                              {code.createdBy?.name
-                                ?.split(' ')
-                                .map((n) => n[0])
-                                .join('') || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">
-                              {code.createdBy?.name}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {code.createdBy?.email}
-                            </p>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="flex text-xs">
+                            {code.maxUses ? (
+                              <span>
+                                {code.maxUses - (code.currentUses ?? 0)}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">∞</span>
+                            )}
                           </div>
                         </div>
-                      )}
-                      {code.createdBy === null && (
-                        <span className="text-muted-foreground">Unknown</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <CopyToClipboardButton
-                          text={`${process.env.BASE_URL}/join/${organizationSlug}/${code.id}`}
-                        />
-                        <ActionButton
-                          variant="ghost"
-                          size="icon"
-                          // disabled={isDeleting}
-                          catchToast
-                          hideIcon
-                          askForConfirmation
-                          action={async () => {
-                            'use server'
-                            return superAction(async () => {
-                              await db
-                                .delete(schema.inviteCodes)
-                                .where(eq(schema.inviteCodes.id, code.id))
-                              revalidatePath(
-                                `/org/${organizationSlug}/settings/members`,
-                              )
-                            })
-                          }}
-                          title="Delete code"
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                          <span className="sr-only">Delete code</span>
-                        </ActionButton>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                      </TableCell>
+                      <TableCell>
+                        {code.createdBy && (
+                          <div className="flex items-center gap-3">
+                            <Avatar>
+                              <AvatarImage
+                                src={code.createdBy?.image || ''}
+                                alt={code.createdBy?.name || 'Member'}
+                              />
+                              <AvatarFallback>
+                                {code.createdBy?.name
+                                  ?.split(' ')
+                                  .map((n) => n[0])
+                                  .join('') || 'U'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">
+                                {code.createdBy?.name}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {code.createdBy?.email}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                        {code.createdBy === null && (
+                          <span className="text-muted-foreground">Unknown</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <CopyToClipboardButton
+                            text={`${process.env.BASE_URL}/join/${organizationSlug}/${code.id}`}
+                          />
+                          <ActionButton
+                            variant="ghost"
+                            size="icon"
+                            // disabled={isDeleting}
+                            catchToast
+                            hideIcon
+                            askForConfirmation
+                            action={async () => {
+                              'use server'
+                              return superAction(async () => {
+                                await db
+                                  .delete(schema.inviteCodes)
+                                  .where(eq(schema.inviteCodes.id, code.id))
+                                revalidatePath(
+                                  `/org/${organizationSlug}/settings/members`,
+                                )
+                              })
+                            }}
+                            title="Delete code"
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                            <span className="sr-only">Delete code</span>
+                          </ActionButton>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
               )}
             </TableBody>
           </Table>

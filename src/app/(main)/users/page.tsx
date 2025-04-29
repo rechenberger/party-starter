@@ -1,7 +1,6 @@
 import { notFoundIfNotAdmin, throwIfNotAdmin } from '@/auth/getIsAdmin'
 import { getMyUserId } from '@/auth/getMyUser'
 import { impersonate } from '@/auth/impersonate'
-import { LocalDateTime } from '@/components/demo/LocalDateTime'
 import { SimpleParamSelect } from '@/components/simple/SimpleParamSelect'
 import {
   Card,
@@ -12,7 +11,7 @@ import {
 } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 import { db } from '@/db/db'
-import { users as usersTable } from '@/db/schema-auth'
+import { user as usersTable } from '@/db/schema-auth'
 import {
   streamToast,
   superAction,
@@ -41,7 +40,7 @@ export default async function Page({
   const { filter } = await searchParams
   await notFoundIfNotAdmin({ allowDev: true })
   const myUserId = await getMyUserId()
-  const users = await db.query.users.findMany({
+  const users = await db.query.user.findMany({
     with: {
       accounts: true,
     },
@@ -65,18 +64,14 @@ export default async function Page({
       <div className="grid lg:grid-cols-3 gap-4">
         {users.map((user) => {
           const isAdmin = !!user.isAdmin
-          const tags: string[] = []
-          if (user.passwordHash) tags.push('password')
-          for (const account of user.accounts) {
-            tags.push(account.provider)
-          }
+          const tags = user.accounts.map((a) => a.providerId)
           return (
             <Fragment key={user.id}>
               <Card>
                 <CardHeader>
                   <CardTitle>{user.name ?? user.email}</CardTitle>
                   <CardDescription>{user.id}</CardDescription>
-                  {tags.length && (
+                  {!!tags.length && (
                     <div className="flex flex-row gap-2">
                       {tags.map((tag) => (
                         <Fragment key={tag}>
@@ -92,16 +87,7 @@ export default async function Page({
                   <div>
                     <div>{user.email}</div>
                     <div className="text-muted-foreground">
-                      {user.emailVerified ? (
-                        <>
-                          Verified{' '}
-                          <LocalDateTime
-                            datetime={user.emailVerified.toISOString()}
-                          />
-                        </>
-                      ) : (
-                        <>Not verified</>
-                      )}
+                      {user.emailVerified ? <>Verified</> : <>Not verified</>}
                     </div>
                   </div>
                   <label className="">
@@ -169,6 +155,7 @@ export default async function Page({
                       variant={'outline'}
                       disabled={myUserId === user.id}
                       icon={myUserId === user.id ? <Check /> : undefined}
+                      catchToast
                       action={async () => {
                         'use server'
                         return superAction(async () => {

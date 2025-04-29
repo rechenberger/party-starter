@@ -2,6 +2,11 @@ import { ChangePasswordForm } from '@/auth/ChangePasswordForm'
 import { getIsLoggedIn } from '@/auth/getMyUser'
 import { loginWithRedirect } from '@/auth/loginWithRedirect'
 import { Card, CardContent } from '@/components/ui/card'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Change Password',
+}
 
 export default async function Page({
   searchParams,
@@ -21,7 +26,7 @@ export default async function Page({
     <>
       <Card className="self-center w-full max-w-md flex flex-col gap-4">
         <CardContent className="flex flex-col gap-4 pt-6">
-          <ChangePasswordForm redirectUrl={redirectUrl} />
+          <ChangePasswordForm variant="change" redirectUrl={redirectUrl} />
         </CardContent>
       </Card>
     </>

@@ -94,8 +94,7 @@ export const InvitationCodesList = async ({
                             role: data.role,
                             expiresAt: expiresAtResolved,
                             maxUses: data.maxUses,
-                            // TODO: fix this
-                            createdById: myMembership!.userId,
+                            createdById: myMembership.userId,
                           })
                           revalidatePath(
                             `/org/${organizationId}/settings/members`,

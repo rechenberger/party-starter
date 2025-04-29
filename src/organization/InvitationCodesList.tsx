@@ -1,5 +1,5 @@
+import { CopyToClipboardButton } from '@/components/CopyToClipboardButton'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import {
@@ -19,7 +19,7 @@ import {
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { addDays, addMonths, addYears, format } from 'date-fns'
 import { eq } from 'drizzle-orm'
-import { Copy, PlusCircle, Trash2 } from 'lucide-react'
+import { PlusCircle, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
 
@@ -186,15 +186,7 @@ export const InvitationCodesList = ({
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          // onClick={() => copyCodeToClipboard(code.id)}
-                          title="Copy code"
-                        >
-                          <Copy className="h-4 w-4" />
-                          <span className="sr-only">Copy code</span>
-                        </Button>
+                        <CopyToClipboardButton text={code.id} />
                         <ActionButton
                           variant="ghost"
                           size="icon"

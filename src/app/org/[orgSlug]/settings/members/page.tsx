@@ -5,8 +5,9 @@ import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
 } from '@/organization/getMyMembership'
+import { InvitationCodesList } from '@/organization/InvitationCodesList'
 import { MemberList } from '@/organization/MemberList'
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 
 const allowedRoles: schema.OrganizationRole[] = ['admin', 'member']
@@ -21,18 +22,21 @@ export default async function OrgSettingsPage({
     allowedRoles,
   })
 
-  const organizations = await db.query.organizations.findMany({
+  const organization = await db.query.organizations.findFirst({
     where: eq(schema.organizations.slug, orgSlug),
     with: {
+      inviteCodes: {
+        orderBy: [desc(schema.inviteCodes.expiresAt)],
+      },
       memberships: {
         columns: {
           createdAt: true,
           role: true,
           userId: true,
-          // invitationCodeId: true,
+          invitationCodeId: true,
         },
         with: {
-          // invitationCode: true,
+          invitationCode: true,
           user: {
             columns: {
               id: true,
@@ -78,14 +82,32 @@ export default async function OrgSettingsPage({
     revalidatePath(`/org/${orgSlug}/settings/members`)
   }
 
+  const deleteInvitationCodeAction = async (data: {
+    invitationCodeId: string
+  }) => {
+    'use server'
+
+    await getMyMembershipOrThrow({
+      allowedRoles,
+    })
+    await db
+      .delete(schema.inviteCodes)
+      .where(eq(schema.inviteCodes.id, data.invitationCodeId))
+  }
+
   return (
     <>
       <TopHeader>Organization Members for {orgSlug}</TopHeader>
-      <MemberList
-        organizations={organizations}
-        changeRoleAction={changeRoleAction}
-        kickUserAction={kickUserAction}
-      />
+      {organization && (
+        <>
+          <MemberList
+            organization={organization}
+            changeRoleAction={changeRoleAction}
+            kickUserAction={kickUserAction}
+          />
+          <InvitationCodesList organization={organization} />
+        </>
+      )}
     </>
   )
 }

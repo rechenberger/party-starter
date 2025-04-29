@@ -5,7 +5,7 @@ import {
   SidebarMenuButton,
 } from '@/components/ui/sidebar'
 import { getMyMembershipOrNotFound } from '@/organization/getMyMembership'
-import { Building2, Laugh } from 'lucide-react'
+import { Building2, Laugh, Users } from 'lucide-react'
 import Link from 'next/link'
 
 export const SidebarOrgSection = async ({ orgSlug }: { orgSlug: string }) => {
@@ -24,6 +24,12 @@ export const SidebarOrgSection = async ({ orgSlug }: { orgSlug: string }) => {
       title: 'Organization',
       url: `/org/${orgSlug}/settings`,
       icon: Building2,
+      show: membership?.role === 'admin',
+    },
+    {
+      title: 'Members',
+      url: `/org/${orgSlug}/settings/members`,
+      icon: Users,
       show: membership?.role === 'admin',
     },
   ]

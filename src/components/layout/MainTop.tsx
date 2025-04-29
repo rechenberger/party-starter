@@ -35,7 +35,7 @@ export const MainTop = async () => {
         <Link href="/" className="flex flex-row items-center gap-3">
           <div className="text-xl">
             <strong>
-              Party <span className="text-primary">Starter</span>
+              Party&nbsp;<span className="text-primary">Starter</span>
             </strong>
           </div>
         </Link>

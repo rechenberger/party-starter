@@ -36,7 +36,7 @@ export const Sidebar = ({
             >
               <div className="text-xl">
                 <strong>
-                  Party <span className="text-primary">Starter</span>
+                  Party&nbsp;<span className="text-primary">Starter</span>
                 </strong>
               </div>
             </Link>

@@ -19,7 +19,7 @@ export const LocaleSelect = () => {
     <div className="w-[300px] max-w-full text-foreground-dimmed">
       {/* <Label htmlFor="language">{t.settings.language}</Label> */}
       <Select
-        value={locale}
+        defaultValue={locale}
         onValueChange={(newLocale: typeof locale) => {
           setLocale(newLocale)
         }}

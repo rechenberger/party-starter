@@ -1,7 +1,7 @@
 import { isDev } from '@/auth/dev'
 import { Toaster } from '@/components/ui/toaster'
 import { LocaleProvider } from '@/i18n/LocaleContext'
-import { DEFAULT_LOCALE } from '@/i18n/locale'
+import { getMyLocale } from '@/i18n/getMyLocale'
 import { ActionCommandProvider } from '@/super-action/command/ActionCommandProvider'
 import { DialogProvider } from '@/super-action/dialog/DialogProvider'
 import type { Metadata } from 'next'
@@ -18,13 +18,19 @@ export const metadata: Metadata = {
   description: 'by Tristan Rechenberger',
 }
 
-export const BaseLayout = ({ children }: { children: React.ReactNode }) => {
+export const BaseLayout = async ({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ locale?: string }>
+}) => {
+  const locale = await getMyLocale({ params })
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-background min-h-[100svh] flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {/* // TODO: Correct local */}
-          <LocaleProvider value={DEFAULT_LOCALE}>
+          <LocaleProvider value={locale}>
             {children}
             <ActionCommandProvider />
             <Toaster />

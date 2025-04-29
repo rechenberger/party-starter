@@ -1,8 +1,8 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { use, useCallback, useEffect, useState } from 'react'
-import { DEFAULT_LOCALE, Locale, LOCALES } from './locale'
+import { useCallback, useContext } from 'react'
+import { Locale, LOCALES } from './locale'
 import { LocaleContext } from './LocaleContext'
 
 const COOKIE_NAME = 'locale'
@@ -11,19 +11,9 @@ const setCookie = (name: string, value: string) => {
   document.cookie = `${name}=${value}; path=/; max-age=31536000` // 1 year
 }
 
-const useLocaleLoaded = () => {
-  const [localeLoaded, setLocaleLoaded] = useState(false)
-  useEffect(() => {
-    setLocaleLoaded(true)
-  }, [])
-  return localeLoaded
-}
-
 export const useLocale = () => {
-  const locale = use(LocaleContext)
-  const loaded = useLocaleLoaded()
-
-  return loaded ? locale : DEFAULT_LOCALE
+  const locale = useContext(LocaleContext)
+  return locale
 }
 
 export const useSetLocale = () => {
@@ -37,7 +27,7 @@ export const useSetLocale = () => {
         pathname.startsWith(`/${locale}`),
       )
       if (isLocalePath) {
-        router.push(pathname.replace(DEFAULT_LOCALE, locale))
+        router.push(pathname.replace(/^\/[^/]+/, `/${locale}`))
       } else {
         router.refresh()
       }

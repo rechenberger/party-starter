@@ -275,6 +275,7 @@ export default async function JoinOrgPage({
                   organizationId: organization.id,
                   userId: user.id,
                   role: inviteCode.role,
+                  invitationCodeId: inviteCode.id,
                 })
                 revalidatePath(`/join/${organization.slug}/${code}`)
               })

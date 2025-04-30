@@ -1,4 +1,5 @@
-import { getMyUserOrLogin } from '@/auth/getMyUser'
+import { auth } from '@/auth/auth'
+import { loginWithRedirect } from '@/auth/loginWithRedirect'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -32,6 +33,29 @@ export default async function JoinOrgPage({
 }: {
   params: Promise<{ orgSlug: string; code: string }>
 }) {
+  const authRes = await auth()
+
+  if (!authRes?.user) {
+    return (
+      <div className="flex h-full items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <AlertCircle className="h-5 w-5 text-destructive" />
+              <CardTitle>Login Required</CardTitle>
+            </div>
+            <CardDescription>Please login to continue.</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <ActionButton className="w-full" action={loginWithRedirect}>
+              Login / Register
+            </ActionButton>
+          </CardFooter>
+        </Card>
+      </div>
+    )
+  }
+
   const { orgSlug, code } = await params
 
   const organization = await db.query.organizations.findFirst({
@@ -53,15 +77,9 @@ export default async function JoinOrgPage({
     ),
   })
 
-  console.log({ inviteCode })
-
   if (!inviteCode) {
     return notFound()
   }
-
-  const user = await getMyUserOrLogin()
-
-  const membership = find(organization.memberships, (m) => m.userId === user.id)
 
   let invalidReason: string | null = null
 
@@ -78,7 +96,7 @@ export default async function JoinOrgPage({
   // Render invalid state
   if (invalidReason) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+      <div className="flex h-full items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
             <div className="flex items-center gap-2 mb-2">
@@ -135,10 +153,14 @@ export default async function JoinOrgPage({
     )
   }
 
+  const user = authRes.user
+
+  const membership = find(organization.memberships, (m) => m.userId === user.id)
+
   // Render success state (after joining)
   if (membership) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+      <div className="flex h-full items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
             <div className="flex items-center gap-2 mb-2">

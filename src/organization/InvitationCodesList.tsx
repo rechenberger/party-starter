@@ -1,3 +1,4 @@
+import { getMyUserOrThrow } from '@/auth/getMyUser'
 import { CopyToClipboardButton } from '@/components/CopyToClipboardButton'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -27,10 +28,12 @@ import {
   isPast,
 } from 'date-fns'
 import { eq } from 'drizzle-orm'
-import { PlusCircle, Trash2 } from 'lucide-react'
+import { Mail, PlusCircle, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
+import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
 import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
 import { getMyMembershipOrThrow } from './getMyMembership'
+import { sendOrgInviteMail } from './sendOrgInviteMail'
 
 type InvitationCode = {
   id: string
@@ -53,6 +56,7 @@ export const InvitationCodesList = async ({
     inviteCodes: InvitationCode[]
     id: string
     slug: string
+    name: string
   }
 }) => {
   const myMembership = await getMyMembershipOrThrow({
@@ -63,6 +67,7 @@ export const InvitationCodesList = async ({
     inviteCodes,
     id: organizationId,
     slug: organizationSlug,
+    name: organizationName,
   } = organization
 
   return (
@@ -70,61 +75,120 @@ export const InvitationCodesList = async ({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Invitation Codes</CardTitle>
-          <ActionButton
-            size="sm"
-            action={async () => {
-              'use server'
-              return superAction(async () => {
-                return streamDialog({
-                  title: 'Create Invitation Code',
-                  content: (
-                    <CreateInviteCodeFormClient
-                      action={async (data) => {
-                        'use server'
-                        return superAction(async () => {
-                          let expiresAtResolved: Date | null = null
-                          switch (data.expiresAt) {
-                            case 'never':
-                              expiresAtResolved = null
-                              break
-                            case '1d':
-                              expiresAtResolved = addDays(new Date(), 1)
-                              break
-                            case '1w':
-                              expiresAtResolved = addDays(new Date(), 7)
-                              break
-                            case '1m':
-                              expiresAtResolved = addMonths(new Date(), 1)
-                              break
-                            case '1y':
-                              expiresAtResolved = addYears(new Date(), 1)
-                              break
-                            default:
-                              throw new Error('Invalid expires at')
-                          }
-                          await db.insert(schema.inviteCodes).values({
-                            organizationId: organizationId,
-                            role: data.role,
-                            expiresAt: expiresAtResolved,
-                            maxUses: data.maxUses,
-                            createdById: myMembership.userId,
-                          })
+          <div className="flex gap-2">
+            <ActionButton
+              size="sm"
+              action={async () => {
+                'use server'
+                return superAction(async () => {
+                  return streamDialog({
+                    title: 'Create Invitation Code',
+                    content: (
+                      <CreateInviteCodeFormClient
+                        action={async (data) => {
+                          'use server'
+                          return superAction(async () => {
+                            const myMembership = await getMyMembershipOrThrow({
+                              allowedRoles: ['admin'],
+                            })
+                            let expiresAtResolved: Date | null = null
+                            switch (data.expiresAt) {
+                              case 'never':
+                                expiresAtResolved = null
+                                break
+                              case '1d':
+                                expiresAtResolved = addDays(new Date(), 1)
+                                break
+                              case '1w':
+                                expiresAtResolved = addDays(new Date(), 7)
+                                break
+                              case '1m':
+                                expiresAtResolved = addMonths(new Date(), 1)
+                                break
+                              case '1y':
+                                expiresAtResolved = addYears(new Date(), 1)
+                                break
+                              default:
+                                throw new Error('Invalid expires at')
+                            }
+                            await db.insert(schema.inviteCodes).values({
+                              organizationId: organizationId,
+                              role: data.role,
+                              expiresAt: expiresAtResolved,
+                              maxUses: data.maxUses,
+                              createdById: myMembership.userId,
+                            })
 
-                          revalidatePath(
-                            `/org/${organizationId}/settings/members`,
-                          )
-                          streamDialog(null)
-                        })
-                      }}
-                    />
-                  ),
+                            revalidatePath(
+                              `/org/${organizationId}/settings/members`,
+                            )
+                            streamDialog(null)
+                          })
+                        }}
+                      />
+                    ),
+                  })
                 })
-              })
-            }}
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Invitation Code
-          </ActionButton>
+              }}
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Invitation Code
+            </ActionButton>
+            <ActionButton
+              size="sm"
+              action={async () => {
+                'use server'
+                return superAction(async () => {
+                  return streamDialog({
+                    title: 'Send Invitation Code',
+                    content: (
+                      <CreateInviteCodeEmailFormClient
+                        action={async (data) => {
+                          'use server'
+                          return superAction(async () => {
+                            const myMembership = await getMyMembershipOrThrow({
+                              allowedRoles: ['admin'],
+                            })
+                            const newCode = await db
+                              .insert(schema.inviteCodes)
+                              .values({
+                                organizationId: organizationId,
+                                role: data.role,
+                                expiresAt: addDays(new Date(), 1),
+                                maxUses: 1,
+                                createdById: myMembership.userId,
+                              })
+                              .returning({ id: schema.inviteCodes.id })
+
+                            const code = newCode[0]
+
+                            const me = await getMyUserOrThrow()
+
+                            await sendOrgInviteMail({
+                              receiverEmail: data.receiverEmail,
+                              invitedByEmail: me.email,
+                              invitedByUsername: me.name,
+                              orgName: organizationName,
+                              inviteLink: `${process.env.BASE_URL}/join/${organizationSlug}/${code.id}`,
+                              role: data.role,
+                            })
+
+                            revalidatePath(
+                              `/org/${organizationId}/settings/members`,
+                            )
+                            streamDialog(null)
+                          })
+                        }}
+                      />
+                    ),
+                  })
+                })
+              }}
+            >
+              <Mail className="mr-2 h-4 w-4" />
+              Mail Invitation
+            </ActionButton>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>

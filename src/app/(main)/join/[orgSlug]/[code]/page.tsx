@@ -34,6 +34,10 @@ export default async function JoinOrgPage({
 }) {
   const { orgSlug, code } = await params
 
+  const user = await getMyUserOrLogin({
+    forceRedirectUrl: `/join/${orgSlug}/${code}`,
+  })
+
   const organization = await db.query.organizations.findFirst({
     where: eq(schema.organizations.slug, orgSlug),
     with: {
@@ -53,15 +57,9 @@ export default async function JoinOrgPage({
     ),
   })
 
-  console.log({ inviteCode })
-
   if (!inviteCode) {
     return notFound()
   }
-
-  const user = await getMyUserOrLogin()
-
-  const membership = find(organization.memberships, (m) => m.userId === user.id)
 
   let invalidReason: string | null = null
 
@@ -78,7 +76,7 @@ export default async function JoinOrgPage({
   // Render invalid state
   if (invalidReason) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+      <div className="flex h-full items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
             <div className="flex items-center gap-2 mb-2">
@@ -135,10 +133,12 @@ export default async function JoinOrgPage({
     )
   }
 
+  const membership = find(organization.memberships, (m) => m.userId === user.id)
+
   // Render success state (after joining)
   if (membership) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+      <div className="flex h-full items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
             <div className="flex items-center gap-2 mb-2">

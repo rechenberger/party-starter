@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "ts:check": "tsc --noEmit"
+    "ts:check": "tsc --noEmit",
+    "email:dev": "email dev --port 3001"
   },
   "dependencies": {
     "@auth/core": "^0.39.0",
@@ -46,6 +47,7 @@
     "@radix-ui/react-toggle": "^1.1.2",
     "@radix-ui/react-toggle-group": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.8",
+    "@react-email/components": "0.0.36",
     "@sodefa/next-server-context": "^0.0.2",
     "@tailwindcss/postcss": "^4.0.15",
     "@teampilot/sdk": "^0.0.32",
@@ -100,7 +102,8 @@
     "@types/ws": "^8.18.1",
     "dotenv-flow": "^4.1.0",
     "drizzle-kit": "^0.31.0",
-    "prettier": "^3.1.1"
+    "prettier": "^3.1.1",
+    "react-email": "4.0.7"
   },
   "pnpm": {
     "overrides": {

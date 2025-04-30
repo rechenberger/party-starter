@@ -6,7 +6,7 @@ import { DEFAULT_LOCALE, Locale, LOCALES } from './locale'
 export const getMyLocale = async ({
   params,
 }: {
-  params: Promise<{ locale?: string }>
+  params?: Promise<{ locale?: string }>
 }) => {
   const locale =
     (await getFromParams({ params })) ??
@@ -24,7 +24,7 @@ export const getMyLocale = async ({
 const getFromParams = async ({
   params,
 }: {
-  params: Promise<{ locale?: string }>
+  params?: Promise<{ locale?: string }>
 }) => {
   const locale = (await params)?.locale
   const parsedParamLocale = Locale.safeParse(locale)

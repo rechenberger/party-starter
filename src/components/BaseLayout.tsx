@@ -23,7 +23,7 @@ export const BaseLayout = async ({
   params,
 }: {
   children: React.ReactNode
-  params: Promise<{ locale?: string }>
+  params?: Promise<{ locale?: string }>
 }) => {
   const locale = await getMyLocale({ params })
   return (

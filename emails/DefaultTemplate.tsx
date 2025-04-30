@@ -53,7 +53,11 @@ export const DefaultTemplate = ({
             {children}
             <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
             <Text className="text-[#666666] text-[12px] leading-[24px]">
-              Best regards The Party Starter Team 🎉
+              Best regards
+              <br />
+              The Party Starter Team
+              <br />
+              🎉
             </Text>
           </Container>
         </Body>

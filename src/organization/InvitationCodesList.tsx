@@ -242,7 +242,10 @@ export const InvitationCodesList = async ({
                               'use server'
                               return superAction(async () => {
                                 await db
-                                  .delete(schema.inviteCodes)
+                                  .update(schema.inviteCodes)
+                                  .set({
+                                    deletedAt: new Date(),
+                                  })
                                   .where(eq(schema.inviteCodes.id, code.id))
                                 revalidatePath(
                                   `/org/${organizationSlug}/settings/members`,

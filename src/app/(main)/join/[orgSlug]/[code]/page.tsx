@@ -14,7 +14,7 @@ import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, isNull } from 'drizzle-orm'
 import { find } from 'lodash-es'
 import {
   AlertCircle,
@@ -49,6 +49,7 @@ export default async function JoinOrgPage({
     where: and(
       eq(schema.inviteCodes.id, code),
       eq(schema.inviteCodes.organizationId, organization.id),
+      isNull(schema.inviteCodes.deletedAt),
     ),
   })
 

@@ -9,7 +9,7 @@ import {
 import { InvitationCodesList } from '@/organization/InvitationCodesList'
 import { MemberList } from '@/organization/MemberList'
 import { superAction } from '@/super-action/action/createSuperAction'
-import { and, desc, eq } from 'drizzle-orm'
+import { and, desc, eq, isNull } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -32,6 +32,7 @@ export default async function OrgSettingsPage({
     where: eq(schema.organizations.slug, orgSlug),
     with: {
       inviteCodes: {
+        where: isNull(schema.inviteCodes.deletedAt),
         with: {
           createdBy: {
             columns: {
@@ -62,6 +63,7 @@ export default async function OrgSettingsPage({
             },
           },
         },
+        orderBy: [desc(schema.organizationMemberships.createdAt)],
       },
     },
   })

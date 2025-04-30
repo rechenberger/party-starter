@@ -30,7 +30,6 @@ import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { formatDistanceToNow } from 'date-fns'
-import { orderBy } from 'lodash-es'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
@@ -123,9 +122,7 @@ export const MemberList = ({
       return userName.includes(query) || userEmail.includes(query)
     })
 
-    const ordered = orderBy(filtered, [(f) => f.createdAt], ['desc'])
-
-    setFilteredMemberships(ordered)
+    setFilteredMemberships(filtered)
   }, [organization, searchQuery])
 
   return (

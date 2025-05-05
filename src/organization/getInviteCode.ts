@@ -38,13 +38,18 @@ export const getInviteCode = async ({
   }
 
   if (inviteCode.expiresAt && inviteCode.expiresAt < new Date()) {
-    return { error: 'Expired' as const, organization }
+    return { error: 'Expired' as const, organization, inviteCode, user }
   } else if (
     inviteCode.usesMax &&
     inviteCode.usesCurrent &&
     inviteCode.usesCurrent >= inviteCode.usesMax
   ) {
-    return { error: 'Max uses reached' as const, organization }
+    return {
+      error: 'Max uses reached' as const,
+      organization,
+      inviteCode,
+      user,
+    }
   }
 
   return { inviteCode, organization, user }

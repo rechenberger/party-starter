@@ -4,6 +4,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
   Table,
   TableBody,
   TableCell,
@@ -30,7 +35,7 @@ import {
   isPast,
 } from 'date-fns'
 import { eq } from 'drizzle-orm'
-import { Mail, PlusCircle, Trash2 } from 'lucide-react'
+import { Info, Mail, PlusCircle, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
 import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
@@ -304,7 +309,19 @@ export const InvitationCodesList = async ({
                         )}
                       </TableCell>
                       <TableCell>
-                        <div className="text-wrap max-w-40">{code.comment}</div>
+                        {code.comment && (
+                          <Popover>
+                            <PopoverTrigger>
+                              <div className="max-w-40 flex items-center gap-1">
+                                <span className="truncate">{code.comment}</span>
+                                <Info className="size-4 flex-shrink-0" />
+                              </div>
+                            </PopoverTrigger>
+                            <PopoverContent side="top">
+                              {code.comment}
+                            </PopoverContent>
+                          </Popover>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">

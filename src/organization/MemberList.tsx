@@ -34,7 +34,10 @@ import { formatDistanceToNow } from 'date-fns'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useMemo, useState } from 'react'
-import { OrganizationRole } from './organizationRoles'
+import {
+  OrganizationRole,
+  organizationRoleDefinitions,
+} from './organizationRoles'
 
 type MembershipWithUser = Pick<
   OrganizationMembership,
@@ -187,8 +190,11 @@ export const MemberList = ({
                             <SelectValue placeholder="Select role" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="member">Member</SelectItem>
+                            {organizationRoleDefinitions.map((role) => (
+                              <SelectItem key={role.name} value={role.name}>
+                                {role.label}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       )}

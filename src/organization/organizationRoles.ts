@@ -1,7 +1,7 @@
 import { map } from 'remeda'
 import { z } from 'zod'
 
-export const OrganizationRoleDefinitions = [
+export const organizationRoleDefinitions = [
   {
     name: 'admin',
     label: 'Admin',
@@ -12,13 +12,13 @@ export const OrganizationRoleDefinitions = [
   },
 ] as const
 
-const OrganizationRoles = map(OrganizationRoleDefinitions, (role) => role.name)
+const organizationRoles = map(organizationRoleDefinitions, (role) => role.name)
 
-export const OrganizationRole = z.enum(OrganizationRoles)
+export const OrganizationRole = z.enum(organizationRoles)
 export type OrganizationRole = z.infer<typeof OrganizationRole>
 
 export const getOrganizationRole = (role: OrganizationRole) => {
-  const definition = OrganizationRoleDefinitions.find((r) => r.name === role)
+  const definition = organizationRoleDefinitions.find((r) => r.name === role)
   if (!definition) {
     throw new Error(`Organization role ${role} not found`)
   }

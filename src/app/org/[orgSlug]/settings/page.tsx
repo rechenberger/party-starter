@@ -7,12 +7,13 @@ import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
 } from '@/organization/getMyMembership'
+import { OrganizationRole } from '@/organization/organizationRoles'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { eq } from 'drizzle-orm'
 import { AlertTriangle } from 'lucide-react'
 import { redirect } from 'next/navigation'
 
-const allowedRoles: schema.OrganizationRole[] = ['admin']
+const allowedRoles: OrganizationRole[] = ['admin']
 
 export default async function OrgSettingsPage({
   params,

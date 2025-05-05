@@ -25,7 +25,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { schema } from '@/db/schema-export'
 import { Organization, OrganizationMembership, User } from '@/db/schema-zod'
 import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
@@ -35,6 +34,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useMemo, useState } from 'react'
+import { OrganizationRole } from './organizationRoles'
 
 type MembershipWithUser = Pick<
   OrganizationMembership,
@@ -54,7 +54,7 @@ export const MemberList = ({
   }
   changeRoleAction: SuperActionWithInput<{
     userId: string
-    role: schema.OrganizationRole
+    role: OrganizationRole
   }>
   kickUserAction: SuperActionWithInput<{
     userId: string
@@ -177,7 +177,7 @@ export const MemberList = ({
                           onValueChange={(value: 'admin' | 'member') =>
                             trigger({
                               userId: membership.userId,
-                              role: value as schema.OrganizationRole,
+                              role: value as OrganizationRole,
                             })
                           }
                           disabled={isChangeRoleLoading}

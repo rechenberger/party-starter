@@ -1,5 +1,7 @@
 import { createdAtColumn, idColumn, updatedAtColumn } from '@/db/commonColumns'
 import { users } from '@/db/schema-auth'
+import { OrganizationRole } from '@/organization/organizationRoles'
+
 import { relations } from 'drizzle-orm'
 import {
   customType,
@@ -9,10 +11,6 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/pg-core'
-import { z } from 'zod'
-
-export const OrganizationRole = z.enum(['admin', 'member'])
-export type OrganizationRole = z.infer<typeof OrganizationRole>
 
 const organizationRoleType = customType<{
   data: OrganizationRole

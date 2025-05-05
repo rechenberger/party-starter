@@ -8,13 +8,14 @@ import {
 } from '@/organization/getMyMembership'
 import { InvitationCodesList } from '@/organization/InvitationCodesList'
 import { MemberList } from '@/organization/MemberList'
+import { OrganizationRole } from '@/organization/organizationRoles'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { and, desc, eq, isNull } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-const allowedRolesView: schema.OrganizationRole[] = ['admin', 'member']
-const allowedRolesEdit: schema.OrganizationRole[] = ['admin']
+const allowedRolesView: OrganizationRole[] = ['admin', 'member']
+const allowedRolesEdit: OrganizationRole[] = ['admin']
 
 export default async function OrgSettingsPage({
   params,
@@ -70,7 +71,7 @@ export default async function OrgSettingsPage({
 
   const changeRoleAction = async (data: {
     userId: string
-    role: schema.OrganizationRole
+    role: OrganizationRole
   }) => {
     'use server'
 

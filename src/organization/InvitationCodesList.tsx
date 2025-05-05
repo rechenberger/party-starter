@@ -41,7 +41,9 @@ export const InvitationCodesList = async ({
   organization,
 }: {
   organization: {
-    inviteCodes: (InviteCode & { createdBy: User | null })[]
+    inviteCodes: (InviteCode & {
+      createdBy: Pick<User, 'name' | 'email' | 'image'> | null
+    })[]
     id: string
     slug: string
     name: string

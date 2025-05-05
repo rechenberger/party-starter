@@ -1,3 +1,4 @@
+import { OrganizationRole } from '@/organization/organizationRoles'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import z from 'zod'
 import { schema } from './schema-export'
@@ -19,12 +20,16 @@ export type InviteCodeInsert = z.infer<typeof InviteCodeInsert>
 
 export const OrganizationMembership = createSelectSchema(
   schema.organizationMemberships,
-  {},
+  {
+    role: OrganizationRole,
+  },
 )
 export type OrganizationMembership = z.infer<typeof OrganizationMembership>
 export const OrganizationMembershipInsert = createInsertSchema(
   schema.organizationMemberships,
-  {},
+  {
+    role: OrganizationRole,
+  },
 )
 export type OrganizationMembershipInsert = z.infer<
   typeof OrganizationMembershipInsert

@@ -1,6 +1,6 @@
 import { getMyUserOrLogin } from '@/auth/getMyUser'
+import SeededAvatar from '@/components/SeededAvatar'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -99,16 +99,7 @@ export default async function JoinOrgPage({
             </Alert>
 
             <div className="flex items-center gap-4 mt-6">
-              <Avatar className="h-12 w-12">
-                <AvatarImage src={''} alt={organization.name} />
-                <AvatarFallback>
-                  {organization.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')
-                    .toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <SeededAvatar value={organization.slug} />
               <div>
                 <h3 className="font-medium">{organization.name}</h3>
                 <p className="text-sm text-muted-foreground">
@@ -151,16 +142,7 @@ export default async function JoinOrgPage({
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center justify-center py-6">
-              <Avatar className="h-20 w-20 mb-4">
-                <AvatarImage src={''} alt={organization.name} />
-                <AvatarFallback>
-                  {organization.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')
-                    .toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <SeededAvatar value={organization.slug} />
               <h2 className="text-xl font-bold mb-1">{organization.name}</h2>
               <Badge
                 variant={inviteCode.role === 'admin' ? 'default' : 'secondary'}
@@ -201,24 +183,14 @@ export default async function JoinOrgPage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center py-6">
-            <Avatar className="h-20 w-20 mb-4">
-              <AvatarImage src={''} alt={organization.name} />
-              <AvatarFallback>
-                {organization.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')
-                  .toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <h2 className="text-xl font-bold mb-1">{organization.name}</h2>
-            <p className="text-sm text-muted-foreground mb-4">
+          <div className="flex flex-col items-center justify-center py-6 gap-2">
+            <SeededAvatar size={100} value={organization.slug} />
+            <h2 className="text-xl font-bold">{organization.name}</h2>
+            <p className="text-sm text-muted-foreground">
               Invitation Code: {code}
             </p>
             <Badge
               variant={inviteCode.role === 'admin' ? 'default' : 'secondary'}
-              className="mb-6"
             >
               {inviteCode.role === 'admin' ? 'Admin Role' : 'Member Role'}
             </Badge>

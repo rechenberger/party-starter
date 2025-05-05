@@ -35,7 +35,7 @@ import { revalidatePath } from 'next/cache'
 import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
 import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
 import { getMyMembershipOrThrow } from './getMyMembership'
-import { OrganizationRole } from './organizationRoles'
+import { getOrganizationRole, OrganizationRole } from './organizationRoles'
 import { sendOrgInviteMail } from './sendOrgInviteMail'
 
 const allowedRoles: OrganizationRole[] = ['admin']
@@ -62,6 +62,20 @@ export const InvitationCodesList = async ({
     slug: organizationSlug,
     name: organizationName,
   } = organization
+
+  const validInviteCodes = inviteCodes.filter((code) => {
+    if (code.expiresAt && isPast(code.expiresAt)) {
+      return false
+    }
+    if (
+      !!code.usesMax &&
+      !!code.usesCurrent &&
+      code.usesCurrent >= code.usesMax
+    ) {
+      return false
+    }
+    return true
+  })
 
   return (
     <>
@@ -189,14 +203,14 @@ export const InvitationCodesList = async ({
               <TableRow>
                 <TableHead>Code</TableHead>
                 <TableHead>Role</TableHead>
-                <TableHead>Expires At</TableHead>
+                <TableHead>Expires</TableHead>
                 <TableHead>Uses left</TableHead>
                 <TableHead>Created By</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {inviteCodes.length === 0 ? (
+              {validInviteCodes.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={5}
@@ -206,7 +220,7 @@ export const InvitationCodesList = async ({
                   </TableCell>
                 </TableRow>
               ) : (
-                inviteCodes.map((code) => {
+                validInviteCodes.map((code) => {
                   const isExpired =
                     (code.expiresAt && isPast(code.expiresAt)) ||
                     (code.usesMax && code.usesCurrent === code.usesMax)
@@ -215,7 +229,11 @@ export const InvitationCodesList = async ({
                       <TableCell
                         className={cn('font-mono', isExpired && 'line-through')}
                       >
-                        {code.id}
+                        <CopyToClipboardButton
+                          textToDisplay={code.id}
+                          size="vanilla"
+                          textToCopy={`${BASE_URL}/join/${organizationSlug}/${code.id}`}
+                        />
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -223,7 +241,7 @@ export const InvitationCodesList = async ({
                             code.role === 'admin' ? 'default' : 'secondary'
                           }
                         >
-                          {code.role}
+                          {getOrganizationRole(code.role).label}
                         </Badge>
                       </TableCell>
                       <TableCell
@@ -285,9 +303,6 @@ export const InvitationCodesList = async ({
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <CopyToClipboardButton
-                            text={`${BASE_URL}/join/${organizationSlug}/${code.id}`}
-                          />
                           <ActionButton
                             variant="ghost"
                             size="icon"

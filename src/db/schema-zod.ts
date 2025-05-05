@@ -13,9 +13,13 @@ export type Organization = z.infer<typeof Organization>
 export const OrganizationInsert = createInsertSchema(schema.organizations, {})
 export type OrganizationInsert = z.infer<typeof OrganizationInsert>
 
-export const InviteCode = createSelectSchema(schema.inviteCodes, {})
+export const InviteCode = createSelectSchema(schema.inviteCodes, {
+  role: OrganizationRole,
+})
 export type InviteCode = z.infer<typeof InviteCode>
-export const InviteCodeInsert = createInsertSchema(schema.inviteCodes, {})
+export const InviteCodeInsert = createInsertSchema(schema.inviteCodes, {
+  role: OrganizationRole,
+})
 export type InviteCodeInsert = z.infer<typeof InviteCodeInsert>
 
 export const OrganizationMembership = createSelectSchema(

@@ -35,7 +35,10 @@ import { revalidatePath } from 'next/cache'
 import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
 import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
 import { getMyMembershipOrThrow } from './getMyMembership'
+import { OrganizationRole } from './organizationRoles'
 import { sendOrgInviteMail } from './sendOrgInviteMail'
+
+const allowedRoles: OrganizationRole[] = ['admin']
 
 export const InvitationCodesList = async ({
   organization,
@@ -50,7 +53,7 @@ export const InvitationCodesList = async ({
   }
 }) => {
   await getMyMembershipOrThrow({
-    allowedRoles: ['admin'],
+    allowedRoles,
   })
 
   const {
@@ -79,7 +82,7 @@ export const InvitationCodesList = async ({
                           'use server'
                           return superAction(async () => {
                             const myMembership = await getMyMembershipOrThrow({
-                              allowedRoles: ['admin'],
+                              allowedRoles,
                             })
                             let expiresAtResolved: Date | null = null
                             switch (data.expiresAt) {

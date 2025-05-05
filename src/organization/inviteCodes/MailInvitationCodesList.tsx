@@ -13,13 +13,14 @@ import {
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { BASE_URL } from '@/lib/config'
+import { ORGS } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import {
   streamDialog,
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { addDays, format, formatDistanceToNow, isPast } from 'date-fns'
+import { format, formatDistanceToNow, isPast } from 'date-fns'
 import { eq } from 'drizzle-orm'
 import { Mail, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
@@ -28,6 +29,7 @@ import { getOrganizationRole } from '../organizationRoles'
 import { sendOrgInviteMail } from '../sendOrgInviteMail'
 import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
 import { InvitationCodesListProps } from './InvitationCodesList'
+import { resolveExpiresAt } from './resolveExpiresAt'
 
 export const MailInvitationCodesList = async (
   props: InvitationCodesListProps,
@@ -65,7 +67,9 @@ export const MailInvitationCodesList = async (
                               .values({
                                 organizationId: organizationId,
                                 role: data.role,
-                                expiresAt: addDays(new Date(), 1),
+                                expiresAt: resolveExpiresAt(
+                                  ORGS.defaultExpirationEmailInvitation,
+                                ),
                                 usesMax: 1,
                                 createdById: myMembership.userId,
                                 sentToEmail: data.receiverEmail,
@@ -222,7 +226,9 @@ export const MailInvitationCodesList = async (
                                 await db
                                   .update(schema.inviteCodes)
                                   .set({
-                                    expiresAt: addDays(new Date(), 1),
+                                    expiresAt: resolveExpiresAt(
+                                      ORGS.defaultExpirationEmailInvitation,
+                                    ),
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))
 

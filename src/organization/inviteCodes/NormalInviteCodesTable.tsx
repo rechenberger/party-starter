@@ -24,14 +24,7 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import {
-  addDays,
-  addMonths,
-  addYears,
-  format,
-  formatDistanceToNow,
-  isPast,
-} from 'date-fns'
+import { format, formatDistanceToNow, isPast } from 'date-fns'
 import { eq } from 'drizzle-orm'
 import { Info, PlusCircle, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
@@ -39,6 +32,7 @@ import { getMyMembershipOrThrow } from '../getMyMembership'
 import { getOrganizationRole, OrganizationRole } from '../organizationRoles'
 import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
 import { InvitationCodesListProps } from './InvitationCodesList'
+import { resolveExpiresAt } from './resolveExpiresAt'
 
 const allowedRoles: OrganizationRole[] = ['admin']
 
@@ -65,26 +59,9 @@ export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
                             const myMembership = await getMyMembershipOrThrow({
                               allowedRoles,
                             })
-                            let expiresAtResolved: Date | null = null
-                            switch (data.expiresAt) {
-                              case 'never':
-                                expiresAtResolved = null
-                                break
-                              case '1d':
-                                expiresAtResolved = addDays(new Date(), 1)
-                                break
-                              case '1w':
-                                expiresAtResolved = addDays(new Date(), 7)
-                                break
-                              case '1m':
-                                expiresAtResolved = addMonths(new Date(), 1)
-                                break
-                              case '1y':
-                                expiresAtResolved = addYears(new Date(), 1)
-                                break
-                              default:
-                                throw new Error('Invalid expires at')
-                            }
+                            const expiresAtResolved = resolveExpiresAt(
+                              data.expiresAt,
+                            )
                             await db.insert(schema.inviteCodes).values({
                               organizationId: organizationId,
                               role: data.role,

@@ -30,6 +30,8 @@ const CreateInviteCodeSchema = z.object({
   comment: z.string().optional(),
 })
 
+export type ExpiresAt = z.infer<typeof CreateInviteCodeSchema>['expiresAt']
+
 type CreateInviteCodeData = z.infer<typeof CreateInviteCodeSchema>
 
 const [useCreateInviteCodeForm] = createZodForm(CreateInviteCodeSchema)

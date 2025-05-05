@@ -21,6 +21,7 @@ import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { z } from 'zod'
+import { organizationRoleDefinitions } from './organizationRoles'
 
 const CreateInviteCodeSchema = z.object({
   role: z.enum(['admin', 'member']),
@@ -83,8 +84,11 @@ export const CreateInviteCodeFormClient = ({
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="member">Member</SelectItem>
+                      {organizationRoleDefinitions.map((role) => (
+                        <SelectItem key={role.name} value={role.name}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>

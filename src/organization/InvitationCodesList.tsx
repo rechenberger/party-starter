@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { InviteCode, User } from '@/db/schema-zod'
 import { BASE_URL } from '@/lib/config'
 import { cn } from '@/lib/utils'
 import {
@@ -36,31 +37,17 @@ import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
 import { getMyMembershipOrThrow } from './getMyMembership'
 import { sendOrgInviteMail } from './sendOrgInviteMail'
 
-type InvitationCode = {
-  id: string
-  role: 'admin' | 'member'
-  expiresAt: Date | null
-  maxUses: number | null
-  currentUses: number | null
-  createdAt: Date
-  createdBy: {
-    name: string | null
-    image: string | null
-    email: string
-  } | null
-}
-
 export const InvitationCodesList = async ({
   organization,
 }: {
   organization: {
-    inviteCodes: InvitationCode[]
+    inviteCodes: (InviteCode & { createdBy: User | null })[]
     id: string
     slug: string
     name: string
   }
 }) => {
-  const myMembership = await getMyMembershipOrThrow({
+  await getMyMembershipOrThrow({
     allowedRoles: ['admin'],
   })
 
@@ -116,7 +103,7 @@ export const InvitationCodesList = async ({
                               organizationId: organizationId,
                               role: data.role,
                               expiresAt: expiresAtResolved,
-                              maxUses: data.maxUses,
+                              usesMax: data.usesMax,
                               createdById: myMembership.userId,
                             })
 
@@ -156,7 +143,7 @@ export const InvitationCodesList = async ({
                                 organizationId: organizationId,
                                 role: data.role,
                                 expiresAt: addDays(new Date(), 1),
-                                maxUses: 1,
+                                usesMax: 1,
                                 createdById: myMembership.userId,
                               })
                               .returning({ id: schema.inviteCodes.id })
@@ -217,7 +204,7 @@ export const InvitationCodesList = async ({
                 inviteCodes.map((code) => {
                   const isExpired =
                     (code.expiresAt && isPast(code.expiresAt)) ||
-                    (code.maxUses && code.currentUses === code.maxUses)
+                    (code.usesMax && code.usesCurrent === code.usesMax)
                   return (
                     <TableRow key={code.id}>
                       <TableCell
@@ -252,9 +239,9 @@ export const InvitationCodesList = async ({
                       <TableCell>
                         <div className="space-y-1">
                           <div className="flex text-xs">
-                            {code.maxUses ? (
+                            {code.usesMax ? (
                               <span>
-                                {code.maxUses - (code.currentUses ?? 0)}
+                                {code.usesMax - (code.usesCurrent ?? 0)}
                               </span>
                             ) : (
                               <span className="text-muted-foreground">∞</span>

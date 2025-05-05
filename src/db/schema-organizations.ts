@@ -58,8 +58,8 @@ export const inviteCodes = pgTable('invite_code', {
   role: organizationRoleType('role').notNull(),
   comment: text('comment'),
   expiresAt: timestamp('expiresAt'),
-  maxUses: integer('maxUses'),
-  currentUses: integer('currentUses'),
+  usesMax: integer('usesMax'),
+  usesCurrent: integer('usesCurrent'),
 })
 
 export const inviteCodesRelations = relations(inviteCodes, ({ one, many }) => ({

@@ -1,4 +1,3 @@
-import { getMyUserOrLogin } from '@/auth/getMyUser'
 import SeededAvatar from '@/components/SeededAvatar'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -12,9 +11,10 @@ import {
 } from '@/components/ui/card'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { getInviteCode } from '@/organization/getInviteCode'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { and, eq, isNull } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { find } from 'lodash-es'
 import {
   AlertCircle,
@@ -34,47 +34,18 @@ export default async function JoinOrgPage({
 }) {
   const { orgSlug, code } = await params
 
-  const user = await getMyUserOrLogin({
-    forceRedirectUrl: `/join/${orgSlug}/${code}`,
-  })
-
-  const organization = await db.query.organizations.findFirst({
-    where: eq(schema.organizations.slug, orgSlug),
-    with: {
-      memberships: true,
-    },
-  })
-
-  if (!organization) {
+  const {error, organization, inviteCode, user} = await getInviteCode({ orgSlug, code })
+  
+  if (error === 'Organization not found') {
     return notFound()
   }
 
-  const inviteCode = await db.query.inviteCodes.findFirst({
-    where: and(
-      eq(schema.inviteCodes.id, code),
-      eq(schema.inviteCodes.organizationId, organization.id),
-      isNull(schema.inviteCodes.deletedAt),
-    ),
-  })
-
-  if (!inviteCode) {
+  if (error === 'Invite code not found') {
     return notFound()
-  }
-
-  let invalidReason: string | null = null
-
-  if (inviteCode.expiresAt && inviteCode.expiresAt < new Date()) {
-    invalidReason = 'Expired'
-  } else if (
-    inviteCode.maxUses &&
-    inviteCode.currentUses &&
-    inviteCode.currentUses >= inviteCode.maxUses
-  ) {
-    invalidReason = 'Max uses reached'
   }
 
   // Render invalid state
-  if (invalidReason) {
+  if (error === 'Expired' || error === 'Max uses reached') {
     return (
       <div className="flex h-full items-center justify-center p-4">
         <Card className="w-full max-w-md">
@@ -92,14 +63,14 @@ export default async function JoinOrgPage({
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>
-                {invalidReason === 'Expired'
+                {error === 'Expired'
                   ? 'This invitation has expired.'
                   : 'This invitation has reached its maximum number of uses.'}
               </AlertDescription>
             </Alert>
 
             <div className="flex items-center gap-4 mt-6">
-              <SeededAvatar value={organization.slug} />
+              <SeededAvatar value={orgSlug} />
               <div>
                 <h3 className="font-medium">{organization.name}</h3>
                 <p className="text-sm text-muted-foreground">
@@ -226,11 +197,11 @@ export default async function JoinOrgPage({
                 </div>
               )}
 
-              {inviteCode.maxUses && (
+              {inviteCode.usesMax && (
                 <div className="flex items-center gap-2 text-sm">
                   <Users className="h-4 w-4 text-muted-foreground" />
                   <span>
-                    {inviteCode.currentUses ?? 0} of {inviteCode.maxUses} uses
+                    {inviteCode.usesCurrent ?? 0} of {inviteCode.usesMax} uses
                   </span>
                 </div>
               )}
@@ -244,36 +215,26 @@ export default async function JoinOrgPage({
             action={async () => {
               'use server'
               return superAction(async () => {
-                //check not expired, not deleted, not max uses reached
-                if (inviteCode.expiresAt && inviteCode.expiresAt < new Date()) {
-                  throw new Error('Expired')
+                const { error, organization, inviteCode, user } = await getInviteCode({ orgSlug, code })
+                
+                if (error) {
+                  throw new Error(error)
                 }
 
-                if (inviteCode.deletedAt) {
-                  throw new Error('Deleted')
-                }
-
-                if (
-                  inviteCode.maxUses &&
-                  (inviteCode.currentUses ?? 0) >= inviteCode.maxUses
-                ) {
-                  throw new Error('Max uses reached')
-                }
-
-                //add currentUses + 1
-                await db
-                  .update(schema.inviteCodes)
-                  .set({
-                    currentUses: (inviteCode.currentUses ?? 0) + 1,
+                await Promise.all([
+                  db
+                    .update(schema.inviteCodes)
+                    .set({
+                      usesCurrent: (inviteCode.usesCurrent ?? 0) + 1,
+                    })
+                    .where(eq(schema.inviteCodes.id, inviteCode.id)),
+                  db.insert(schema.organizationMemberships).values({
+                    organizationId: organization.id,
+                    userId: user.id,
+                    role: inviteCode.role,
+                    invitationCodeId: inviteCode.id,
                   })
-                  .where(eq(schema.inviteCodes.id, inviteCode.id))
-
-                await db.insert(schema.organizationMemberships).values({
-                  organizationId: organization.id,
-                  userId: user.id,
-                  role: inviteCode.role,
-                  invitationCodeId: inviteCode.id,
-                })
+                ])
                 revalidatePath(`/join/${organization.slug}/${code}`)
               })
             }}

@@ -25,7 +25,7 @@ import { z } from 'zod'
 const CreateInviteCodeSchema = z.object({
   role: z.enum(['admin', 'member']),
   expiresAt: z.enum(['never', '1d', '1w', '1m', '1y']),
-  maxUses: z.coerce.number().optional(),
+  usesMax: z.coerce.number().optional(),
 })
 
 type CreateInviteCodeData = z.infer<typeof CreateInviteCodeSchema>
@@ -50,7 +50,7 @@ export const CreateInviteCodeFormClient = ({
     defaultValues: {
       role: 'member',
       expiresAt: '1d',
-      maxUses: 1,
+      usesMax: 1,
     },
     disabled,
   })
@@ -125,7 +125,7 @@ export const CreateInviteCodeFormClient = ({
           />
           <FormField
             control={form.control}
-            name="maxUses"
+            name="usesMax"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Max Uses</FormLabel>

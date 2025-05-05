@@ -30,10 +30,11 @@ import { Organization, OrganizationMembership, User } from '@/db/schema-zod'
 import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
+import { capitalCase } from 'change-case'
 import { formatDistanceToNow } from 'date-fns'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 type MembershipWithUser = Pick<
   OrganizationMembership,
@@ -68,28 +69,12 @@ export const MemberList = ({
     catchToast: true,
   })
 
-  // State for search query
   const [searchQuery, setSearchQuery] = useState<string>('')
-  // State for filtered memberships
-  const [filteredMemberships, setFilteredMemberships] = useState<
-    MembershipWithUser[]
-  >(organization.memberships)
-
-  // Handle search input change
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query)
-  }
-
-  // Clear search
-  const clearSearch = () => {
-    setSearchQuery('')
-  }
 
   // Filter memberships based on search query
-  useEffect(() => {
+  const filteredMemberships = useMemo(() => {
     if (!searchQuery.trim()) {
-      setFilteredMemberships(organization.memberships)
-      return
+      return organization.memberships
     }
 
     const filtered = organization.memberships.filter((membership) => {
@@ -100,7 +85,7 @@ export const MemberList = ({
       return userName.includes(query) || userEmail.includes(query)
     })
 
-    setFilteredMemberships(filtered)
+    return filtered
   }, [organization, searchQuery])
 
   return (
@@ -132,11 +117,11 @@ export const MemberList = ({
                 placeholder="Search members by name or email..."
                 className="pl-8"
                 value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
               {searchQuery && (
                 <button
-                  onClick={clearSearch}
+                  onClick={() => setSearchQuery('')}
                   className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
                   aria-label="Clear search"
                 >
@@ -209,7 +194,7 @@ export const MemberList = ({
                       )}
                       {!isAdmin && (
                         <Badge variant="outline" className="text-xs">
-                          {membership.role}
+                          {capitalCase(membership.role)}
                         </Badge>
                       )}
                     </TableCell>

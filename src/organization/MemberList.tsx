@@ -144,95 +144,107 @@ export const MemberList = ({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredMemberships.map((membership) => (
-                  <TableRow key={membership.userId}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarImage
-                            src={membership.user.image || ''}
-                            alt={membership.user.name || 'Member'}
-                          />
-                          <AvatarFallback>
-                            {membership.user.name
-                              ?.split(' ')
-                              .map((n) => n[0])
-                              .join('') || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{membership.user.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {membership.user.email}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {formatDistanceToNow(new Date(membership.createdAt), {
-                        addSuffix: true,
-                      })}
-                    </TableCell>
-                    <TableCell>
-                      {isAdmin && (
-                        <Select
-                          defaultValue={membership.role}
-                          onValueChange={(value: 'admin' | 'member') =>
-                            trigger({
-                              userId: membership.userId,
-                              role: value as OrganizationRole,
-                            })
-                          }
-                          disabled={isChangeRoleLoading}
-                          value={membership.role}
-                        >
-                          <SelectTrigger className="w-[110px]">
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {organizationRoleDefinitions.map((role) => (
-                              <SelectItem key={role.name} value={role.name}>
-                                {role.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                      {!isAdmin && (
-                        <Badge variant="outline" className="text-xs">
-                          {getOrganizationRole(membership.role).label}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    {(isAdmin || membership.userId === myUserId) && (
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <ActionButton
-                            variant="ghost"
-                            size="icon"
-                            // disabled={isDeleting}
-                            catchToast
-                            hideIcon
-                            askForConfirmation
-                            action={async () =>
-                              kickUserAction({
-                                userId: membership.userId,
-                              })
-                            }
-                            title="Kick user"
-                          >
-                            {membership.userId === myUserId ? (
-                              <LogOut className="h-4 w-4 text-destructive" />
-                            ) : (
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            )}
-                            <span className="sr-only">Kick user</span>
-                          </ActionButton>
+                {filteredMemberships.map((membership) => {
+                  const isMyMember = membership.userId === myUserId
+                  return (
+                    <TableRow key={membership.userId}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar>
+                            <AvatarImage
+                              src={membership.user.image || ''}
+                              alt={membership.user.name || 'Member'}
+                            />
+                            <AvatarFallback>
+                              {membership.user.name
+                                ?.split(' ')
+                                .map((n) => n[0])
+                                .join('') || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">
+                              {membership.user.name}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {membership.user.email}
+                            </p>
+                          </div>
                         </div>
                       </TableCell>
-                    )}
-                  </TableRow>
-                ))}
+                      <TableCell className="text-muted-foreground">
+                        {formatDistanceToNow(new Date(membership.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </TableCell>
+                      <TableCell>
+                        {isAdmin && (
+                          <Select
+                            defaultValue={membership.role}
+                            onValueChange={(value: 'admin' | 'member') =>
+                              trigger({
+                                userId: membership.userId,
+                                role: value as OrganizationRole,
+                              })
+                            }
+                            disabled={isChangeRoleLoading}
+                            value={membership.role}
+                          >
+                            <SelectTrigger className="w-[110px]">
+                              <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {organizationRoleDefinitions.map((role) => (
+                                <SelectItem key={role.name} value={role.name}>
+                                  {role.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                        {!isAdmin && (
+                          <Badge variant="outline" className="text-xs">
+                            {getOrganizationRole(membership.role).label}
+                          </Badge>
+                        )}
+                      </TableCell>
+                      {(isAdmin || isMyMember) && (
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <ActionButton
+                              variant="ghost"
+                              size="icon"
+                              // disabled={isDeleting}
+                              catchToast
+                              hideIcon
+                              askForConfirmation={{
+                                title: isMyMember
+                                  ? 'Leave Organization'
+                                  : 'Kick User',
+                                content: `Are you sure you want to ${isMyMember ? 'leave' : `kick ${membership.user.name} from`} ${organization.name}?`,
+                              }}
+                              action={async () =>
+                                kickUserAction({
+                                  userId: membership.userId,
+                                })
+                              }
+                              title={
+                                isMyMember ? 'Leave Organization' : 'Kick User'
+                              }
+                            >
+                              {isMyMember ? (
+                                <LogOut className="h-4 w-4 text-destructive" />
+                              ) : (
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              )}
+                              <span className="sr-only">Kick user</span>
+                            </ActionButton>
+                          </div>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  )
+                })}
               </TableBody>
             </Table>
           </CardContent>

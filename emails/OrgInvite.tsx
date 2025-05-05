@@ -1,21 +1,19 @@
 import { Button, Heading, Link, Section, Text } from '@react-email/components'
 import { DefaultTemplate } from './DefaultTemplate'
 
-interface OrgInviteProps {
-  invitedByUsername?: string | null
-  invitedByEmail: string
-  orgName: string
-  inviteLink: string
-  role: 'admin' | 'member'
-}
-
 export const OrgInvite = ({
   invitedByUsername,
   invitedByEmail,
   orgName,
   inviteLink,
   role,
-}: OrgInviteProps) => {
+}: {
+  invitedByUsername?: string | null
+  invitedByEmail: string
+  orgName: string
+  inviteLink: string
+  role: 'admin' | 'member'
+}) => {
   const previewText = `Join ${invitedByUsername} on Vercel`
 
   return (

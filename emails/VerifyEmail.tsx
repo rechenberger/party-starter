@@ -1,10 +1,9 @@
 import { Button, Heading, Link, Section, Text } from '@react-email/components'
 import { DefaultTemplate } from './DefaultTemplate'
-interface VerifyEmailProps {
-  verifyUrl: string
-}
 
-export const VerifyEmail = ({ verifyUrl }: VerifyEmailProps) => {
+export const VerifyEmail = ({ verifyUrl }: {
+  verifyUrl: string
+}) => {
   const previewText = `Verify your email address`
 
   return (

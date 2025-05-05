@@ -26,7 +26,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { schema } from '@/db/schema-export'
-import { SuperActionPromise } from '@/super-action/action/createSuperAction'
+import { Organization, OrganizationMembership, User } from '@/db/schema-zod'
+import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { formatDistanceToNow } from 'date-fns'
@@ -34,28 +35,11 @@ import { LogOut, Search, Trash2, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 
-type User = {
-  id: string
-  email: string
-  emailVerified: Date | null
-  name: string | null
-  image: string | null
-}
-
-type Membership = {
-  createdAt: Date
-  role: 'admin' | 'member'
-  userId: string
-  user: User
-}
-
-type Organization = {
-  id: string
-  createdAt: Date
-  updatedAt: Date
-  name: string
-  slug: string
-  memberships: Membership[]
+type MembershipWithUser = Pick<
+  OrganizationMembership,
+  'userId' | 'role' | 'createdAt'
+> & {
+  user: Pick<User, 'name' | 'email' | 'image'>
 }
 
 export const MemberList = ({
@@ -64,17 +48,16 @@ export const MemberList = ({
   kickUserAction,
   isAdmin,
 }: {
-  organization: Organization
-  changeRoleAction: (data: {
+  organization: Organization & {
+    memberships: MembershipWithUser[]
+  }
+  changeRoleAction: SuperActionWithInput<{
     userId: string
     role: schema.OrganizationRole
-  }) => SuperActionPromise<
-    void,
-    { userId: string; role: schema.OrganizationRole }
-  >
-  kickUserAction: (data: {
+  }>
+  kickUserAction: SuperActionWithInput<{
     userId: string
-  }) => SuperActionPromise<void, { userId: string }>
+  }>
   isAdmin: boolean
 }) => {
   const { data: session } = useSession()
@@ -84,18 +67,13 @@ export const MemberList = ({
     action: changeRoleAction,
     catchToast: true,
   })
-  const { trigger: triggerKickUser, isLoading: isKickUserLoading } =
-    useSuperAction({
-      action: kickUserAction,
-      catchToast: true,
-    })
 
   // State for search query
   const [searchQuery, setSearchQuery] = useState<string>('')
   // State for filtered memberships
-  const [filteredMemberships, setFilteredMemberships] = useState<Membership[]>(
-    organization.memberships,
-  )
+  const [filteredMemberships, setFilteredMemberships] = useState<
+    MembershipWithUser[]
+  >(organization.memberships)
 
   // Handle search input change
   const handleSearchChange = (query: string) => {
@@ -246,7 +224,7 @@ export const MemberList = ({
                             hideIcon
                             askForConfirmation
                             action={async () =>
-                              triggerKickUser({
+                              kickUserAction({
                                 userId: membership.userId,
                               })
                             }

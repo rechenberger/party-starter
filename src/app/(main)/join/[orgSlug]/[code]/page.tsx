@@ -244,6 +244,30 @@ export default async function JoinOrgPage({
             action={async () => {
               'use server'
               return superAction(async () => {
+                //check not expired, not deleted, not max uses reached
+                if (inviteCode.expiresAt && inviteCode.expiresAt < new Date()) {
+                  throw new Error('Expired')
+                }
+
+                if (inviteCode.deletedAt) {
+                  throw new Error('Deleted')
+                }
+
+                if (
+                  inviteCode.maxUses &&
+                  (inviteCode.currentUses ?? 0) >= inviteCode.maxUses
+                ) {
+                  throw new Error('Max uses reached')
+                }
+
+                //add currentUses + 1
+                await db
+                  .update(schema.inviteCodes)
+                  .set({
+                    currentUses: (inviteCode.currentUses ?? 0) + 1,
+                  })
+                  .where(eq(schema.inviteCodes.id, inviteCode.id))
+
                 await db.insert(schema.organizationMemberships).values({
                   organizationId: organization.id,
                   userId: user.id,

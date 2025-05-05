@@ -1,9 +1,15 @@
-import { getMyUserOrLogin } from "@/auth/getMyUser"
-import { db } from "@/db/db"
-import { schema } from "@/db/schema-export"
-import { and, eq, isNull } from "drizzle-orm"
+import { getMyUserOrLogin } from '@/auth/getMyUser'
+import { db } from '@/db/db'
+import { schema } from '@/db/schema-export'
+import { and, eq, isNull } from 'drizzle-orm'
 
-export const getInviteCode = async ({orgSlug, code}: {orgSlug: string, code: string}) => {
+export const getInviteCode = async ({
+  orgSlug,
+  code,
+}: {
+  orgSlug: string
+  code: string
+}) => {
   const user = await getMyUserOrLogin({
     forceRedirectUrl: `/join/${orgSlug}/${code}`,
   })
@@ -16,7 +22,7 @@ export const getInviteCode = async ({orgSlug, code}: {orgSlug: string, code: str
   })
 
   if (!organization) {
-    return {error: 'Organization not found' as const}
+    return { error: 'Organization not found' as const }
   }
 
   const inviteCode = await db.query.inviteCodes.findFirst({
@@ -28,18 +34,18 @@ export const getInviteCode = async ({orgSlug, code}: {orgSlug: string, code: str
   })
 
   if (!inviteCode) {
-    return {error: 'Invite code not found' as const, organization}
+    return { error: 'Invite code not found' as const, organization }
   }
 
   if (inviteCode.expiresAt && inviteCode.expiresAt < new Date()) {
-    return {error: 'Expired' as const , organization} 
+    return { error: 'Expired' as const, organization }
   } else if (
     inviteCode.usesMax &&
     inviteCode.usesCurrent &&
     inviteCode.usesCurrent >= inviteCode.usesMax
   ) {
-    return {error: 'Max uses reached' as const, organization}
+    return { error: 'Max uses reached' as const, organization }
   }
 
-  return {inviteCode, organization, user}
+  return { inviteCode, organization, user }
 }

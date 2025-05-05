@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { BASE_URL } from '@/lib/config'
 import { cn } from '@/lib/utils'
 import {
   streamDialog,
@@ -169,7 +170,7 @@ export const InvitationCodesList = async ({
                               invitedByEmail: me.email,
                               invitedByUsername: me.name,
                               orgName: organizationName,
-                              inviteLink: `${process.env.BASE_URL}/join/${organizationSlug}/${code.id}`,
+                              inviteLink: `${BASE_URL}/join/${organizationSlug}/${code.id}`,
                               role: data.role,
                             })
 
@@ -293,7 +294,7 @@ export const InvitationCodesList = async ({
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <CopyToClipboardButton
-                            text={`${process.env.BASE_URL}/join/${organizationSlug}/${code.id}`}
+                            text={`${BASE_URL}/join/${organizationSlug}/${code.id}`}
                           />
                           <ActionButton
                             variant="ghost"

@@ -58,6 +58,7 @@ export const inviteCodes = pgTable('invite_code', {
   expiresAt: timestamp('expiresAt'),
   usesMax: integer('usesMax'),
   usesCurrent: integer('usesCurrent'),
+  sentToEmail: text('sentToEmail'),
 })
 
 export const inviteCodesRelations = relations(inviteCodes, ({ one, many }) => ({

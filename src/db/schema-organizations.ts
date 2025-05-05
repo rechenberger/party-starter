@@ -87,7 +87,7 @@ export const organizationMemberships = pgTable('organization_membership', {
     .references(() => organizations.id, { onDelete: 'cascade' }),
   role: organizationRoleType('role').notNull(),
   invitationCodeId: text('invitationCodeId').references(() => inviteCodes.id, {
-    onDelete: 'cascade',
+    onDelete: 'restrict',
   }),
 })
 

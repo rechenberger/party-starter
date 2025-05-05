@@ -27,6 +27,7 @@ const CreateInviteCodeSchema = z.object({
   role: z.enum(['admin', 'member']),
   expiresAt: z.enum(['never', '1d', '1w', '1m', '1y']),
   usesMax: z.coerce.number().optional(),
+  comment: z.string().optional(),
 })
 
 type CreateInviteCodeData = z.infer<typeof CreateInviteCodeSchema>
@@ -52,6 +53,7 @@ export const CreateInviteCodeFormClient = ({
       role: 'member',
       expiresAt: '1d',
       usesMax: 1,
+      comment: '',
     },
     disabled,
   })
@@ -135,6 +137,23 @@ export const CreateInviteCodeFormClient = ({
                 <FormLabel>Max Uses</FormLabel>
                 <FormControl>
                   <Input type="number" {...field} placeholder="unlimited" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="comment"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Comment</FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    {...field}
+                    placeholder="Add an optional Comment"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

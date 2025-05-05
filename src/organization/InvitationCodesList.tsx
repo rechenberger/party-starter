@@ -123,6 +123,7 @@ export const InvitationCodesList = async ({
                               role: data.role,
                               expiresAt: expiresAtResolved,
                               usesMax: data.usesMax,
+                              comment: data.comment,
                               createdById: myMembership.userId,
                             })
 
@@ -206,6 +207,7 @@ export const InvitationCodesList = async ({
                 <TableHead>Expires</TableHead>
                 <TableHead>Uses left</TableHead>
                 <TableHead>Created By</TableHead>
+                <TableHead>Comment</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -300,6 +302,9 @@ export const InvitationCodesList = async ({
                         {code.createdBy === null && (
                           <span className="text-muted-foreground">Unknown</span>
                         )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-wrap max-w-40">{code.comment}</div>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">

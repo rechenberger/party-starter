@@ -6,7 +6,7 @@ import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
 } from '@/organization/getMyMembership'
-import { InvitationCodesList } from '@/organization/InvitationCodesList'
+import { InvitationCodesList } from '@/organization/inviteCodes/InvitationCodesList'
 import { MemberList } from '@/organization/MemberList'
 import { OrganizationRole } from '@/organization/organizationRoles'
 import { superAction } from '@/super-action/action/createSuperAction'
@@ -50,10 +50,8 @@ export default async function OrgSettingsPage({
           createdAt: true,
           role: true,
           userId: true,
-          // invitationCodeId: true,
         },
         with: {
-          // invitationCode: true,
           user: {
             columns: {
               id: true,
@@ -177,7 +175,7 @@ export default async function OrgSettingsPage({
             kickUserAction={kickUserAction}
             isAdmin={isAdmin}
           />
-          {isAdmin && <InvitationCodesList organization={organization} />}
+          {isAdmin && <InvitationCodesList {...organization} />}
         </>
       )}
     </>

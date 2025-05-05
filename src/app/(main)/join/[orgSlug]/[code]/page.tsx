@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
-import { getInviteCode } from '@/organization/getInviteCode'
+import { getInviteCode } from '@/organization/inviteCodes/getInviteCode'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { eq } from 'drizzle-orm'

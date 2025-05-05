@@ -21,7 +21,7 @@ import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { z } from 'zod'
-import { organizationRoleDefinitions } from './organizationRoles'
+import { organizationRoleDefinitions } from '../organizationRoles'
 
 const CreateInviteCodeSchema = z.object({
   role: z.enum(['admin', 'member']),

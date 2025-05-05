@@ -1,4 +1,3 @@
-import { getMyUserOrThrow } from '@/auth/getMyUser'
 import { CopyToClipboardButton } from '@/components/CopyToClipboardButton'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -18,7 +17,6 @@ import {
 } from '@/components/ui/table'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
-import { InviteCode, User } from '@/db/schema-zod'
 import { BASE_URL } from '@/lib/config'
 import { cn } from '@/lib/utils'
 import {
@@ -35,53 +33,17 @@ import {
   isPast,
 } from 'date-fns'
 import { eq } from 'drizzle-orm'
-import { Info, Mail, PlusCircle, Trash2 } from 'lucide-react'
+import { Info, PlusCircle, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
-import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
+import { getMyMembershipOrThrow } from '../getMyMembership'
+import { getOrganizationRole, OrganizationRole } from '../organizationRoles'
 import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
-import { getMyMembershipOrThrow } from './getMyMembership'
-import { getOrganizationRole, OrganizationRole } from './organizationRoles'
-import { sendOrgInviteMail } from './sendOrgInviteMail'
+import { InvitationCodesListProps } from './InvitationCodesList'
 
 const allowedRoles: OrganizationRole[] = ['admin']
 
-export const InvitationCodesList = async ({
-  organization,
-}: {
-  organization: {
-    inviteCodes: (InviteCode & {
-      createdBy: Pick<User, 'name' | 'email' | 'image'> | null
-    })[]
-    id: string
-    slug: string
-    name: string
-  }
-}) => {
-  await getMyMembershipOrThrow({
-    allowedRoles,
-  })
-
-  const {
-    inviteCodes,
-    id: organizationId,
-    slug: organizationSlug,
-    name: organizationName,
-  } = organization
-
-  const validInviteCodes = inviteCodes.filter((code) => {
-    if (code.expiresAt && isPast(code.expiresAt)) {
-      return false
-    }
-    if (
-      !!code.usesMax &&
-      !!code.usesCurrent &&
-      code.usesCurrent >= code.usesMax
-    ) {
-      return false
-    }
-    return true
-  })
-
+export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
+  const { inviteCodes, id: organizationId, slug: organizationSlug } = props
   return (
     <>
       <Card>
@@ -147,60 +109,6 @@ export const InvitationCodesList = async ({
               <PlusCircle className="mr-2 h-4 w-4" />
               Add Invitation Code
             </ActionButton>
-            <ActionButton
-              size="sm"
-              action={async () => {
-                'use server'
-                return superAction(async () => {
-                  return streamDialog({
-                    title: 'Send Invitation Code',
-                    content: (
-                      <CreateInviteCodeEmailFormClient
-                        action={async (data) => {
-                          'use server'
-                          return superAction(async () => {
-                            const myMembership = await getMyMembershipOrThrow({
-                              allowedRoles: ['admin'],
-                            })
-                            const newCode = await db
-                              .insert(schema.inviteCodes)
-                              .values({
-                                organizationId: organizationId,
-                                role: data.role,
-                                expiresAt: addDays(new Date(), 1),
-                                usesMax: 1,
-                                createdById: myMembership.userId,
-                              })
-                              .returning({ id: schema.inviteCodes.id })
-
-                            const code = newCode[0]
-
-                            const me = await getMyUserOrThrow()
-
-                            await sendOrgInviteMail({
-                              receiverEmail: data.receiverEmail,
-                              invitedByEmail: me.email,
-                              invitedByUsername: me.name,
-                              orgName: organizationName,
-                              inviteLink: `${BASE_URL}/join/${organizationSlug}/${code.id}`,
-                              role: data.role,
-                            })
-
-                            revalidatePath(
-                              `/org/${organizationId}/settings/members`,
-                            )
-                            streamDialog(null)
-                          })
-                        }}
-                      />
-                    ),
-                  })
-                })
-              }}
-            >
-              <Mail className="mr-2 h-4 w-4" />
-              Mail Invitation
-            </ActionButton>
           </div>
         </CardHeader>
         <CardContent>
@@ -217,7 +125,7 @@ export const InvitationCodesList = async ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {validInviteCodes.length === 0 ? (
+              {inviteCodes.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={5}
@@ -227,7 +135,7 @@ export const InvitationCodesList = async ({
                   </TableCell>
                 </TableRow>
               ) : (
-                validInviteCodes.map((code) => {
+                inviteCodes.map((code) => {
                   const isExpired =
                     (code.expiresAt && isPast(code.expiresAt)) ||
                     (code.usesMax && code.usesCurrent === code.usesMax)

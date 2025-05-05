@@ -92,6 +92,7 @@ export default async function OrgSettingsPage({
             eq(schema.organizationMemberships.organizationId, organization.id),
           ),
         )
+
       if (
         currentAdmins.length === 1 &&
         data.role === 'member' &&
@@ -105,7 +106,12 @@ export default async function OrgSettingsPage({
         .set({
           role: data.role,
         })
-        .where(eq(schema.organizationMemberships.userId, data.userId))
+        .where(
+          and(
+            eq(schema.organizationMemberships.userId, data.userId),
+            eq(schema.organizationMemberships.organizationId, organization.id),
+          ),
+        )
 
       revalidatePath(`/org/${orgSlug}/settings/members`)
     })
@@ -145,7 +151,12 @@ export default async function OrgSettingsPage({
 
       await db
         .delete(schema.organizationMemberships)
-        .where(eq(schema.organizationMemberships.userId, data.userId))
+        .where(
+          and(
+            eq(schema.organizationMemberships.userId, data.userId),
+            eq(schema.organizationMemberships.organizationId, organization.id),
+          ),
+        )
 
       revalidatePath(`/org/${orgSlug}/settings/members`)
       if (myUserId === data.userId) {

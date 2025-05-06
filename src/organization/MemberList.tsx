@@ -74,7 +74,6 @@ export const MemberList = ({
 
   const [searchQuery, setSearchQuery] = useState<string>('')
 
-  // Filter memberships based on search query
   const filteredMemberships = useMemo(() => {
     if (!searchQuery.trim()) {
       return organization.memberships

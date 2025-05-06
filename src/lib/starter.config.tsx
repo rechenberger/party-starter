@@ -1,5 +1,3 @@
-import 'server-only'
-
 import { ExpiresAt } from '@/organization/inviteCodes/CreateInviteCodeFormClient'
 
 export const ORGS = {
@@ -22,7 +20,15 @@ export const BRAND = {
   },
   emails: {
     footer: {
-      signature: 'The Party Starter Team',
+      Signature: () => (
+        <>
+          Best regards
+          <br />
+          The Party Starter Team
+          <br />
+          🎉
+        </>
+      ),
     },
   },
   colors: {

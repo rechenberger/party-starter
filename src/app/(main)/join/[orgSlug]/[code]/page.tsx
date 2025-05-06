@@ -1,5 +1,5 @@
 import SeededAvatar from '@/components/SeededAvatar'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Alert, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -96,12 +96,11 @@ export default async function JoinOrgPage({
         <CardContent>
           <Alert variant="destructive" className="mb-4">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>
+            <AlertTitle>
               {error === 'Expired'
                 ? 'This invitation has expired.'
                 : 'This invitation has reached its maximum number of uses.'}
-            </AlertDescription>
+            </AlertTitle>
           </Alert>
 
           <JoinCardOrgInfo

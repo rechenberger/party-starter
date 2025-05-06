@@ -1,9 +1,9 @@
-import { ExpiresAt } from '@/organization/inviteCodes/CreateInviteCodeFormClient'
+import { type ExpirationTime } from '@/organization/inviteCodes/expirationTimes'
 
 export const ORGS = {
   isActive: true,
   onlyAdminsCanCreateOrgs: false,
-  defaultExpirationEmailInvitation: '1d' satisfies ExpiresAt,
+  defaultExpirationEmailInvitation: '1d' satisfies ExpirationTime,
 } as const
 
 export const BRAND = {

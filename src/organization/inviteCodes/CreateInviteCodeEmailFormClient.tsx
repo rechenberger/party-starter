@@ -20,10 +20,11 @@ import {
 import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
-import { uniq } from 'lodash-es'
+import { map, uniq } from 'lodash-es'
 import { Plus, X } from 'lucide-react'
 import { useState } from 'react'
 import { z } from 'zod'
+import { organizationRoleDefinitions } from '../organizationRoles'
 
 const CreateInviteCodeEmailSchema = z.object({
   role: z.enum(['admin', 'member']),
@@ -59,11 +60,6 @@ export const CreateInviteCodeEmailFormClient = ({
   })
 
   const [receiverEmail, setReceiverEmail] = useState('')
-
-  // const receiverMails = useWatch({
-  //   control: form.control,
-  //   name: 'receiverEmail',
-  // })
 
   const handleAddReceiverEmail = (currentValue: string[]) => {
     if (receiverEmail) {
@@ -107,8 +103,11 @@ export const CreateInviteCodeEmailFormClient = ({
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="member">Member</SelectItem>
+                      {map(organizationRoleDefinitions, (role) => (
+                        <SelectItem key={role.name} value={role.name}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -141,7 +140,7 @@ export const CreateInviteCodeEmailFormClient = ({
                   return (
                     <Button
                       key={mail}
-                      variant={error ? 'destructive' : 'secondary'}
+                      variant={!!error ? 'destructive' : 'secondary'}
                       title={error?.message}
                       onClick={() => {
                         form.setValue(

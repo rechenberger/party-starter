@@ -1,8 +1,8 @@
 import { addDays, addMonths, addYears } from 'date-fns'
-import { ExpiresAt } from './CreateInviteCodeFormClient'
+import { ExpirationTime } from './expirationTimes'
 
-export const resolveExpiresAt = (expiresAt: ExpiresAt) => {
-  switch (expiresAt) {
+export const resolveExpiresAt = (expirationTime: ExpirationTime) => {
+  switch (expirationTime) {
     case 'never':
       return null
     case '1d':

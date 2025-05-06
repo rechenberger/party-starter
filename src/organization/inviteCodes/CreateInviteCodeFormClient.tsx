@@ -24,16 +24,15 @@ import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { useShowDialog } from '@/super-action/dialog/DialogProvider'
 import { z } from 'zod'
 import { organizationRoleDefinitions } from '../organizationRoles'
+import { ExpirationTime, expirationTimesDefinitions } from './expirationTimes'
 import { getInviteCodeUrl } from './getInviteCodeUrl'
 
 const CreateInviteCodeSchema = z.object({
   role: z.enum(['admin', 'member']),
-  expiresAt: z.enum(['never', '1d', '1w', '1m', '1y']),
+  expiresAt: ExpirationTime,
   usesMax: z.coerce.number().optional(),
   comment: z.string().optional(),
 })
-
-export type ExpiresAt = z.infer<typeof CreateInviteCodeSchema>['expiresAt']
 
 type CreateInviteCodeData = z.infer<typeof CreateInviteCodeSchema>
 
@@ -138,11 +137,14 @@ export const CreateInviteCodeFormClient = ({
                       <SelectValue placeholder="Select expires at" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1d">1 Day</SelectItem>
-                      <SelectItem value="1w">1 Week</SelectItem>
-                      <SelectItem value="1m">1 Month</SelectItem>
-                      <SelectItem value="1y">1 Year</SelectItem>
-                      <SelectItem value="never">Never</SelectItem>
+                      {expirationTimesDefinitions.map((expirationTime) => (
+                        <SelectItem
+                          key={expirationTime.value}
+                          value={expirationTime.value}
+                        >
+                          {expirationTime.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>

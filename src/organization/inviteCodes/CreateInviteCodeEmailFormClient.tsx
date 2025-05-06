@@ -23,7 +23,6 @@ import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { uniq } from 'lodash-es'
 import { Plus, X } from 'lucide-react'
 import { useState } from 'react'
-import { useWatch } from 'react-hook-form'
 import { z } from 'zod'
 
 const CreateInviteCodeEmailSchema = z.object({
@@ -59,22 +58,34 @@ export const CreateInviteCodeEmailFormClient = ({
     disabled: isLoading,
   })
 
-  const errors = form.formState.errors
-
   const [receiverEmail, setReceiverEmail] = useState('')
 
-  const receiverMails = useWatch({
-    control: form.control,
-    name: 'receiverEmail',
-  })
+  // const receiverMails = useWatch({
+  //   control: form.control,
+  //   name: 'receiverEmail',
+  // })
+
+  const handleAddReceiverEmail = (currentValue: string[]) => {
+    if (receiverEmail) {
+      form.setValue('receiverEmail', uniq([...currentValue, receiverEmail]))
+      setReceiverEmail('')
+    }
+    form.trigger('receiverEmail')
+  }
 
   return (
     <>
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(async (formData) => {
-            await trigger(formData)
-          })}
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (!!receiverEmail) {
+              handleAddReceiverEmail(form.getValues('receiverEmail'))
+            }
+            form.handleSubmit(async (formData) => {
+              await trigger(formData)
+            })()
+          }}
           className="flex flex-col gap-4"
         >
           <FormField
@@ -105,82 +116,69 @@ export const CreateInviteCodeEmailFormClient = ({
               </FormItem>
             )}
           />
-
-          <FormField
-            control={form.control}
-            name="receiverEmail"
-            render={({ field }) => {
-              const handleAddReceiverEmail = () => {
-                if (receiverEmail) {
-                  form.setValue(
-                    'receiverEmail',
-                    uniq([...field.value, receiverEmail]),
+          <FormItem>
+            <FormLabel>Receiver</FormLabel>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-1">
+                <Input
+                  type="email"
+                  autoFocus
+                  className="flex-1"
+                  placeholder="john@example.com"
+                  value={receiverEmail}
+                  onChange={(e) => setReceiverEmail(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleAddReceiverEmail(form.getValues('receiverEmail'))
+                    }
+                  }}
+                />
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  disabled={!receiverEmail}
+                  onClick={() => {
+                    handleAddReceiverEmail(form.getValues('receiverEmail'))
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {form.getValues('receiverEmail').map((mail, i) => {
+                  const error = form.formState.errors.receiverEmail?.[i]
+                  return (
+                    <Button
+                      key={mail}
+                      variant={error ? 'destructive' : 'secondary'}
+                      title={error?.message}
+                      onClick={() => {
+                        form.setValue(
+                          'receiverEmail',
+                          form
+                            .getValues('receiverEmail')
+                            .filter((m) => m !== mail),
+                        )
+                        form.trigger('receiverEmail')
+                      }}
+                    >
+                      {mail}
+                      <X className="h-4 w-4" />
+                    </Button>
                   )
-                  setReceiverEmail('')
-                }
-              }
-              return (
-                <div>
-                  <FormItem>
-                    <FormLabel>Receiver</FormLabel>
-                    <FormControl>
-                      <div className="flex flex-col gap-2">
-                        <div className="flex gap-1">
-                          <Input
-                            type="email"
-                            className="flex-1"
-                            placeholder="john@example.com"
-                            value={receiverEmail}
-                            onChange={(e) => setReceiverEmail(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault()
-                                handleAddReceiverEmail()
-                              }
-                            }}
-                          />
-                          <Button
-                            variant="secondary"
-                            size="icon"
-                            disabled={!receiverEmail}
-                            onClick={() => {
-                              handleAddReceiverEmail()
-                            }}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {receiverMails.map((mail, i) => {
-                            const error = errors.receiverEmail?.[i]
-                            return (
-                              <Button
-                                key={mail}
-                                variant={error ? 'destructive' : 'secondary'}
-                                title={error?.message}
-                                onClick={() => {
-                                  form.setValue(
-                                    'receiverEmail',
-                                    receiverMails.filter((m) => m !== mail),
-                                  )
-                                  form.clearErrors('receiverEmail')
-                                }}
-                              >
-                                {mail}
-                                <X className="h-4 w-4" />
-                              </Button>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                </div>
-              )
-            }}
-          />
-
+                })}
+              </div>
+            </div>
+            {form.formState.errors.receiverEmail && !receiverEmail.length && (
+              <p
+                data-slot="form-message"
+                className={'text-destructive text-sm'}
+              >
+                {form.formState.errors.receiverEmail?.message}
+              </p>
+            )}
+          </FormItem>
           <Button type="submit" className="" disabled={isLoading}>
             {isLoading ? 'Sending...' : 'Send Invitation'}
           </Button>

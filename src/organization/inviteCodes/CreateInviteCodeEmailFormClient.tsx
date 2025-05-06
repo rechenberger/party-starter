@@ -139,6 +139,7 @@ export const CreateInviteCodeEmailFormClient = ({
                   onClick: () => {
                     handleAddReceiverEmail(form.getValues('receiverEmail'))
                   },
+                  type: 'button',
                 }}
                 icon={<Plus className="h-4 w-4" />}
               />

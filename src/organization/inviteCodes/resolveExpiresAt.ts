@@ -1,5 +1,5 @@
 import { addDays, addMonths, addYears } from 'date-fns'
-import { ExpirationTime } from './expirationTimes'
+import { type ExpirationTime } from './expirationTimes'
 
 export const resolveExpiresAt = (expirationTime: ExpirationTime) => {
   switch (expirationTime) {

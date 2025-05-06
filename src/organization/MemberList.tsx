@@ -152,7 +152,7 @@ export const MemberList = ({
                         <div className="flex items-center gap-3">
                           <Avatar>
                             <AvatarImage
-                              src={membership.user.image || ''}
+                              src={membership.user.image || undefined}
                               alt={membership.user.name || 'Member'}
                             />
                             <AvatarFallback>

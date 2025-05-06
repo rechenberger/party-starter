@@ -215,7 +215,7 @@ export const MailInvitationCodesList = async (
                           <div className="flex items-center gap-3">
                             <Avatar>
                               <AvatarImage
-                                src={code.createdBy?.image || ''}
+                                src={code.createdBy?.image || undefined}
                                 alt={code.createdBy?.name || 'Member'}
                               />
                               <AvatarFallback>

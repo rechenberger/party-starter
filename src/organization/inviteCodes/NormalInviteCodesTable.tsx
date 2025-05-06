@@ -117,8 +117,9 @@ export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
               {inviteCodes.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
                     className="text-center py-6 text-muted-foreground"
+                    //just a high number to make sure the cell takes the full width
+                    colSpan={42}
                   >
                     No invitation codes found. Create one to get started.
                   </TableCell>

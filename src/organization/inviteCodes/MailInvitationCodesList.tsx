@@ -267,8 +267,7 @@ export const MailInvitationCodesList = async (
                             hideIcon
                             askForConfirmation={{
                               title: 'Resend invitation',
-                              content:
-                                'Are you sure you want to resend the invitation?',
+                              content: `Are you sure you want to resend the invitation to ${code.sentToEmail}?`,
                             }}
                             action={async () => {
                               'use server'

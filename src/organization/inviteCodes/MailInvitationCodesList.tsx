@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/table'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { User } from '@/db/schema-zod'
 import { ORGS } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import {
@@ -21,26 +22,102 @@ import {
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { format, formatDistanceToNow, isPast } from 'date-fns'
-import { and, desc, eq } from 'drizzle-orm'
+import { and, desc, eq, or } from 'drizzle-orm'
 import { Mail, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import { getMyMembershipOrThrow } from '../getMyMembership'
-import { getOrganizationRole } from '../organizationRoles'
+import { getOrganizationRole, OrganizationRole } from '../organizationRoles'
 import { sendOrgInviteMail } from '../sendOrgInviteMail'
 import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
 import { getInviteCodeUrl } from './getInviteCodeUrl'
 import { InvitationCodesListProps } from './InvitationCodesList'
 import { resolveExpiresAt } from './resolveExpiresAt'
 
+const upsertInviteCodeAndSendMail = async ({
+  receiverEmail,
+  role,
+  creator,
+  existingCodeId,
+  id: organizationId,
+  slug: organizationSlug,
+  name: organizationName,
+}: {
+  receiverEmail: string
+  creator: Pick<User, 'id' | 'email' | 'name'>
+} & InvitationCodesListProps &
+  (
+    | {
+        role: OrganizationRole
+        existingCodeId?: never
+      }
+    | {
+        role?: OrganizationRole
+        existingCodeId: string
+      }
+  )) => {
+  'use server'
+  const existingCode = await db
+    .select()
+    .from(schema.inviteCodes)
+    .where(
+      or(
+        existingCodeId ? eq(schema.inviteCodes.id, existingCodeId) : undefined,
+        and(
+          eq(schema.inviteCodes.sentToEmail, receiverEmail),
+          eq(schema.inviteCodes.organizationId, organizationId),
+        ),
+      ),
+    )
+    .orderBy(desc(schema.inviteCodes.createdAt))
+    .limit(1)
+    .then((res) => res[0])
+
+  if (existingCodeId && !existingCode) {
+    throw new Error('No existing code found')
+  }
+
+  const newCodeRes = await db
+    .insert(schema.inviteCodes)
+    .values({
+      id: existingCode?.id,
+      organizationId: organizationId,
+      role: role ?? existingCode.role,
+      expiresAt: resolveExpiresAt(ORGS.defaultExpirationEmailInvitation),
+      usesMax: 1,
+      createdById: creator.id,
+      sentToEmail: receiverEmail,
+    })
+    .onConflictDoUpdate({
+      target: [schema.inviteCodes.id],
+      set: {
+        role: role ?? existingCode.role,
+        usesMax: 1,
+        expiresAt: resolveExpiresAt(ORGS.defaultExpirationEmailInvitation),
+        deletedAt: null,
+        createdById: creator.id,
+      },
+    })
+    .returning({ id: schema.inviteCodes.id, role: schema.inviteCodes.role })
+
+  const newCode = newCodeRes[0]
+
+  await sendOrgInviteMail({
+    receiverEmail,
+    invitedByEmail: creator.email,
+    invitedByUsername: creator.name,
+    orgName: organizationName,
+    inviteLink: getInviteCodeUrl({
+      organizationSlug: organizationSlug,
+      code: newCode.id,
+    }),
+    role: newCode.role,
+  })
+}
+
 export const MailInvitationCodesList = async (
   props: InvitationCodesListProps,
 ) => {
-  const {
-    inviteCodes,
-    id: organizationId,
-    slug: organizationSlug,
-    name: organizationName,
-  } = props
+  const { inviteCodes, id: organizationId, slug: organizationSlug } = props
 
   return (
     <>
@@ -61,66 +138,17 @@ export const MailInvitationCodesList = async (
                         action={async (data) => {
                           'use server'
                           return superAction(async () => {
-                            const { membership: myMembership } =
-                              await getMyMembershipOrThrow({
-                                allowedRoles: ['admin'],
-                              })
+                            await getMyMembershipOrThrow({
+                              allowedRoles: ['admin'],
+                            })
+                            const me = await getMyUserOrThrow()
                             await Promise.all(
                               data.receiverEmail.map(async (mail) => {
-                                const me = await getMyUserOrThrow()
-                                const existingCode = await db
-                                  .select()
-                                  .from(schema.inviteCodes)
-                                  .where(
-                                    and(
-                                      eq(schema.inviteCodes.sentToEmail, mail),
-                                      eq(
-                                        schema.inviteCodes.organizationId,
-                                        organizationId,
-                                      ),
-                                    ),
-                                  )
-                                  .orderBy(desc(schema.inviteCodes.createdAt))
-                                  .limit(1)
-                                const newCode = await db
-                                  .insert(schema.inviteCodes)
-                                  .values({
-                                    id: existingCode[0]?.id,
-                                    organizationId: organizationId,
-                                    role: data.role,
-                                    expiresAt: resolveExpiresAt(
-                                      ORGS.defaultExpirationEmailInvitation,
-                                    ),
-                                    usesMax: 1,
-                                    createdById: myMembership.userId,
-                                    sentToEmail: mail,
-                                  })
-                                  .onConflictDoUpdate({
-                                    target: [schema.inviteCodes.id],
-                                    set: {
-                                      role: data.role,
-                                      usesMax: 1,
-                                      expiresAt: resolveExpiresAt(
-                                        ORGS.defaultExpirationEmailInvitation,
-                                      ),
-                                      deletedAt: null,
-                                      createdById: me.id,
-                                    },
-                                  })
-                                  .returning({ id: schema.inviteCodes.id })
-
-                                const code = newCode[0]
-
-                                await sendOrgInviteMail({
+                                await upsertInviteCodeAndSendMail({
                                   receiverEmail: mail,
-                                  invitedByEmail: me.email,
-                                  invitedByUsername: me.name,
-                                  orgName: organizationName,
-                                  inviteLink: getInviteCodeUrl({
-                                    organizationSlug,
-                                    code: code.id,
-                                  }),
                                   role: data.role,
+                                  creator: me,
+                                  ...props,
                                 })
                               }),
                             )
@@ -251,29 +279,13 @@ export const MailInvitationCodesList = async (
                                 if (!code.sentToEmail) {
                                   throw new Error('No email found')
                                 }
-                                await db
-                                  .update(schema.inviteCodes)
-                                  .set({
-                                    expiresAt: resolveExpiresAt(
-                                      ORGS.defaultExpirationEmailInvitation,
-                                    ),
-                                  })
-                                  .where(eq(schema.inviteCodes.id, code.id))
-
                                 const me = await getMyUserOrThrow()
-
-                                await sendOrgInviteMail({
+                                await upsertInviteCodeAndSendMail({
                                   receiverEmail: code.sentToEmail,
-                                  invitedByEmail: me.email,
-                                  invitedByUsername: me.name,
-                                  orgName: organizationName,
-                                  inviteLink: getInviteCodeUrl({
-                                    organizationSlug,
-                                    code: code.id,
-                                  }),
-                                  role: code.role,
+                                  creator: me,
+                                  existingCodeId: code.id,
+                                  ...props,
                                 })
-
                                 streamToast({
                                   title: `Invitation sent to ${code.sentToEmail}`,
                                 })

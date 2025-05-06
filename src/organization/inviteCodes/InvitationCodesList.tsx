@@ -33,7 +33,6 @@ export const InvitationCodesList = async (props: InvitationCodesListProps) => {
     }
   })
 
-  const invalidCodes: typeof codesWithIsValid = []
   const validNormalCodes: typeof codesWithIsValid = []
   const emailCodes: typeof codesWithIsValid = []
 
@@ -43,8 +42,6 @@ export const InvitationCodesList = async (props: InvitationCodesListProps) => {
       emailCodes.push(code)
     } else if (!code.isExpired && !code.isCompletelyUsed) {
       validNormalCodes.push(code)
-    } else {
-      invalidCodes.push(code)
     }
   }
 

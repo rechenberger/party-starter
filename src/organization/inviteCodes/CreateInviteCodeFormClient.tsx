@@ -82,7 +82,8 @@ export const CreateInviteCodeFormClient = ({
               navigator.clipboard.writeText(url)
               showDialog(null)
               toast({
-                title: 'Invite code copied to clipboard',
+                variant: 'success',
+                title: 'Invitation Code created and copied to clipboard',
               })
             }
           })}
@@ -138,11 +139,11 @@ export const CreateInviteCodeFormClient = ({
                       <SelectValue placeholder="Select expires at" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="never">Never</SelectItem>
                       <SelectItem value="1d">1 Day</SelectItem>
                       <SelectItem value="1w">1 Week</SelectItem>
                       <SelectItem value="1m">1 Month</SelectItem>
                       <SelectItem value="1y">1 Year</SelectItem>
+                      <SelectItem value="never">Never</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -157,7 +158,7 @@ export const CreateInviteCodeFormClient = ({
               <FormItem>
                 <FormLabel>Max Uses</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} placeholder="unlimited" />
+                  <Input type="number" {...field} placeholder="Unlimited" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -173,7 +174,7 @@ export const CreateInviteCodeFormClient = ({
                   <Input
                     type="text"
                     {...field}
-                    placeholder="Add an optional Comment"
+                    placeholder="Add an optional comment for yourself"
                   />
                 </FormControl>
                 <FormMessage />
@@ -182,7 +183,7 @@ export const CreateInviteCodeFormClient = ({
           />
 
           <Button type="submit" className="mt-2" disabled={disabled}>
-            Create Invite Code
+            Create Invitation Code
           </Button>
         </form>
       </Form>

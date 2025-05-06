@@ -52,9 +52,9 @@ export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
                 'use server'
                 return superAction(async () => {
                   return streamDialog({
-                    title: 'Create Invitation Code',
+                    title: 'New Invitation Code',
                     description:
-                      'Create an invitation code and send it to the people you want to invite.',
+                      'Create and share the code with others to invite them to this organization.',
                     content: (
                       <CreateInviteCodeFormClient
                         organizationSlug={organizationSlug}

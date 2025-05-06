@@ -1,5 +1,5 @@
 import { InviteCode, User } from '@/db/schema-zod'
-import { isFuture } from 'date-fns'
+import { isPast } from 'date-fns'
 import { getMyMembershipOrThrow } from '../getMyMembership'
 import { OrganizationRole } from '../organizationRoles'
 import { MailInvitationCodesList } from './MailInvitationCodesList'
@@ -27,9 +27,8 @@ export const InvitationCodesList = async (props: InvitationCodesListProps) => {
   const codesWithIsValid = inviteCodes.map((code) => {
     return {
       ...code,
-      isValid:
-        (!code.expiresAt || isFuture(code.expiresAt)) &&
-        (!code.usesMax || (code.usesCurrent ?? 0) < code.usesMax),
+      isExpired: code.expiresAt && isPast(code.expiresAt),
+      isCompletelyUsed: code.usesCurrent === code.usesMax,
       sentViaMail: !!code.sentToEmail,
     }
   })
@@ -39,10 +38,10 @@ export const InvitationCodesList = async (props: InvitationCodesListProps) => {
   const emailCodes: typeof codesWithIsValid = []
 
   for (const code of codesWithIsValid) {
-    // email codes should know if they expired to resend or have no uses to show invitation accepted
-    if (code.sentViaMail) {
+    // email codes should know if they expired to resend them, accepted ones are hidden
+    if (code.sentViaMail && !code.isCompletelyUsed) {
       emailCodes.push(code)
-    } else if (code.isValid) {
+    } else if (!code.isExpired && !code.isCompletelyUsed) {
       validNormalCodes.push(code)
     } else {
       invalidCodes.push(code)

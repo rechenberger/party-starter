@@ -110,6 +110,15 @@ export const CreateInviteCodeEmailFormClient = ({
             control={form.control}
             name="receiverEmail"
             render={({ field }) => {
+              const handleAddReceiverEmail = () => {
+                if (receiverEmail) {
+                  form.setValue(
+                    'receiverEmail',
+                    uniq([...field.value, receiverEmail]),
+                  )
+                  setReceiverEmail('')
+                }
+              }
               return (
                 <div>
                   <FormItem>
@@ -126,14 +135,7 @@ export const CreateInviteCodeEmailFormClient = ({
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
                                 e.preventDefault()
-                                if (receiverEmail) {
-                                  form.setValue(
-                                    'receiverEmail',
-                                    uniq([...field.value, receiverEmail]),
-                                  )
-                                  form.clearErrors('receiverEmail')
-                                  setReceiverEmail('')
-                                }
+                                handleAddReceiverEmail()
                               }
                             }}
                           />
@@ -142,14 +144,7 @@ export const CreateInviteCodeEmailFormClient = ({
                             size="icon"
                             disabled={!receiverEmail}
                             onClick={() => {
-                              if (receiverEmail) {
-                                form.setValue(
-                                  'receiverEmail',
-                                  uniq([...field.value, receiverEmail]),
-                                )
-                                form.clearErrors('receiverEmail')
-                                setReceiverEmail('')
-                              }
+                              handleAddReceiverEmail()
                             }}
                           >
                             <Plus className="h-4 w-4" />

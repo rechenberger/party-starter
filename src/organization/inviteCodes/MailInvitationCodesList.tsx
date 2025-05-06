@@ -1,5 +1,5 @@
 import { getMyUserOrThrow } from '@/auth/getMyUser'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -214,18 +214,7 @@ export const MailInvitationCodesList = async (
                       <TableCell>
                         {code.createdBy && (
                           <div className="flex items-center gap-3">
-                            <Avatar>
-                              <AvatarImage
-                                src={code.createdBy?.image || undefined}
-                                alt={code.createdBy?.name || 'Member'}
-                              />
-                              <AvatarFallback>
-                                {code.createdBy?.name
-                                  ?.split(' ')
-                                  .map((n) => n[0])
-                                  .join('') || 'U'}
-                              </AvatarFallback>
-                            </Avatar>
+                            <SimpleUserAvatar user={code.createdBy} />
                             <div>
                               <p className="font-medium">
                                 {code.createdBy?.name}

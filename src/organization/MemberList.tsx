@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -149,18 +149,7 @@ export const MemberList = ({
                     <TableRow key={membership.userId}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <Avatar>
-                            <AvatarImage
-                              src={membership.user.image || undefined}
-                              alt={membership.user.name || 'Member'}
-                            />
-                            <AvatarFallback>
-                              {membership.user.name
-                                ?.split(' ')
-                                .map((n) => n[0])
-                                .join('') || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
+                          <SimpleUserAvatar user={membership.user} />
                           <div>
                             <p className="font-medium">
                               {membership.user.name}

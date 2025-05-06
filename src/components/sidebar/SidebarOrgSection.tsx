@@ -8,13 +8,13 @@ import { getMyMembershipOrNotFound } from '@/organization/getMyMembership'
 import { Building2, Laugh, Users } from 'lucide-react'
 import Link from 'next/link'
 
-export const SidebarOrgSection = async ({ orgSlug }: { orgSlug: string }) => {
-  const { membership } = await getMyMembershipOrNotFound()
+export const SidebarOrgSection = async () => {
+  const { membership, org } = await getMyMembershipOrNotFound()
 
   const items = [
     {
       title: 'Say Hello',
-      url: `/org/${orgSlug}?say=hello`,
+      url: `/org/${org.slug}?say=hello`,
       icon: Laugh,
     },
   ]
@@ -22,13 +22,13 @@ export const SidebarOrgSection = async ({ orgSlug }: { orgSlug: string }) => {
   const settings = [
     {
       title: 'Organization',
-      url: `/org/${orgSlug}/settings`,
+      url: `/org/${org.slug}/settings`,
       icon: Building2,
       show: membership.role === 'admin',
     },
     {
       title: 'Members',
-      url: `/org/${orgSlug}/settings/members`,
+      url: `/org/${org.slug}/settings/members`,
       icon: Users,
       show: membership.role === 'admin' || membership.role === 'member',
     },
@@ -39,7 +39,7 @@ export const SidebarOrgSection = async ({ orgSlug }: { orgSlug: string }) => {
   return (
     <>
       <SidebarGroup>
-        <SidebarGroupLabel>Org Stuff for {orgSlug}</SidebarGroupLabel>
+        <SidebarGroupLabel>Org Stuff for {org.name}</SidebarGroupLabel>
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuButton key={item.title} tooltip={item.title} asChild>

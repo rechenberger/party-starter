@@ -1,5 +1,4 @@
-export * from '@/components/sidebar/SidebarLayout'
-import SidebarLayout from '@/components/sidebar/SidebarLayout'
+import { SidebarLayout } from '@/components/sidebar/SidebarLayout'
 import { ORGS } from '@/lib/starter.config'
 import { redirect } from 'next/navigation'
 

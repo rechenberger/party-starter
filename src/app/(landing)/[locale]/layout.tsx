@@ -1,5 +1,4 @@
-import { MainTop } from '@/components/layout/MainTop'
-
+import { MainTopLayout } from '@/components/layout/MainTopLayout'
 export default function Layout({
   children,
   params,
@@ -7,11 +6,5 @@ export default function Layout({
   children: React.ReactNode
   params: Promise<{ locale?: string }>
 }) {
-  return (
-    <>
-      <MainTop />
-      <hr />
-      {children}
-    </>
-  )
+  return <MainTopLayout>{children}</MainTopLayout>
 }

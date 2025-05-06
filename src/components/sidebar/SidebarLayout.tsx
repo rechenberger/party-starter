@@ -2,13 +2,13 @@ import { TopHeader } from '../TopHeader'
 import { SidebarInset, SidebarProvider } from '../ui/sidebar'
 import { Sidebar } from './Sidebar'
 
-export default async function SidebarLayout({
+export const SidebarLayout = async ({
   children,
   params,
 }: {
   children: React.ReactNode
   params?: Promise<{ orgSlug: string }>
-}) {
+}) => {
   const orgSlug = (await params)?.orgSlug
   return (
     <>

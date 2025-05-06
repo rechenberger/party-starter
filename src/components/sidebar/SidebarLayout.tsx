@@ -1,9 +1,6 @@
-import { BaseLayout } from '../BaseLayout'
 import { TopHeader } from '../TopHeader'
 import { SidebarInset, SidebarProvider } from '../ui/sidebar'
 import { Sidebar } from './Sidebar'
-
-export { metadata } from '../BaseLayout'
 
 export default async function SidebarLayout({
   children,
@@ -15,15 +12,13 @@ export default async function SidebarLayout({
   const orgSlug = (await params)?.orgSlug
   return (
     <>
-      <BaseLayout>
-        <SidebarProvider>
-          <Sidebar orgSlug={orgSlug} />
-          <SidebarInset className="group/topheader flex flex-col gap-4 px-4">
-            <TopHeader disableSeparator hideIfSecondTopHeaderExists></TopHeader>
-            {children}
-          </SidebarInset>
-        </SidebarProvider>
-      </BaseLayout>
+      <SidebarProvider>
+        <Sidebar orgSlug={orgSlug} />
+        <SidebarInset className="group/topheader flex flex-col gap-4 px-4">
+          <TopHeader disableSeparator hideIfSecondTopHeaderExists></TopHeader>
+          {children}
+        </SidebarInset>
+      </SidebarProvider>
     </>
   )
 }

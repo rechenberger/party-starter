@@ -18,13 +18,13 @@ export const metadata: Metadata = {
   description: 'by Tristan Rechenberger',
 }
 
-export const BaseLayout = async ({
+export default async function Layout({
   children,
   params,
 }: {
   children: React.ReactNode
   params: Promise<{ locale?: string }>
-}) => {
+}) {
   const locale = await getMyLocale({ params })
   return (
     <html lang="en" suppressHydrationWarning>

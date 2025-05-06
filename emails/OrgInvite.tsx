@@ -1,3 +1,4 @@
+import { BRAND } from '@/lib/starter.config'
 import { Button, Heading, Link, Section, Text } from '@react-email/components'
 import { DefaultTemplate } from './DefaultTemplate'
 
@@ -16,19 +17,18 @@ export const OrgInvite = ({
   inviteLink,
   role,
 }: OrgInviteProps) => {
-  const previewText = `Join ${invitedByUsername} on Vercel`
+  const previewText = `Join ${invitedByUsername} on ${BRAND.name}`
 
   return (
     <DefaultTemplate previewText={previewText}>
       <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-        Join <strong>{orgName}</strong> on <strong>Party Starter</strong>
+        Join <strong>{orgName}</strong> on <BRAND.TextLogo />
       </Heading>
       <Text className="text-black text-[14px] leading-[24px]">Hello,</Text>
       <Text className="text-black text-[14px] leading-[24px]">
         <strong>{invitedByUsername ?? invitedByEmail}</strong>
         {invitedByUsername && ` (${invitedByEmail})`} has invited you to the{' '}
-        <strong>{orgName}</strong> organization as {role} on{' '}
-        <strong>Party Starter</strong>.
+        <strong>{orgName}</strong> organization as {role} on <BRAND.TextLogo />.
       </Text>
       <Section className="text-center mt-[32px] mb-[32px]">
         <Button

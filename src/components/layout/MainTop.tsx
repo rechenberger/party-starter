@@ -35,7 +35,7 @@ export const MainTop = async () => {
       <div className="container flex flex-row items-center justify-between gap-6 py-6">
         <Link href="/" className="flex flex-row items-center gap-3">
           <div className="text-xl">
-            <BRAND.Logo />
+            <BRAND.TextLogo />
           </div>
         </Link>
         <div className="hidden flex-1 xl:flex items-center gap-2">

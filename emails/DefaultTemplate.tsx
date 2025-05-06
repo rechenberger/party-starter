@@ -1,3 +1,4 @@
+import { BRAND } from '@/lib/starter.config'
 import {
   Body,
   Container,
@@ -26,8 +27,8 @@ export const DefaultTemplate = ({
           theme: {
             extend: {
               colors: {
-                primary: '#79a913',
-                'primary-foreground': '#fafaf9',
+                primary: BRAND.colors.primary,
+                'primary-foreground': BRAND.colors.primaryForeground,
               },
             },
           },
@@ -38,10 +39,10 @@ export const DefaultTemplate = ({
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
             <Section className="mt-[32px]">
               <Img
-                src={`https://party-starter.vercel.app/logo.svg`}
+                src={BRAND.logoUrl}
                 width="40"
                 height="37"
-                alt="Logo"
+                alt={BRAND.name}
                 className="my-0 mx-auto"
               />
             </Section>
@@ -50,7 +51,7 @@ export const DefaultTemplate = ({
             <Text className="text-[#666666] text-[12px] leading-[24px]">
               Best regards
               <br />
-              The Party Starter Team
+              {BRAND.emails.footer.signature}
               <br />
               🎉
             </Text>
@@ -62,7 +63,7 @@ export const DefaultTemplate = ({
 }
 
 DefaultTemplate.PreviewProps = {
-  previewText: 'Party Starter',
+  previewText: BRAND.name,
 }
 
 export default DefaultTemplate

@@ -1,4 +1,5 @@
 import { db } from '@/db/db'
+import { BRAND } from '@/lib/starter.config'
 import Nodemailer from '@auth/core/providers/nodemailer'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
 import NextAuth from 'next-auth'
@@ -33,7 +34,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
               await sendVerificationRequestEmail({
                 ...params,
-                theme: { brandColor: '#79a913' },
+                theme: { brandColor: BRAND.colors.primary },
                 url,
               })
             },

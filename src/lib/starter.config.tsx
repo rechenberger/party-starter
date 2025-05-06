@@ -10,7 +10,8 @@ export const ORGS = {
 
 export const BRAND = {
   name: 'Party Starter',
-  Logo: () => (
+  logoUrl: 'https://party-starter.vercel.app/logo.svg',
+  TextLogo: () => (
     <strong>
       Party&nbsp;<span className="text-primary">Starter</span>
     </strong>
@@ -18,5 +19,14 @@ export const BRAND = {
   github: {
     active: true,
     url: 'https://github.com/rechenberger/party-starter',
+  },
+  emails: {
+    footer: {
+      signature: 'The Party Starter Team',
+    },
+  },
+  colors: {
+    primary: '#79a913',
+    primaryForeground: '#fafaf9',
   },
 }

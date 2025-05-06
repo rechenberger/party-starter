@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     default: `${titlePrefix}${BRAND.name}`,
     template: `${titlePrefix}%s | ${BRAND.name}`,
   },
-  description: 'by Tristan Rechenberger',
+  description: BRAND.metadata.description,
 }
 
 export const BaseLayout = async ({

@@ -14,6 +14,10 @@ export const BRAND = {
       Party&nbsp;<span className="text-primary">Starter</span>
     </strong>
   ),
+  metadata: {
+    description:
+      'by Tristan Rechenberger, Tim Weiskopf, Sean Dieterle & Kevin Graf',
+  },
   github: {
     active: true,
     url: 'https://github.com/rechenberger/party-starter',

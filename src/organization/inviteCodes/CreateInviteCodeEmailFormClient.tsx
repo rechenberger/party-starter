@@ -33,7 +33,9 @@ const CreateInviteCodeEmailSchema = z.object({
     .min(1, 'At least one email address is required'),
 })
 
-type CreateInviteCodeEmailData = z.infer<typeof CreateInviteCodeEmailSchema>
+export type CreateInviteCodeEmailData = z.infer<
+  typeof CreateInviteCodeEmailSchema
+>
 
 const [useCreateInviteCodeEmailForm] = createZodForm(
   CreateInviteCodeEmailSchema,
@@ -126,6 +128,12 @@ export const CreateInviteCodeEmailFormClient = ({
                   placeholder: 'john@example.com',
                   value: receiverEmail,
                   onChange: (e) => setReceiverEmail(e.target.value),
+                  onKeyDown: (e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleAddReceiverEmail(form.getValues('receiverEmail'))
+                    }
+                  },
                 }}
                 buttonProps={{
                   onClick: () => {

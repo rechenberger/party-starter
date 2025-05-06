@@ -35,7 +35,7 @@ export const Sidebar = ({
               className="flex flex-row items-center gap-2 w-full overflow-hidden group-data-[collapsible=icon]:hidden"
             >
               <div className="text-xl">
-                <BRAND.Logo />
+                <BRAND.TextLogo />
               </div>
             </Link>
           </SidebarMenuItem>

@@ -21,7 +21,7 @@ import {
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { format, formatDistanceToNow, isPast } from 'date-fns'
-import { eq } from 'drizzle-orm'
+import { and, desc, eq } from 'drizzle-orm'
 import { Mail, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import { getMyMembershipOrThrow } from '../getMyMembership'
@@ -66,9 +66,25 @@ export const MailInvitationCodesList = async (
                             })
                             await Promise.all(
                               data.receiverEmail.map(async (mail) => {
+                                const me = await getMyUserOrThrow()
+                                const existingCode = await db
+                                  .select()
+                                  .from(schema.inviteCodes)
+                                  .where(
+                                    and(
+                                      eq(schema.inviteCodes.sentToEmail, mail),
+                                      eq(
+                                        schema.inviteCodes.organizationId,
+                                        organizationId,
+                                      ),
+                                    ),
+                                  )
+                                  .orderBy(desc(schema.inviteCodes.createdAt))
+                                  .limit(1)
                                 const newCode = await db
                                   .insert(schema.inviteCodes)
                                   .values({
+                                    id: existingCode[0]?.id,
                                     organizationId: organizationId,
                                     role: data.role,
                                     expiresAt: resolveExpiresAt(
@@ -78,11 +94,21 @@ export const MailInvitationCodesList = async (
                                     createdById: myMembership.userId,
                                     sentToEmail: mail,
                                   })
+                                  .onConflictDoUpdate({
+                                    target: [schema.inviteCodes.id],
+                                    set: {
+                                      role: data.role,
+                                      usesMax: 1,
+                                      expiresAt: resolveExpiresAt(
+                                        ORGS.defaultExpirationEmailInvitation,
+                                      ),
+                                      deletedAt: null,
+                                      createdById: me.id,
+                                    },
+                                  })
                                   .returning({ id: schema.inviteCodes.id })
 
                                 const code = newCode[0]
-
-                                const me = await getMyUserOrThrow()
 
                                 await sendOrgInviteMail({
                                   receiverEmail: mail,

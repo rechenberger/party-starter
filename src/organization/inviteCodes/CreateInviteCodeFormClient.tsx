@@ -82,7 +82,6 @@ export const CreateInviteCodeFormClient = ({
               navigator.clipboard.writeText(url)
               showDialog(null)
               toast({
-                variant: 'success',
                 title: 'Invitation Code created and copied to clipboard',
               })
             }

@@ -17,7 +17,7 @@ import { redirect } from 'next/navigation'
 const allowedRolesView: OrganizationRole[] = ['admin', 'member']
 const allowedRolesEdit: OrganizationRole[] = ['admin']
 
-export default async function OrgSettingsPage({
+export default async function OrgMembersPage({
   params,
 }: {
   params: Promise<{ orgSlug: string }>
@@ -145,7 +145,9 @@ export default async function OrgSettingsPage({
         currentAdmins.length === 1 &&
         data.userId === currentAdmins[0].userId
       ) {
-        throw new Error('Cannot remove last admin')
+        throw new Error(
+          'Cannot remove last admin. Please assign another admin beforehand. Otherwise you can delete the whole organization.',
+        )
       }
 
       await db
@@ -166,7 +168,9 @@ export default async function OrgSettingsPage({
 
   return (
     <>
-      <TopHeader>Organization Members for {orgSlug}</TopHeader>
+      <TopHeader>
+        Organization Members for {organization?.name ?? orgSlug}
+      </TopHeader>
       {organization && (
         <>
           <MemberList

@@ -1,3 +1,4 @@
+import { BRAND } from '@/lib/starter.config'
 import { OrgInvite } from '@emails/OrgInvite'
 import { render } from '@react-email/components'
 import nodemailer from 'nodemailer'
@@ -53,7 +54,7 @@ export const sendOrgInviteMail = async (params: {
     const mailOptions = {
       from: process.env.EMAIL_FROM,
       to: receiverEmail,
-      subject: `Join ${orgName} on Party Starter`,
+      subject: `Join ${orgName} on ${BRAND.name}`,
       html: emailHtml,
       text: emailPlainText,
     }

@@ -110,15 +110,9 @@ export default async function JoinOrgPage({
           />
         </CardContent>
         <CardFooter>
-          <ActionButton
-            className="w-full"
-            action={async () => {
-              'use server'
-              redirect(`/`)
-            }}
-          >
-            Return to Home
-          </ActionButton>
+          <Link href={`/`} className="w-full">
+            <Button className="w-full">Return to Home</Button>
+          </Link>
         </CardFooter>
       </CardShell>
     )

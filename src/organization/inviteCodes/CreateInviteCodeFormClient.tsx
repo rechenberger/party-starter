@@ -17,11 +17,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useToast } from '@/components/ui/use-toast'
 import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
+import { useShowDialog } from '@/super-action/dialog/DialogProvider'
 import { z } from 'zod'
 import { organizationRoleDefinitions } from '../organizationRoles'
+import { getInviteCodeUrl } from './getInviteCodeUrl'
 
 const CreateInviteCodeSchema = z.object({
   role: z.enum(['admin', 'member']),
@@ -38,16 +41,20 @@ const [useCreateInviteCodeForm] = createZodForm(CreateInviteCodeSchema)
 
 export const CreateInviteCodeFormClient = ({
   action,
+  organizationSlug,
 }: {
+  organizationSlug: string
   action: (
     data: CreateInviteCodeData,
-  ) => SuperActionPromise<void, CreateInviteCodeData>
+  ) => SuperActionPromise<{ id: string }, CreateInviteCodeData>
 }) => {
   const { trigger, isLoading } = useSuperAction({
     action,
     catchToast: true,
   })
 
+  const showDialog = useShowDialog()
+  const { toast } = useToast()
   const disabled = isLoading
 
   const form = useCreateInviteCodeForm({
@@ -65,7 +72,19 @@ export const CreateInviteCodeFormClient = ({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(async (formData) => {
-            await trigger(formData)
+            const result = await trigger(formData)
+            if (result?.id) {
+              const url = getInviteCodeUrl({
+                organizationSlug: organizationSlug,
+                code: result.id,
+              })
+
+              navigator.clipboard.writeText(url)
+              showDialog(null)
+              toast({
+                title: 'Invite code copied to clipboard',
+              })
+            }
           })}
           className="flex flex-col gap-4"
         >

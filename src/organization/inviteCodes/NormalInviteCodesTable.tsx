@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/table'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
-import { BASE_URL } from '@/lib/config'
 import { cn } from '@/lib/utils'
 import {
   streamDialog,
@@ -31,6 +30,7 @@ import { revalidatePath } from 'next/cache'
 import { getMyMembershipOrThrow } from '../getMyMembership'
 import { getOrganizationRole, OrganizationRole } from '../organizationRoles'
 import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
+import { getInviteCodeUrl } from './getInviteCodeUrl'
 import { InvitationCodesListProps } from './InvitationCodesList'
 import { resolveExpiresAt } from './resolveExpiresAt'
 
@@ -38,6 +38,7 @@ const allowedRoles: OrganizationRole[] = ['admin']
 
 export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
   const { inviteCodes, id: organizationId, slug: organizationSlug } = props
+
   return (
     <>
       <Card>
@@ -46,13 +47,17 @@ export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
           <div className="flex gap-2">
             <ActionButton
               size="sm"
+              icon={<PlusCircle className="mr-2 h-4 w-4" />}
               action={async () => {
                 'use server'
                 return superAction(async () => {
                   return streamDialog({
                     title: 'Create Invitation Code',
+                    description:
+                      'Create an invitation code and send it to the people you want to invite.',
                     content: (
                       <CreateInviteCodeFormClient
+                        organizationSlug={organizationSlug}
                         action={async (data) => {
                           'use server'
                           return superAction(async () => {
@@ -62,19 +67,26 @@ export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
                             const expiresAtResolved = resolveExpiresAt(
                               data.expiresAt,
                             )
-                            await db.insert(schema.inviteCodes).values({
-                              organizationId: organizationId,
-                              role: data.role,
-                              expiresAt: expiresAtResolved,
-                              usesMax: data.usesMax,
-                              comment: data.comment,
-                              createdById: myMembership.userId,
-                            })
+                            const [code] = await db
+                              .insert(schema.inviteCodes)
+                              .values({
+                                organizationId: organizationId,
+                                role: data.role,
+                                expiresAt: expiresAtResolved,
+                                usesMax: data.usesMax,
+                                comment: data.comment,
+                                createdById: myMembership.userId,
+                              })
+                              .returning({
+                                id: schema.inviteCodes.id,
+                              })
 
                             revalidatePath(
                               `/org/${organizationId}/settings/members`,
                             )
-                            streamDialog(null)
+                            return {
+                              id: code.id,
+                            }
                           })
                         }}
                       />
@@ -83,7 +95,6 @@ export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
                 })
               }}
             >
-              <PlusCircle className="mr-2 h-4 w-4" />
               Add Invitation Code
             </ActionButton>
           </div>
@@ -124,7 +135,10 @@ export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
                         <CopyToClipboardButton
                           textToDisplay={code.id}
                           size="vanilla"
-                          textToCopy={`${BASE_URL}/join/${organizationSlug}/${code.id}`}
+                          textToCopy={getInviteCodeUrl({
+                            organizationSlug,
+                            code: code.id,
+                          })}
                         />
                       </TableCell>
                       <TableCell>

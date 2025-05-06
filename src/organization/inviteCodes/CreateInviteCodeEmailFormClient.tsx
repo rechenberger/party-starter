@@ -20,11 +20,15 @@ import {
 import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
+import { uniq } from 'lodash-es'
+import { X } from 'lucide-react'
+import { useState } from 'react'
+import { useWatch } from 'react-hook-form'
 import { z } from 'zod'
 
 const CreateInviteCodeEmailSchema = z.object({
   role: z.enum(['admin', 'member']),
-  receiverEmail: z.string().email(),
+  receiverEmail: z.array(z.string().min(10, 'Email is required')).min(1),
 })
 
 type CreateInviteCodeEmailData = z.infer<typeof CreateInviteCodeEmailSchema>
@@ -45,14 +49,19 @@ export const CreateInviteCodeEmailFormClient = ({
     catchToast: true,
   })
 
-  const disabled = isLoading
-
   const form = useCreateInviteCodeEmailForm({
     defaultValues: {
       role: 'member',
-      receiverEmail: '',
+      receiverEmail: [],
     },
-    disabled,
+    disabled: isLoading,
+  })
+
+  const [receiverEmail, setReceiverEmail] = useState('')
+
+  const receiverMails = useWatch({
+    control: form.control,
+    name: 'receiverEmail',
   })
 
   return (
@@ -92,26 +101,61 @@ export const CreateInviteCodeEmailFormClient = ({
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="receiverEmail"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Receiver Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    {...field}
-                    placeholder="john@example.com"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              return (
+                <div>
+                  <FormItem>
+                    <FormLabel>Receiver</FormLabel>
+                    <FormControl>
+                      <>
+                        <Input
+                          type="email"
+                          placeholder="john@example.com"
+                          value={receiverEmail}
+                          onChange={(e) => setReceiverEmail(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              form.setValue(
+                                'receiverEmail',
+                                uniq([...field.value, receiverEmail]),
+                              )
+                              setReceiverEmail('')
+                            }
+                          }}
+                        />
+                        <div className="flex flex-wrap gap-2">
+                          {receiverMails.map((mail) => (
+                            <Button
+                              key={mail}
+                              variant="secondary"
+                              onClick={() => {
+                                form.setValue(
+                                  'receiverEmail',
+                                  receiverMails.filter((m) => m !== mail),
+                                )
+                              }}
+                            >
+                              {mail}
+                              <X className="h-4 w-4" />
+                            </Button>
+                          ))}
+                        </div>
+                      </>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </div>
+              )
+            }}
           />
 
-          <Button type="submit" className="mt-2" disabled={disabled}>
-            Send Invitation
+          <Button type="submit" className="" disabled={isLoading}>
+            {isLoading ? 'Sending...' : 'Send Invitation'}
           </Button>
         </form>
       </Form>

@@ -12,11 +12,11 @@ import {
 } from '@/components/ui/table'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
-import { BASE_URL } from '@/lib/config'
 import { ORGS } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import {
   streamDialog,
+  streamToast,
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
@@ -28,6 +28,7 @@ import { getMyMembershipOrThrow } from '../getMyMembership'
 import { getOrganizationRole } from '../organizationRoles'
 import { sendOrgInviteMail } from '../sendOrgInviteMail'
 import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
+import { getInviteCodeUrl } from './getInviteCodeUrl'
 import { InvitationCodesListProps } from './InvitationCodesList'
 import { resolveExpiresAt } from './resolveExpiresAt'
 
@@ -49,11 +50,12 @@ export const MailInvitationCodesList = async (
           <div className="flex gap-2">
             <ActionButton
               size="sm"
+              icon={<Mail className="h-4 w-4" />}
               action={async () => {
                 'use server'
                 return superAction(async () => {
                   return streamDialog({
-                    title: 'Send Invitation Code',
+                    title: 'Send Invitation Mail',
                     content: (
                       <CreateInviteCodeEmailFormClient
                         action={async (data) => {
@@ -62,36 +64,47 @@ export const MailInvitationCodesList = async (
                             const myMembership = await getMyMembershipOrThrow({
                               allowedRoles: ['admin'],
                             })
-                            const newCode = await db
-                              .insert(schema.inviteCodes)
-                              .values({
-                                organizationId: organizationId,
-                                role: data.role,
-                                expiresAt: resolveExpiresAt(
-                                  ORGS.defaultExpirationEmailInvitation,
-                                ),
-                                usesMax: 1,
-                                createdById: myMembership.userId,
-                                sentToEmail: data.receiverEmail,
-                              })
-                              .returning({ id: schema.inviteCodes.id })
+                            await Promise.all(
+                              data.receiverEmail.map(async (mail) => {
+                                const newCode = await db
+                                  .insert(schema.inviteCodes)
+                                  .values({
+                                    organizationId: organizationId,
+                                    role: data.role,
+                                    expiresAt: resolveExpiresAt(
+                                      ORGS.defaultExpirationEmailInvitation,
+                                    ),
+                                    usesMax: 1,
+                                    createdById: myMembership.userId,
+                                    sentToEmail: mail,
+                                  })
+                                  .returning({ id: schema.inviteCodes.id })
 
-                            const code = newCode[0]
+                                const code = newCode[0]
 
-                            const me = await getMyUserOrThrow()
+                                const me = await getMyUserOrThrow()
 
-                            await sendOrgInviteMail({
-                              receiverEmail: data.receiverEmail,
-                              invitedByEmail: me.email,
-                              invitedByUsername: me.name,
-                              orgName: organizationName,
-                              inviteLink: `${BASE_URL}/join/${organizationSlug}/${code.id}`,
-                              role: data.role,
-                            })
+                                await sendOrgInviteMail({
+                                  receiverEmail: mail,
+                                  invitedByEmail: me.email,
+                                  invitedByUsername: me.name,
+                                  orgName: organizationName,
+                                  inviteLink: getInviteCodeUrl({
+                                    organizationSlug,
+                                    code: code.id,
+                                  }),
+                                  role: data.role,
+                                })
+                              }),
+                            )
 
                             revalidatePath(
                               `/org/${organizationId}/settings/members`,
                             )
+
+                            streamToast({
+                              title: `Invitation sent to ${data.receiverEmail}`,
+                            })
                             streamDialog(null)
                           })
                         }}
@@ -101,7 +114,6 @@ export const MailInvitationCodesList = async (
                 })
               }}
             >
-              <Mail className="mr-2 h-4 w-4" />
               Mail Invitation
             </ActionButton>
           </div>
@@ -239,10 +251,16 @@ export const MailInvitationCodesList = async (
                                   invitedByEmail: me.email,
                                   invitedByUsername: me.name,
                                   orgName: organizationName,
-                                  inviteLink: `${BASE_URL}/join/${organizationSlug}/${code.id}`,
+                                  inviteLink: getInviteCodeUrl({
+                                    organizationSlug,
+                                    code: code.id,
+                                  }),
                                   role: code.role,
                                 })
 
+                                streamToast({
+                                  title: `Invitation sent to ${code.sentToEmail}`,
+                                })
                                 revalidatePath(
                                   `/org/${organizationId}/settings/members`,
                                 )

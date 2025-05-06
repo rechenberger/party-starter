@@ -23,7 +23,7 @@ export default async function OrgMembersPage({
   params: Promise<{ orgSlug: string }>
 }) {
   const orgSlug = (await params).orgSlug
-  const myMembership = await getMyMembershipOrNotFound({
+  const { membership: myMembership } = await getMyMembershipOrNotFound({
     allowedRoles: allowedRolesView,
   })
 

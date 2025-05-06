@@ -9,7 +9,7 @@ import { Building2, Laugh, Users } from 'lucide-react'
 import Link from 'next/link'
 
 export const SidebarOrgSection = async ({ orgSlug }: { orgSlug: string }) => {
-  const membership = await getMyMembershipOrNotFound()
+  const { membership } = await getMyMembershipOrNotFound()
 
   const items = [
     {

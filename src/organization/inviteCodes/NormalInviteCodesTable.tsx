@@ -61,9 +61,10 @@ export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
                         action={async (data) => {
                           'use server'
                           return superAction(async () => {
-                            const myMembership = await getMyMembershipOrThrow({
-                              allowedRoles,
-                            })
+                            const { membership: myMembership } =
+                              await getMyMembershipOrThrow({
+                                allowedRoles,
+                              })
                             const expiresAtResolved = resolveExpiresAt(
                               data.expiresAt,
                             )

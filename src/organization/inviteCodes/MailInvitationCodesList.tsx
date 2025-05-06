@@ -61,9 +61,10 @@ export const MailInvitationCodesList = async (
                         action={async (data) => {
                           'use server'
                           return superAction(async () => {
-                            const myMembership = await getMyMembershipOrThrow({
-                              allowedRoles: ['admin'],
-                            })
+                            const { membership: myMembership } =
+                              await getMyMembershipOrThrow({
+                                allowedRoles: ['admin'],
+                              })
                             await Promise.all(
                               data.receiverEmail.map(async (mail) => {
                                 const me = await getMyUserOrThrow()

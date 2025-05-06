@@ -31,8 +31,10 @@ export const getMyMembership = async ({
       },
     },
   })
+  const membership = org?.memberships.at(0)
+  const valid = !!org && !!membership
 
-  return org?.memberships.at(0)
+  return valid ? { org, membership } : null
 }
 
 export const getMyMembershipOrThrow = neverNullish(

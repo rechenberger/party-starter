@@ -5,8 +5,12 @@ import {
   SidebarMenuButton,
 } from '@/components/ui/sidebar'
 import { getMyMembershipOrNotFound } from '@/organization/getMyMembership'
+import { OrganizationRole } from '@/organization/organizationRoles'
 import { Building2, Laugh, Users } from 'lucide-react'
 import Link from 'next/link'
+
+const defaultViewRoles: OrganizationRole[] = ['admin', 'member']
+const protectedViewRoles: OrganizationRole[] = ['admin']
 
 export const SidebarOrgSection = async () => {
   const { membership, org } = await getMyMembershipOrNotFound()
@@ -24,13 +28,13 @@ export const SidebarOrgSection = async () => {
       title: 'Organization',
       url: `/org/${org.slug}/settings`,
       icon: Building2,
-      show: membership.role === 'admin',
+      show: protectedViewRoles.includes(membership.role),
     },
     {
       title: 'Members',
       url: `/org/${org.slug}/settings/members`,
       icon: Users,
-      show: membership.role === 'admin' || membership.role === 'member',
+      show: defaultViewRoles.includes(membership.role),
     },
   ]
 

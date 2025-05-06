@@ -152,8 +152,8 @@ export const MailInvitationCodesList = async (
                 <TableHead>Receiver</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Role</TableHead>
-                <TableHead>Invited At</TableHead>
-                <TableHead>Invited By</TableHead>
+                <TableHead>Sent at</TableHead>
+                <TableHead>Sent by</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>

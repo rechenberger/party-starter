@@ -3,6 +3,7 @@ import { getIsAdmin } from '@/auth/getIsAdmin'
 import { getIsLoggedIn } from '@/auth/getMyUser'
 import { DarkModeToggle } from '@/components/layout/DarkModeToggle'
 import { Button } from '@/components/ui/button'
+import { BRAND } from '@/lib/starter.config'
 import { Github } from 'lucide-react'
 import Link from 'next/link'
 import { DevBadges } from './DevBadges'
@@ -34,9 +35,7 @@ export const MainTop = async () => {
       <div className="container flex flex-row items-center justify-between gap-6 py-6">
         <Link href="/" className="flex flex-row items-center gap-3">
           <div className="text-xl">
-            <strong>
-              Party&nbsp;<span className="text-primary">Starter</span>
-            </strong>
+            <BRAND.Logo />
           </div>
         </Link>
         <div className="hidden flex-1 xl:flex items-center gap-2">
@@ -45,14 +44,13 @@ export const MainTop = async () => {
           <UserButton />
         </div>
         <div className="flex flex-row">
-          <Button variant={'ghost'} size="icon" asChild>
-            <Link
-              href="https://github.com/rechenberger/party-starter"
-              target="_blank"
-            >
-              <Github />
-            </Link>
-          </Button>
+          {BRAND.github.active && (
+            <Button variant={'ghost'} size="icon" asChild>
+              <Link href={BRAND.github.url} target="_blank">
+                <Github />
+              </Link>
+            </Button>
+          )}
           <DarkModeToggle />
         </div>
       </div>

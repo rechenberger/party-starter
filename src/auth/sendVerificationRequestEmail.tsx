@@ -1,3 +1,4 @@
+import { BRAND } from '@/lib/starter.config'
 import type { EmailConfig } from '@auth/core/providers/email'
 import { VerifyEmail } from '@emails/VerifyEmail'
 import { render } from '@react-email/components'
@@ -12,7 +13,6 @@ export const sendVerificationRequestEmail = async (
     provider: { from },
   } = params
   try {
-    // Looking to send emails in production? Check out our Email API/SMTP product!
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_URL,
       port: 2525,
@@ -32,7 +32,7 @@ export const sendVerificationRequestEmail = async (
     const mailOptions = {
       from: from,
       to: email,
-      subject: `Login to ${host}`,
+      subject: `Login to ${BRAND.name}`,
       html: emailHtml,
       text: emailPlainText,
     }

@@ -1,6 +1,7 @@
 import SeededAvatar from '@/components/SeededAvatar'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -18,6 +19,7 @@ import { eq } from 'drizzle-orm'
 import { find } from 'lodash-es'
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
+import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 
 export default async function JoinOrgPage({
@@ -40,10 +42,13 @@ export default async function JoinOrgPage({
     return notFound()
   }
 
-  const membership = find(organization.memberships, (m) => m.userId === user.id)
+  const alreadyOrgMember = !!find(
+    organization.memberships,
+    (m) => m.userId === user.id,
+  )
 
-  // Render success state (after joining)
-  if (membership) {
+  // Card if already joined the team
+  if (alreadyOrgMember) {
     return (
       <CardShell>
         <CardHeader>
@@ -67,21 +72,15 @@ export default async function JoinOrgPage({
           </p>
         </CardContent>
         <CardFooter>
-          <ActionButton
-            className="w-full"
-            action={async () => {
-              'use server'
-              redirect(`/org/${organization.slug}`)
-            }}
-          >
-            Go to Organization
-          </ActionButton>
+          <Link href={`/org/${organization.slug}`} className="w-full">
+            <Button className="w-full">Go to Organization</Button>
+          </Link>
         </CardFooter>
       </CardShell>
     )
   }
 
-  // Render invalid state
+  // Card if code is invalid
   if (error === 'Expired' || error === 'Max uses reached') {
     return (
       <CardShell>

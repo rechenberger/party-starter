@@ -117,7 +117,7 @@ export const MemberList = ({
               <Input
                 type="text"
                 placeholder="Search members by name or email..."
-                className="pl-8"
+                className="px-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />

@@ -9,7 +9,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+import { InputWithButton } from '@/components/ui/input-with-button'
 import {
   Select,
   SelectContent,
@@ -69,8 +69,8 @@ export const CreateInviteCodeEmailFormClient = ({
     if (receiverEmail) {
       form.setValue('receiverEmail', uniq([...currentValue, receiverEmail]))
       setReceiverEmail('')
+      form.trigger('receiverEmail')
     }
-    form.trigger('receiverEmail')
   }
 
   return (
@@ -119,32 +119,22 @@ export const CreateInviteCodeEmailFormClient = ({
           <FormItem>
             <FormLabel>Receiver</FormLabel>
             <div className="flex flex-col gap-2">
-              <div className="flex gap-1">
-                <Input
-                  type="email"
-                  autoFocus
-                  className="flex-1"
-                  placeholder="john@example.com"
-                  value={receiverEmail}
-                  onChange={(e) => setReceiverEmail(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault()
-                      handleAddReceiverEmail(form.getValues('receiverEmail'))
-                    }
-                  }}
-                />
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  disabled={!receiverEmail}
-                  onClick={() => {
+              <InputWithButton
+                inputProps={{
+                  type: 'email',
+                  autoFocus: true,
+                  className: 'flex-1',
+                  placeholder: 'john@example.com',
+                  value: receiverEmail,
+                  onChange: (e) => setReceiverEmail(e.target.value),
+                }}
+                buttonProps={{
+                  onClick: () => {
                     handleAddReceiverEmail(form.getValues('receiverEmail'))
-                  }}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
+                  },
+                }}
+                icon={<Plus className="h-4 w-4" />}
+              />
               <div className="flex flex-wrap gap-2">
                 {form.getValues('receiverEmail').map((mail, i) => {
                   const error = form.formState.errors.receiverEmail?.[i]

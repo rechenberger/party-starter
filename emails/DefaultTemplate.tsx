@@ -49,11 +49,7 @@ export const DefaultTemplate = ({
             {children}
             <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
             <Text className="text-[#666666] text-[12px] leading-[24px]">
-              Best regards
-              <br />
-              {BRAND.emails.footer.signature}
-              <br />
-              🎉
+              <BRAND.emails.footer.Signature />
             </Text>
           </Container>
         </Body>

@@ -103,7 +103,7 @@ export const MailInvitationCodesList = async (
                             )
 
                             streamToast({
-                              title: `Invitation sent to ${data.receiverEmail}`,
+                              title: `Invitation sent to ${data.receiverEmail.join(', ')}`,
                             })
                             streamDialog(null)
                           })

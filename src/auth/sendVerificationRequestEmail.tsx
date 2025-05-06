@@ -1,7 +1,7 @@
 import type { EmailConfig } from '@auth/core/providers/email'
+import { VerifyEmail } from '@emails/VerifyEmail'
 import { render } from '@react-email/components'
 import nodemailer from 'nodemailer'
-import { VerifyEmail } from '@emails/VerifyEmail'
 
 export const sendVerificationRequestEmail = async (
   params: Parameters<EmailConfig['sendVerificationRequest']>[0],
@@ -9,7 +9,6 @@ export const sendVerificationRequestEmail = async (
   const {
     identifier: email,
     url,
-    theme,
     provider: { from },
   } = params
   try {

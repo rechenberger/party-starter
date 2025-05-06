@@ -13,6 +13,8 @@
 
 ## Setup
 
+- Configure the features you want in [starter.config.ts](src/lib/starter.config.ts)
+- Run `pnpm starter:init` to setup the project
 - Create [.env.local](.env.local)
 - Generate Auth Secret
   - run `npx auth secret`

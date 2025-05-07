@@ -208,18 +208,22 @@ export const NormalInviteCodesTable = async (
                         )}
                       </TableCell>
                       <TableCell>
-                        {code.comment && (
+                        {code.comment && code.comment.length > 20 ? (
                           <Popover>
                             <PopoverTrigger>
-                              <div className="max-w-40 flex items-center gap-1">
-                                <span className="truncate">{code.comment}</span>
+                              <div className="flex items-center gap-1">
+                                <span className="">
+                                  {code.comment.slice(0, 20)}...
+                                </span>
                                 <Info className="size-4 flex-shrink-0" />
                               </div>
                             </PopoverTrigger>
-                            <PopoverContent side="top">
+                            <PopoverContent side="top" className="break-words">
                               {code.comment}
                             </PopoverContent>
                           </Popover>
+                        ) : (
+                          <span>{code.comment}</span>
                         )}
                       </TableCell>
                       <TableCell className="text-right">

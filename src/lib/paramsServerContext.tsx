@@ -1,3 +1,5 @@
+import { getMyLocale } from '@/i18n/getMyLocale'
+import { LocaleProvider } from '@/i18n/LocaleContext'
 import { createServerContext } from '@sodefa/next-server-context'
 import { ReactNode } from 'react'
 import { z } from 'zod'
@@ -12,7 +14,7 @@ export const paramsContext = createServerContext<
 export const ParamsWrapper = <ComponentProps,>(
   Component: (props: ComponentProps) => ReactNode,
 ) => {
-  const WrapperPage = (props: ComponentProps) => {
+  const WrapperPage = async (props: ComponentProps) => {
     const parsedProps = z
       .object({
         params: z.promise(
@@ -24,7 +26,12 @@ export const ParamsWrapper = <ComponentProps,>(
       })
       .parse(props)
     paramsContext.set(parsedProps.params)
-    return <Component {...(props as any)} />
+    const locale = await getMyLocale()
+    return (
+      <LocaleProvider value={locale}>
+        <Component {...(props as any)} />
+      </LocaleProvider>
+    )
   }
   return WrapperPage
 }

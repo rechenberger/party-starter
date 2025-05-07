@@ -1,4 +1,3 @@
-import { SimpleDataCard } from '@/components/simple/SimpleDataCard'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -8,34 +7,59 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { ChevronDown, KeyRound, LogOut } from 'lucide-react'
+import { ChevronDown, KeyRound, LogOut, User } from 'lucide-react'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import { auth, signOut } from './auth'
 import {
   changePasswordWithRedirect,
   loginWithRedirect,
 } from './loginWithRedirect'
 
+export const UserButtonSuspense = () => {
+  return (
+    <Suspense fallback={<Skeleton className="w-[38px] h-8" />}>
+      <UserButton />
+    </Suspense>
+  )
+}
+
 export const UserButton = async () => {
   const session = await auth()
 
+  const showName = false
+
   if (!!session?.user) {
+    const email = session.user.email
+    const name = session.user.name ?? email
     return (
       <>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
-              <span>{session.user?.name ?? session.user?.email ?? 'You'}</span>
-              <ChevronDown className="size-4" />
+              {showName ? (
+                <>
+                  <span>
+                    {session.user?.name ?? session.user?.email ?? 'You'}
+                  </span>
+                  <ChevronDown className="size-4" />
+                </>
+              ) : (
+                <>
+                  <User className="size-4" />
+                </>
+              )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent side="bottom" align="end">
             <DropdownMenuLabel>
-              <SimpleDataCard
-                data={session.user}
-                classNameCell="max-w-40 overflow-hidden text-ellipsis"
-              />
+              <div className="text-xs text-muted-foreground">Logged in as</div>
+              <div>{name}</div>
+              {email !== name && (
+                <div className="text-xs text-muted-foreground">{email}</div>
+              )}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>

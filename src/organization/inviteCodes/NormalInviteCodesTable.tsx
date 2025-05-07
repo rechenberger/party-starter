@@ -27,7 +27,10 @@ import { format, formatDistanceToNow, isPast } from 'date-fns'
 import { eq } from 'drizzle-orm'
 import { Info, PlusCircle, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
-import { getMyMembershipOrThrow } from '../getMyMembership'
+import {
+  getMyMembershipOrNotFound,
+  getMyMembershipOrThrow,
+} from '../getMyMembership'
 import { getOrganizationRole, OrganizationRole } from '../organizationRoles'
 import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
 import { getInviteCodeUrl } from './getInviteCodeUrl'
@@ -36,8 +39,14 @@ import { resolveExpiresAt } from './resolveExpiresAt'
 
 const allowedRoles: OrganizationRole[] = ['admin']
 
-export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
+export const NormalInviteCodesTable = async (
+  props: InvitationCodesListProps,
+) => {
   const { inviteCodes, id: organizationId, slug: organizationSlug } = props
+
+  await getMyMembershipOrNotFound({
+    allowedRoles,
+  })
 
   return (
     <>
@@ -61,10 +70,11 @@ export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
                         action={async (data) => {
                           'use server'
                           return superAction(async () => {
-                            const { membership: myMembership } =
-                              await getMyMembershipOrThrow({
+                            const { membership } = await getMyMembershipOrThrow(
+                              {
                                 allowedRoles,
-                              })
+                              },
+                            )
                             const expiresAtResolved = resolveExpiresAt(
                               data.expiresAt,
                             )
@@ -76,7 +86,7 @@ export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
                                 expiresAt: expiresAtResolved,
                                 usesMax: data.usesMax,
                                 comment: data.comment,
-                                createdById: myMembership.userId,
+                                createdById: membership.userId,
                               })
                               .returning({
                                 id: schema.inviteCodes.id,
@@ -118,8 +128,7 @@ export const NormalInviteCodesTable = (props: InvitationCodesListProps) => {
                 <TableRow>
                   <TableCell
                     className="text-center py-6 text-muted-foreground"
-                    //just a high number to make sure the cell takes the full width
-                    colSpan={42}
+                    colSpan={42} //just a high number to make sure the cell takes the full width
                   >
                     No invitation codes found. Create one to get started.
                   </TableCell>

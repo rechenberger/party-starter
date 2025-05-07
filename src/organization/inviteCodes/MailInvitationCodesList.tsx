@@ -200,7 +200,7 @@ export const MailInvitationCodesList = async (
               {inviteCodes.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={42} //just a high number to make sure the cell takes the full width
                     className="text-center py-6 text-muted-foreground"
                   >
                     No invitation codes sent yet.

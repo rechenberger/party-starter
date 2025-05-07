@@ -234,6 +234,10 @@ export const NormalInviteCodesTable = async (
                             action={async () => {
                               'use server'
                               return superAction(async () => {
+                                await getMyMembershipOrThrow({
+                                  allowedRoles,
+                                })
+
                                 await db
                                   .update(schema.inviteCodes)
                                   .set({

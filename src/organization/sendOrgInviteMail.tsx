@@ -62,5 +62,6 @@ export const sendOrgInviteMail = async (params: {
     await transporter.sendMail(mailOptions)
   } catch (error) {
     console.log({ error })
+    throw error
   }
 }

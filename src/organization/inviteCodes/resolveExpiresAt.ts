@@ -1,4 +1,4 @@
-import { addDays, addMonths, addYears } from 'date-fns'
+import { addDays, addMonths, addWeeks, addYears } from 'date-fns'
 import { type ExpirationTime } from './expirationTimes'
 
 export const resolveExpiresAt = (expirationTime: ExpirationTime) => {
@@ -8,7 +8,7 @@ export const resolveExpiresAt = (expirationTime: ExpirationTime) => {
     case '1d':
       return addDays(new Date(), 1)
     case '1w':
-      return addDays(new Date(), 7)
+      return addWeeks(new Date(), 1)
     case '1m':
       return addMonths(new Date(), 1)
     case '1y':

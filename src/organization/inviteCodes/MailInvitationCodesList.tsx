@@ -25,7 +25,10 @@ import { format, formatDistanceToNow, isPast } from 'date-fns'
 import { and, desc, eq, or } from 'drizzle-orm'
 import { Mail, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
-import { getMyMembershipOrThrow } from '../getMyMembership'
+import {
+  getMyMembershipOrNotFound,
+  getMyMembershipOrThrow,
+} from '../getMyMembership'
 import { getOrganizationRole, OrganizationRole } from '../organizationRoles'
 import { sendOrgInviteMail } from '../sendOrgInviteMail'
 import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
@@ -114,10 +117,16 @@ const upsertInviteCodeAndSendMail = async ({
   })
 }
 
+const allowedRoles: OrganizationRole[] = ['admin']
+
 export const MailInvitationCodesList = async (
   props: InvitationCodesListProps,
 ) => {
   const { inviteCodes, id: organizationId, slug: organizationSlug } = props
+
+  await getMyMembershipOrNotFound({
+    allowedRoles,
+  })
 
   return (
     <>
@@ -139,7 +148,7 @@ export const MailInvitationCodesList = async (
                           'use server'
                           return superAction(async () => {
                             await getMyMembershipOrThrow({
-                              allowedRoles: ['admin'],
+                              allowedRoles,
                             })
                             const me = await getMyUserOrThrow()
                             await Promise.all(
@@ -158,7 +167,9 @@ export const MailInvitationCodesList = async (
                             )
 
                             streamToast({
-                              title: `Invitation sent to ${data.receiverEmail.join(', ')}`,
+                              title: `Invitation sent to ${data.receiverEmail.join(
+                                ', ',
+                              )}`,
                             })
                             streamDialog(null)
                           })
@@ -273,7 +284,7 @@ export const MailInvitationCodesList = async (
                               'use server'
                               return superAction(async () => {
                                 await getMyMembershipOrThrow({
-                                  allowedRoles: ['admin'],
+                                  allowedRoles,
                                 })
                                 if (!code.sentToEmail) {
                                   throw new Error('No email found')
@@ -308,6 +319,9 @@ export const MailInvitationCodesList = async (
                             action={async () => {
                               'use server'
                               return superAction(async () => {
+                                await getMyMembershipOrThrow({
+                                  allowedRoles,
+                                })
                                 await db
                                   .update(schema.inviteCodes)
                                   .set({

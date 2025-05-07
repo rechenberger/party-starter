@@ -1,9 +1,9 @@
 import { PartyButton } from '@/components/demo/PartyButton'
 import { Readme } from '@/components/demo/Readme'
-import { MainTop } from '@/components/layout/MainTop'
 import { Button } from '@/components/ui/button'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import { Suspense } from 'react'
 
 export default async function Page() {
   return (
@@ -22,7 +22,9 @@ export default async function Page() {
             </Button>
           </Link>
         </div>
-        <Readme />
+        <Suspense>
+          <Readme />
+        </Suspense>
       </div>
     </>
   )

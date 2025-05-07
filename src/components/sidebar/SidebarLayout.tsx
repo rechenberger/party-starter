@@ -7,7 +7,7 @@ export const SidebarLayout = async ({
   params,
 }: {
   children: React.ReactNode
-  params?: Promise<{ orgSlug: string }>
+  params?: Promise<{ orgSlug?: string }>
 }) => {
   const orgSlug = (await params)?.orgSlug
   return (

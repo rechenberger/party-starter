@@ -123,6 +123,7 @@ export const CreateInviteCodeEmailFormClient = ({
               <InputWithButton
                 inputProps={{
                   type: 'email',
+                  autoComplete: 'email',
                   autoFocus: true,
                   className: 'flex-1',
                   placeholder: 'john@example.com',

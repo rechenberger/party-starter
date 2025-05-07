@@ -2,6 +2,7 @@ import { isDev } from '@/auth/dev'
 import { Toaster } from '@/components/ui/toaster'
 import { LocaleProvider } from '@/i18n/LocaleContext'
 import { getMyLocale } from '@/i18n/getMyLocale'
+import { ParamsWrapper } from '@/lib/paramsServerContext'
 import { ActionCommandProvider } from '@/super-action/command/ActionCommandProvider'
 import { DialogProvider } from '@/super-action/dialog/DialogProvider'
 import type { Metadata } from 'next'
@@ -18,26 +19,28 @@ export const metadata: Metadata = {
   description: 'by Tristan Rechenberger',
 }
 
-export default async function Layout({
-  children,
-  params,
-}: {
-  children: React.ReactNode
-  params: Promise<{ locale?: string }>
-}) {
-  const locale = await getMyLocale({ params })
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="bg-background min-h-[100svh] flex flex-col">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <LocaleProvider value={locale}>
-            {children}
-            <ActionCommandProvider />
-            <Toaster />
-            <DialogProvider />
-          </LocaleProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  )
-}
+export default ParamsWrapper(
+  async ({
+    children,
+    params,
+  }: {
+    children: React.ReactNode
+    params: Promise<{ locale?: string }>
+  }) => {
+    const locale = await getMyLocale()
+    return (
+      <html lang="en" suppressHydrationWarning>
+        <body className="bg-background min-h-[100svh] flex flex-col">
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <LocaleProvider value={locale}>
+              {children}
+              <ActionCommandProvider />
+              <Toaster />
+              <DialogProvider />
+            </LocaleProvider>
+          </ThemeProvider>
+        </body>
+      </html>
+    )
+  },
+)

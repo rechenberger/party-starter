@@ -1,11 +1,8 @@
 import { getMyLocale } from '@/i18n/getMyLocale'
+import { ParamsWrapper } from '@/lib/paramsServerContext'
 import { redirect } from 'next/navigation'
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ locale?: string }>
-}) {
-  const locale = await getMyLocale({ params })
+export default ParamsWrapper(async () => {
+  const locale = await getMyLocale()
   redirect(`/${locale}`)
-}
+})

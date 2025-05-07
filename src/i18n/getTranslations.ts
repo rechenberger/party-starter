@@ -2,12 +2,8 @@ import 'server-only'
 
 import { getMyLocale } from './getMyLocale'
 
-export const getTranslations = async ({
-  params,
-}: {
-  params: Promise<{ locale?: string }>
-}) => {
-  const locale = await getMyLocale({ params })
+export const getTranslations = async () => {
+  const locale = await getMyLocale()
   switch (locale) {
     case 'de':
       return import('./translations/translations.server.de').then((m) => m.t)

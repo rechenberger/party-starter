@@ -1,8 +1,8 @@
+import { getMailTransporter } from '@/lib/getMailTransporter'
 import { BRAND } from '@/lib/starter.config'
 import type { EmailConfig } from '@auth/core/providers/email'
 import { VerifyEmail } from '@emails/VerifyEmail'
 import { render } from '@react-email/components'
-import nodemailer from 'nodemailer'
 
 export const sendVerificationRequestEmail = async (
   params: Parameters<EmailConfig['sendVerificationRequest']>[0],
@@ -13,14 +13,7 @@ export const sendVerificationRequestEmail = async (
     provider: { from },
   } = params
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_URL,
-      port: 2525,
-      auth: {
-        user: process.env.MAILTRAP_USER,
-        pass: process.env.MAILTRAP_PASSWORD,
-      },
-    })
+    const transporter = getMailTransporter()
 
     const emailHtml = await render(<VerifyEmail verifyUrl={url} />)
     const emailPlainText = await render(<VerifyEmail verifyUrl={url} />, {

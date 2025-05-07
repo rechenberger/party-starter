@@ -1,7 +1,7 @@
+import { getMailTransporter } from '@/lib/getMailTransporter'
 import { BRAND } from '@/lib/starter.config'
 import { OrgInvite } from '@emails/OrgInvite'
 import { render } from '@react-email/components'
-import nodemailer from 'nodemailer'
 
 export const sendOrgInviteMail = async (params: {
   receiverEmail: string
@@ -20,14 +20,7 @@ export const sendOrgInviteMail = async (params: {
     role,
   } = params
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_URL,
-      port: 2525,
-      auth: {
-        user: process.env.MAILTRAP_USER,
-        pass: process.env.MAILTRAP_PASSWORD,
-      },
-    })
+    const transporter = getMailTransporter()
 
     const emailHtml = await render(
       <OrgInvite

@@ -1,5 +1,3 @@
-import 'server-only'
-
 import { type t as enT } from './en.translations'
 
 export const t = {

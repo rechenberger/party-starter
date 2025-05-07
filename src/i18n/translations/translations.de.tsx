@@ -1,4 +1,4 @@
-import { type t as enT } from './en.translations'
+import { type t as enT } from './translations.en'
 
 export const t = {
   standardWords: {

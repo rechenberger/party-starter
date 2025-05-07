@@ -10,8 +10,8 @@ export const getTranslations = async ({
   const locale = await getMyLocale({ params })
   switch (locale) {
     case 'de':
-      return import('./de.translations').then((m) => m.t)
+      return import('./translations/translations.server.de').then((m) => m.t)
     case 'en':
-      return import('./en.translations').then((m) => m.t)
+      return import('./translations/translations.server.en').then((m) => m.t)
   }
 }

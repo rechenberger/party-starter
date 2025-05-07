@@ -23,7 +23,7 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { format, formatDistanceToNow, isPast } from 'date-fns'
+import { format, formatDistanceToNow } from 'date-fns'
 import { eq } from 'drizzle-orm'
 import { Info, PlusCircle, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
@@ -135,13 +135,13 @@ export const NormalInviteCodesTable = async (
                 </TableRow>
               ) : (
                 inviteCodes.map((code) => {
-                  const isExpired =
-                    (code.expiresAt && isPast(code.expiresAt)) ||
-                    (code.usesMax && code.usesCurrent === code.usesMax)
                   return (
                     <TableRow key={code.id}>
                       <TableCell
-                        className={cn('font-mono', isExpired && 'line-through')}
+                        className={cn(
+                          'font-mono',
+                          code.isExpired && 'line-through',
+                        )}
                       >
                         <CopyToClipboardButton
                           textToDisplay={code.id}
@@ -179,7 +179,7 @@ export const NormalInviteCodesTable = async (
                       <TableCell>
                         <div className="space-y-1">
                           <div className="flex text-xs">
-                            {code.usesMax ? (
+                            {code.usesMax !== null ? (
                               <span>
                                 {code.usesMax - (code.usesCurrent ?? 0)}
                               </span>

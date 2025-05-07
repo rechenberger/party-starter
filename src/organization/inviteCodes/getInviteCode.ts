@@ -1,6 +1,8 @@
 import { getMyUserOrLogin } from '@/auth/getMyUser'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { InviteCode } from '@/db/schema-zod'
+import { isPast } from 'date-fns'
 import { and, eq, isNull } from 'drizzle-orm'
 
 export const getInviteCode = async ({
@@ -25,7 +27,7 @@ export const getInviteCode = async ({
     return { error: 'Organization not found' as const }
   }
 
-  const inviteCode = await db.query.inviteCodes.findFirst({
+  const inviteCodeRaw = await db.query.inviteCodes.findFirst({
     where: and(
       eq(schema.inviteCodes.id, code),
       eq(schema.inviteCodes.organizationId, organization.id),
@@ -33,17 +35,15 @@ export const getInviteCode = async ({
     ),
   })
 
-  if (!inviteCode) {
+  if (!inviteCodeRaw) {
     return { error: 'Invite code not found' as const, organization }
   }
 
-  if (inviteCode.expiresAt && inviteCode.expiresAt < new Date()) {
+  const inviteCode = getEnhancedInviteCode(inviteCodeRaw)
+
+  if (inviteCode.isExpired) {
     return { error: 'Expired' as const, organization, inviteCode, user }
-  } else if (
-    inviteCode.usesMax &&
-    inviteCode.usesCurrent &&
-    inviteCode.usesCurrent >= inviteCode.usesMax
-  ) {
+  } else if (inviteCode.isCompletelyUsed) {
     return {
       error: 'Max uses reached' as const,
       organization,
@@ -52,5 +52,28 @@ export const getInviteCode = async ({
     }
   }
 
-  return { inviteCode, organization, user }
+  return {
+    inviteCode,
+    organization,
+    user,
+  }
+}
+
+export const getEnhancedInviteCode = <
+  T extends Pick<
+    InviteCode,
+    'expiresAt' | 'usesCurrent' | 'usesMax' | 'sentToEmail'
+  >,
+>(
+  inviteCode: T,
+) => {
+  return {
+    ...inviteCode,
+    isExpired: !!(inviteCode.expiresAt && isPast(inviteCode.expiresAt)),
+    isCompletelyUsed:
+      inviteCode.usesMax &&
+      inviteCode.usesCurrent &&
+      inviteCode.usesCurrent >= inviteCode.usesMax,
+    sentViaMail: !!inviteCode.sentToEmail,
+  }
 }

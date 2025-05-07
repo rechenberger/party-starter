@@ -21,7 +21,7 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { format, formatDistanceToNow, isPast } from 'date-fns'
+import { format, formatDistanceToNow } from 'date-fns'
 import { and, desc, eq, or } from 'drizzle-orm'
 import { Mail, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
@@ -208,12 +208,11 @@ export const MailInvitationCodesList = async (
                 </TableRow>
               ) : (
                 inviteCodes.map((code) => {
-                  const status =
-                    (code.usesCurrent || 0) > 0
-                      ? 'Accepted'
-                      : code.expiresAt && isPast(code.expiresAt)
-                        ? 'Expired'
-                        : 'Pending'
+                  const status = code.isCompletelyUsed
+                    ? 'Accepted'
+                    : code.isExpired
+                      ? 'Expired'
+                      : 'Pending'
                   return (
                     <TableRow key={code.id}>
                       <TableCell className={cn()}>{code.sentToEmail}</TableCell>

@@ -1,13 +1,16 @@
 import { InviteCode, User } from '@/db/schema-zod'
-import { isPast } from 'date-fns'
 import { getMyMembershipOrNotFound } from '../getMyMembership'
 import { OrganizationRole } from '../organizationRoles'
+import { getEnhancedInviteCode } from './getInviteCode'
 import { MailInvitationCodesList } from './MailInvitationCodesList'
 import { NormalInviteCodesTable } from './NormalInviteCodesTable'
-
 const allowedRoles: OrganizationRole[] = ['admin']
 
-export type InviteCodesForList = (InviteCode & {
+export type EnhancedInviteCodeForList = ReturnType<
+  typeof getEnhancedInviteCode<InviteCode>
+>
+
+export type InviteCodesForList = (EnhancedInviteCodeForList & {
   createdBy: Pick<User, 'name' | 'email' | 'image'> | null
 })[]
 
@@ -24,19 +27,11 @@ export const InvitationCodesList = async (props: InvitationCodesListProps) => {
   })
 
   const { inviteCodes } = props
-  const codesWithIsValid = inviteCodes.map((code) => {
-    return {
-      ...code,
-      isExpired: code.expiresAt && isPast(code.expiresAt),
-      isCompletelyUsed: (code.usesCurrent ?? 0) >= (code.usesMax ?? 1),
-      sentViaMail: !!code.sentToEmail,
-    }
-  })
 
-  const validNormalCodes: typeof codesWithIsValid = []
-  const emailCodes: typeof codesWithIsValid = []
+  const validNormalCodes: InviteCodesForList = []
+  const emailCodes: InviteCodesForList = []
 
-  for (const code of codesWithIsValid) {
+  for (const code of inviteCodes) {
     if (code.isCompletelyUsed) {
       continue
     }

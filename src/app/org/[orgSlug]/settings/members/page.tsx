@@ -6,11 +6,13 @@ import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
 } from '@/organization/getMyMembership'
+import { getEnhancedInviteCode } from '@/organization/inviteCodes/getInviteCode'
 import { InvitationCodesList } from '@/organization/inviteCodes/InvitationCodesList'
 import { MemberList } from '@/organization/MemberList'
 import { OrganizationRole } from '@/organization/organizationRoles'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { and, desc, eq, isNull } from 'drizzle-orm'
+import { map } from 'lodash-es'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -179,7 +181,12 @@ export default async function OrgMembersPage({
             kickUserAction={kickUserAction}
             isAdmin={isAdmin}
           />
-          {isAdmin && <InvitationCodesList {...organization} />}
+          {isAdmin && (
+            <InvitationCodesList
+              {...organization}
+              inviteCodes={map(organization.inviteCodes, getEnhancedInviteCode)}
+            />
+          )}
         </>
       )}
     </>

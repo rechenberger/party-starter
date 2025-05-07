@@ -176,6 +176,17 @@ export const CreateInviteCodeEmailFormClient = ({
                 {form.formState.errors.receiverEmail?.message}
               </p>
             )}
+            {form.formState.errors.receiverEmail &&
+              form.formState.errors.receiverEmail.some?.((error) => {
+                return !!error?.message
+              }) && (
+                <p
+                  data-slot="form-message"
+                  className={'text-destructive text-sm'}
+                >
+                  At least one email address is invalid
+                </p>
+              )}
           </FormItem>
           <Button type="submit" className="" disabled={isLoading}>
             {isLoading ? 'Sending...' : 'Send Invitation'}

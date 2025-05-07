@@ -22,8 +22,6 @@ export const sendVerificationRequestEmail = async (
       },
     })
 
-    const host = new URL(url).host
-
     const emailHtml = await render(<VerifyEmail verifyUrl={url} />)
     const emailPlainText = await render(<VerifyEmail verifyUrl={url} />, {
       plainText: true,

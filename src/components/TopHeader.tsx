@@ -1,3 +1,4 @@
+import { SIDEBAR } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import { Separator } from './ui/separator'
 import { SidebarTrigger } from './ui/sidebar'
@@ -12,6 +13,10 @@ export const TopHeader = ({
   disableSeparator?: boolean
   hideIfSecondTopHeaderExists?: boolean
 }) => {
+  if (!SIDEBAR.activeInMain) {
+    return children
+  }
+
   return (
     <div
       className={cn(

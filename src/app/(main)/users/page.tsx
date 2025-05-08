@@ -14,7 +14,6 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { db } from '@/db/db'
 import { users as usersTable } from '@/db/schema-auth'
-import { SIDEBAR } from '@/lib/starter.config'
 import {
   streamToast,
   superAction,
@@ -52,24 +51,22 @@ export default async function Page({
 
   return (
     <>
-      {SIDEBAR.activeInMain && (
-        <TopHeader>
-          <div className="flex flex-1 flex-row justify-between gap-2 items-center">
-            <CardTitle className="flex-1">Users</CardTitle>
-            <div className="flex flex-col md:flex-row gap-2 items-center">
-              <SimpleParamSelect
-                paramKey="filter"
-                component="tabs"
-                options={[
-                  { value: null, label: 'All Users' },
-                  { value: 'admins', label: 'Admins' },
-                ]}
-              />
-            </div>
-            <CreateUserButton />
+      <TopHeader>
+        <div className="flex w-full flex-row justify-between gap-2 items-center">
+          <CardTitle className="flex-1">Users</CardTitle>
+          <div className="flex flex-col md:flex-row gap-2 items-center">
+            <SimpleParamSelect
+              paramKey="filter"
+              component="tabs"
+              options={[
+                { value: null, label: 'All Users' },
+                { value: 'admins', label: 'Admins' },
+              ]}
+            />
           </div>
-        </TopHeader>
-      )}
+          <CreateUserButton />
+        </div>
+      </TopHeader>
 
       <div className="grid lg:grid-cols-3 gap-4">
         {users.map((user) => {

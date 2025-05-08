@@ -9,7 +9,7 @@ import {
   SidebarRail,
   Sidebar as UiSidebar,
 } from '@/components/ui/sidebar'
-import { ORGS } from '@/lib/starter.config'
+import { BRAND, ORGS } from '@/lib/starter.config'
 import Link from 'next/link'
 import * as React from 'react'
 import { Suspense } from 'react'
@@ -35,9 +35,7 @@ export const Sidebar = ({
               className="flex flex-row items-center gap-2 w-full overflow-hidden group-data-[collapsible=icon]:hidden"
             >
               <div className="text-xl">
-                <strong>
-                  Party <span className="text-primary">Starter</span>
-                </strong>
+                <BRAND.TextLogo />
               </div>
             </Link>
           </SidebarMenuItem>
@@ -52,7 +50,7 @@ export const Sidebar = ({
       <SidebarContent>
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
           {!!orgSlug && ORGS.isActive ? (
-            <SidebarOrgSection orgSlug={orgSlug} />
+            <SidebarOrgSection />
           ) : (
             <SidebarMainSection />
           )}

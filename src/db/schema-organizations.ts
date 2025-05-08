@@ -1,5 +1,7 @@
 import { createdAtColumn, idColumn, updatedAtColumn } from '@/db/commonColumns'
 import { users } from '@/db/schema-auth'
+import { OrganizationRole } from '@/organization/organizationRoles'
+
 import { relations } from 'drizzle-orm'
 import {
   customType,
@@ -9,10 +11,6 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/pg-core'
-import { z } from 'zod'
-
-export const OrganizationRole = z.enum(['admin', 'member'])
-export type OrganizationRole = z.infer<typeof OrganizationRole>
 
 const organizationRoleType = customType<{
   data: OrganizationRole
@@ -58,8 +56,9 @@ export const inviteCodes = pgTable('invite_code', {
   role: organizationRoleType('role').notNull(),
   comment: text('comment'),
   expiresAt: timestamp('expiresAt'),
-  maxUses: integer('maxUses'),
-  currentUses: integer('currentUses'),
+  usesMax: integer('usesMax'),
+  usesCurrent: integer('usesCurrent'),
+  sentToEmail: text('sentToEmail'),
 })
 
 export const inviteCodesRelations = relations(inviteCodes, ({ one, many }) => ({
@@ -87,7 +86,7 @@ export const organizationMemberships = pgTable('organization_membership', {
     .references(() => organizations.id, { onDelete: 'cascade' }),
   role: organizationRoleType('role').notNull(),
   invitationCodeId: text('invitationCodeId').references(() => inviteCodes.id, {
-    onDelete: 'cascade',
+    onDelete: 'restrict',
   }),
 })
 

@@ -7,25 +7,22 @@ import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
 } from '@/organization/getMyMembership'
+import { OrganizationRole } from '@/organization/organizationRoles'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { eq } from 'drizzle-orm'
 import { AlertTriangle } from 'lucide-react'
 import { redirect } from 'next/navigation'
 
-const allowedRoles: schema.OrganizationRole[] = ['admin']
+const allowedRoles: OrganizationRole[] = ['admin']
 
-export default async function OrgSettingsPage({
-  params,
-}: {
-  params: { orgSlug: string }
-}) {
-  await getMyMembershipOrNotFound({
+export default async function OrgSettingsPage() {
+  const { org } = await getMyMembershipOrNotFound({
     allowedRoles,
   })
 
   return (
     <>
-      <TopHeader>Organization Settings for {params.orgSlug}</TopHeader>
+      <TopHeader>Organization Settings for {org.name}</TopHeader>
 
       <div className="flex flex-row gap-4 justify-center">
         <div className="flex flex-col gap-4 max-w-2xl">
@@ -55,13 +52,13 @@ export default async function OrgSettingsPage({
 
                     await db
                       .delete(schema.organizations)
-                      .where(eq(schema.organizations.slug, params.orgSlug))
+                      .where(eq(schema.organizations.slug, org.slug))
 
                     redirect('/')
                   }}
                   askForConfirmation={{
                     title: 'Delete Organization',
-                    content: `Are you sure you want to delete ${params.orgSlug}? This action cannot be undone.`,
+                    content: `Are you sure you want to delete ${org.name}? This action cannot be undone.`,
                     confirm: 'Delete Organization',
                     cancel: 'Cancel',
                   }}

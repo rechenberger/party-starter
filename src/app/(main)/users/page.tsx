@@ -52,7 +52,7 @@ export default async function Page({
   return (
     <>
       <TopHeader>
-        <div className="flex flex-1 flex-row justify-between gap-2 items-center">
+        <div className="flex w-full flex-row justify-between gap-2 items-center">
           <CardTitle className="flex-1">Users</CardTitle>
           <div className="flex flex-col md:flex-row gap-2 items-center">
             <SimpleParamSelect

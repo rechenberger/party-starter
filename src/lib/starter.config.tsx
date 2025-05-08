@@ -40,3 +40,11 @@ export const BRAND = {
     primaryForeground: '#fafaf9',
   },
 }
+
+export const LOCALIZATION = {
+  isActive: true,
+}
+
+export const SIDEBAR = {
+  activeInMain: true,
+}

@@ -3,6 +3,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { ParamsWrapper } from '@/lib/paramsServerContext'
 import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
@@ -15,7 +16,7 @@ import { redirect } from 'next/navigation'
 
 const allowedRoles: OrganizationRole[] = ['admin']
 
-export default async function OrgSettingsPage() {
+export default ParamsWrapper(async () => {
   const { org } = await getMyMembershipOrNotFound({
     allowedRoles,
   })
@@ -72,4 +73,4 @@ export default async function OrgSettingsPage() {
       </div>
     </>
   )
-}
+})

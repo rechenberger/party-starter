@@ -3,6 +3,10 @@ export const ORGS = {
   onlyAdminsCanCreateOrgs: false,
 }
 
+export const LOCALIZATION = {
+  isActive: true,
+}
+
 export const SIDEBAR = {
   activeInMain: true,
 }

@@ -3,8 +3,13 @@ import { match } from '@formatjs/intl-localematcher'
 import Negotiator from 'negotiator'
 import { cookies, headers } from 'next/headers'
 import { DEFAULT_LOCALE, Locale, LOCALES } from './locale'
+import { LOCALIZATION } from '@/lib/starter.config'
 
 export const getMyLocale = async () => {
+  if (!LOCALIZATION.isActive) {
+    return DEFAULT_LOCALE
+  }
+
   const locale =
     (await getFromParams()) ??
     (await getFromCookies()) ??

@@ -184,7 +184,9 @@ export default async function OrgMembersPage({
           {isAdmin && (
             <InvitationCodesList
               {...organization}
-              inviteCodes={map(organization.inviteCodes, getEnhancedInviteCode)}
+              inviteCodes={map(organization.inviteCodes, (inviteCode) =>
+                getEnhancedInviteCode(inviteCode),
+              )}
             />
           )}
         </>

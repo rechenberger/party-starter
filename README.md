@@ -13,6 +13,8 @@
 
 ## Setup
 
+- Configure the features you want in [starter.config.ts](src/lib/starter.config.ts)
+- Run `pnpm starter:init` to setup the project
 - Create [.env.local](.env.local)
 - Generate Auth Secret
   - run `npx auth secret`
@@ -28,6 +30,12 @@
   - Add Redirects:
   - `http://localhost:3000/api/auth/callback/discord`
   - `https://your-app.com/api/auth/callback/discord`
+- Email
+  - Specify an SMTP server
+  - `EMAIL_FROM`="moin@party-starter.de"
+  - `SMTP_URL`="sandbox.smtp.mailtrap.io"
+  - `SMTP_USER`=""
+  - `SMTP_PASSWORD`=""
 - `pnpm db:push` to push schema to DB
 
 ## Run

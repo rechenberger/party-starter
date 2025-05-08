@@ -12,6 +12,9 @@ const hasEmailEnvVars = !!process.env.EMAIL_FROM && !!process.env.SMTP_URL
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db),
+  pages: {
+    signIn: '/auth/login',
+  },
   providers: [
     Discord,
     ...((hasEmailEnvVars
@@ -30,7 +33,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
               await sendVerificationRequestEmail({
                 ...params,
-                theme: { brandColor: '#79a913' },
                 url,
               })
             },

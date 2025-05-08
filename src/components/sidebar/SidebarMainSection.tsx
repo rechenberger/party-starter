@@ -18,10 +18,6 @@ export const SidebarMainSection = async () => {
     canUserCreateOrg(),
   ])
 
-  if (memberships.length === 0) {
-    return null
-  }
-
   return (
     <>
       {ORGS.isActive && (

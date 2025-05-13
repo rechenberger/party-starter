@@ -14,7 +14,7 @@ export type SelectUser = typeof users.$inferSelect
 
 export const users = pgTable('user', {
   id: idColumn(),
-  ...createdUpdatedAtColumns,
+  ...createdUpdatedAtColumns(),
 
   name: text('name'),
   email: text('email').notNull(),

@@ -17,21 +17,27 @@ export const updatedAtColumn = () =>
     .notNull()
     .$onUpdate(() => new Date())
 
-export const createdUpdatedAtColumns = {
+export const createdUpdatedAtColumns = () => ({
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
-}
+})
 
-export const createdUpdateByColumns = {
-  createdById: text('createdById').references(() => users.id, {
+export const createdByIdColumn = () =>
+  text('createdById').references(() => users.id, {
     onDelete: 'set null',
-  }),
-  updatedById: text('updatedById').references(() => users.id, {
-    onDelete: 'set null',
-  }),
-}
+  })
 
-export const createdUpdatedAtByColumns = {
-  ...createdUpdatedAtColumns,
-  ...createdUpdateByColumns,
-}
+export const updatedByIdColumn = () =>
+  text('updatedById').references(() => users.id, {
+    onDelete: 'set null',
+  })
+
+export const createdUpdateByColumns = () => ({
+  createdById: createdByIdColumn(),
+  updatedById: updatedByIdColumn(),
+})
+
+export const createdUpdatedAtByColumns = () => ({
+  ...createdUpdatedAtColumns(),
+  ...createdUpdateByColumns(),
+})

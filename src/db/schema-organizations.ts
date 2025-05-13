@@ -30,7 +30,7 @@ const organizationRoleType = customType<{
 
 export const organizations = pgTable('organization', {
   id: idColumn(),
-  ...createdUpdatedAtByColumns,
+  ...createdUpdatedAtByColumns(),
 
   name: text('name').notNull(),
   slug: varchar('slug', { length: 255 }).notNull().unique(),
@@ -45,7 +45,7 @@ export const inviteCodes = pgTable(
   'invite_code',
   {
     id: idColumn(),
-    ...createdUpdatedAtByColumns,
+    ...createdUpdatedAtByColumns(),
 
     deletedAt: timestamp('deletedAt'),
 
@@ -86,7 +86,7 @@ export const organizationMemberships = pgTable(
   'organization_membership',
   {
     id: idColumn(),
-    ...createdUpdatedAtByColumns,
+    ...createdUpdatedAtByColumns(),
 
     userId: text('userId')
       .notNull()

@@ -87,6 +87,7 @@ export const NormalInviteCodesTable = async (
                                 usesMax: data.usesMax,
                                 comment: data.comment,
                                 createdById: membership.userId,
+                                updatedById: membership.userId,
                               })
                               .returning({
                                 id: schema.inviteCodes.id,
@@ -118,7 +119,7 @@ export const NormalInviteCodesTable = async (
                 <TableHead>Role</TableHead>
                 <TableHead>Expires</TableHead>
                 <TableHead>Uses left</TableHead>
-                <TableHead>Created By</TableHead>
+                <TableHead>Updated By</TableHead>
                 <TableHead>Comment</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -190,20 +191,20 @@ export const NormalInviteCodesTable = async (
                         </div>
                       </TableCell>
                       <TableCell>
-                        {code.createdBy && (
+                        {code.updatedBy && (
                           <div className="flex items-center gap-3">
-                            <SimpleUserAvatar user={code.createdBy} />
+                            <SimpleUserAvatar user={code.updatedBy} />
                             <div>
                               <p className="font-medium">
-                                {code.createdBy?.name}
+                                {code.updatedBy.name}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {code.createdBy?.email}
+                                {code.updatedBy.email}
                               </p>
                             </div>
                           </div>
                         )}
-                        {code.createdBy === null && (
+                        {code.updatedBy === null && (
                           <span className="text-muted-foreground">Unknown</span>
                         )}
                       </TableCell>
@@ -238,14 +239,16 @@ export const NormalInviteCodesTable = async (
                             action={async () => {
                               'use server'
                               return superAction(async () => {
-                                await getMyMembershipOrThrow({
-                                  allowedRoles,
-                                })
+                                const { membership } =
+                                  await getMyMembershipOrThrow({
+                                    allowedRoles,
+                                  })
 
                                 await db
                                   .update(schema.inviteCodes)
                                   .set({
                                     deletedAt: new Date(),
+                                    updatedById: membership.userId,
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))
                                 revalidatePath(

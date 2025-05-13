@@ -39,14 +39,14 @@ import { resolveExpiresAt } from './resolveExpiresAt'
 const upsertInviteCodeAndSendMail = async ({
   receiverEmail,
   role,
-  creator,
+  user,
   existingCodeId,
   id: organizationId,
   slug: organizationSlug,
   name: organizationName,
 }: {
   receiverEmail: string
-  creator: Pick<User, 'id' | 'email' | 'name'>
+  user: Pick<User, 'id' | 'email' | 'name'>
 } & InvitationCodesListProps &
   (
     | {
@@ -87,7 +87,8 @@ const upsertInviteCodeAndSendMail = async ({
       role: role ?? existingCode.role,
       expiresAt: resolveExpiresAt(ORGS.defaultExpirationEmailInvitation),
       usesMax: 1,
-      createdById: creator.id,
+      createdById: user.id,
+      updatedById: user.id,
       sentToEmail: receiverEmail,
     })
     .onConflictDoUpdate({
@@ -97,7 +98,7 @@ const upsertInviteCodeAndSendMail = async ({
         usesMax: 1,
         expiresAt: resolveExpiresAt(ORGS.defaultExpirationEmailInvitation),
         deletedAt: null,
-        createdById: creator.id,
+        updatedById: user.id,
       },
     })
     .returning({ id: schema.inviteCodes.id, role: schema.inviteCodes.role })
@@ -106,8 +107,8 @@ const upsertInviteCodeAndSendMail = async ({
 
   await sendOrgInviteMail({
     receiverEmail,
-    invitedByEmail: creator.email,
-    invitedByUsername: creator.name,
+    invitedByEmail: user.email,
+    invitedByUsername: user.name,
     orgName: organizationName,
     inviteLink: getInviteCodeUrl({
       organizationSlug: organizationSlug,
@@ -156,7 +157,7 @@ export const MailInvitationCodesList = async (
                                 await upsertInviteCodeAndSendMail({
                                   receiverEmail: mail,
                                   role: data.role,
-                                  creator: me,
+                                  user: me,
                                   ...props,
                                 })
                               }),
@@ -250,20 +251,20 @@ export const MailInvitationCodesList = async (
                         })}
                       </TableCell>
                       <TableCell>
-                        {code.createdBy && (
+                        {code.updatedBy && (
                           <div className="flex items-center gap-3">
-                            <SimpleUserAvatar user={code.createdBy} />
+                            <SimpleUserAvatar user={code.updatedBy} />
                             <div>
                               <p className="font-medium">
-                                {code.createdBy?.name}
+                                {code.updatedBy.name}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {code.createdBy?.email}
+                                {code.updatedBy.email}
                               </p>
                             </div>
                           </div>
                         )}
-                        {code.createdBy === null && (
+                        {code.updatedBy === null && (
                           <span className="text-muted-foreground">Unknown</span>
                         )}
                       </TableCell>
@@ -291,7 +292,7 @@ export const MailInvitationCodesList = async (
                                 const me = await getMyUserOrThrow()
                                 await upsertInviteCodeAndSendMail({
                                   receiverEmail: code.sentToEmail,
-                                  creator: me,
+                                  user: me,
                                   existingCodeId: code.id,
                                   ...props,
                                 })
@@ -318,12 +319,14 @@ export const MailInvitationCodesList = async (
                             action={async () => {
                               'use server'
                               return superAction(async () => {
-                                await getMyMembershipOrThrow({
-                                  allowedRoles,
-                                })
+                                const { membership } =
+                                  await getMyMembershipOrThrow({
+                                    allowedRoles,
+                                  })
                                 await db
                                   .update(schema.inviteCodes)
                                   .set({
+                                    updatedById: membership.userId,
                                     deletedAt: new Date(),
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))

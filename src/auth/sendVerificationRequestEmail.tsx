@@ -7,11 +7,7 @@ import { render } from '@react-email/components'
 export const sendVerificationRequestEmail = async (
   params: Parameters<EmailConfig['sendVerificationRequest']>[0],
 ) => {
-  const {
-    identifier: email,
-    url,
-    provider: { from },
-  } = params
+  const { identifier: email, url } = params
   try {
     const transporter = getMailTransporter()
 
@@ -21,7 +17,6 @@ export const sendVerificationRequestEmail = async (
     })
 
     const mailOptions = {
-      from: from,
       to: email,
       subject: `Login to ${BRAND.name}`,
       html: emailHtml,

@@ -11,7 +11,7 @@ export type EnhancedInviteCodeForList = ReturnType<
 >
 
 export type InviteCodesForList = (EnhancedInviteCodeForList & {
-  createdBy: Pick<User, 'name' | 'email' | 'image'> | null
+  updatedBy: Pick<User, 'name' | 'email' | 'image'> | null
 })[]
 
 export type InvitationCodesListProps = {

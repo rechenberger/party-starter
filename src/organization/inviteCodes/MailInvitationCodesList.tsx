@@ -29,24 +29,24 @@ import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
 } from '../getMyMembership'
-import { getOrganizationRole, OrganizationRole } from '../organizationRoles'
+import { OrganizationRole, getOrganizationRole } from '../organizationRoles'
 import { sendOrgInviteMail } from '../sendOrgInviteMail'
 import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
-import { getInviteCodeUrl } from './getInviteCodeUrl'
 import { InvitationCodesListProps } from './InvitationCodesList'
+import { getInviteCodeUrl } from './getInviteCodeUrl'
 import { resolveExpiresAt } from './resolveExpiresAt'
 
 const upsertInviteCodeAndSendMail = async ({
   receiverEmail,
   role,
-  creator,
+  user,
   existingCodeId,
   id: organizationId,
   slug: organizationSlug,
   name: organizationName,
 }: {
   receiverEmail: string
-  creator: Pick<User, 'id' | 'email' | 'name'>
+  user: Pick<User, 'id' | 'email' | 'name'>
 } & InvitationCodesListProps &
   (
     | {
@@ -87,7 +87,8 @@ const upsertInviteCodeAndSendMail = async ({
       role: role ?? existingCode.role,
       expiresAt: resolveExpiresAt(ORGS.defaultExpirationEmailInvitation),
       usesMax: 1,
-      createdById: creator.id,
+      createdById: user.id,
+      updatedById: user.id,
       sentToEmail: receiverEmail,
     })
     .onConflictDoUpdate({
@@ -97,7 +98,7 @@ const upsertInviteCodeAndSendMail = async ({
         usesMax: 1,
         expiresAt: resolveExpiresAt(ORGS.defaultExpirationEmailInvitation),
         deletedAt: null,
-        createdById: creator.id,
+        updatedById: user.id,
       },
     })
     .returning({ id: schema.inviteCodes.id, role: schema.inviteCodes.role })
@@ -106,8 +107,8 @@ const upsertInviteCodeAndSendMail = async ({
 
   await sendOrgInviteMail({
     receiverEmail,
-    invitedByEmail: creator.email,
-    invitedByUsername: creator.name,
+    invitedByEmail: user.email,
+    invitedByUsername: user.name,
     orgName: organizationName,
     inviteLink: getInviteCodeUrl({
       organizationSlug: organizationSlug,
@@ -122,7 +123,7 @@ const allowedRoles: OrganizationRole[] = ['admin']
 export const MailInvitationCodesList = async (
   props: InvitationCodesListProps,
 ) => {
-  const { inviteCodes, id: organizationId, slug: organizationSlug } = props
+  const { inviteCodes, id: orgId, slug: orgSlug } = props
 
   await getMyMembershipOrNotFound({
     allowedRoles,
@@ -149,6 +150,7 @@ export const MailInvitationCodesList = async (
                           return superAction(async () => {
                             await getMyMembershipOrThrow({
                               allowedRoles,
+                              orgSlug: props.slug,
                             })
                             const me = await getMyUserOrThrow()
                             await Promise.all(
@@ -156,15 +158,13 @@ export const MailInvitationCodesList = async (
                                 await upsertInviteCodeAndSendMail({
                                   receiverEmail: mail,
                                   role: data.role,
-                                  creator: me,
+                                  user: me,
                                   ...props,
                                 })
                               }),
                             )
 
-                            revalidatePath(
-                              `/org/${organizationId}/settings/members`,
-                            )
+                            revalidatePath(`/org/${orgId}/settings/members`)
 
                             streamToast({
                               title: `Invitation sent to ${data.receiverEmail.join(
@@ -250,20 +250,20 @@ export const MailInvitationCodesList = async (
                         })}
                       </TableCell>
                       <TableCell>
-                        {code.createdBy && (
+                        {code.updatedBy && (
                           <div className="flex items-center gap-3">
-                            <SimpleUserAvatar user={code.createdBy} />
+                            <SimpleUserAvatar user={code.updatedBy} />
                             <div>
                               <p className="font-medium">
-                                {code.createdBy?.name}
+                                {code.updatedBy.name}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {code.createdBy?.email}
+                                {code.updatedBy.email}
                               </p>
                             </div>
                           </div>
                         )}
-                        {code.createdBy === null && (
+                        {code.updatedBy === null && (
                           <span className="text-muted-foreground">Unknown</span>
                         )}
                       </TableCell>
@@ -284,6 +284,7 @@ export const MailInvitationCodesList = async (
                               return superAction(async () => {
                                 await getMyMembershipOrThrow({
                                   allowedRoles,
+                                  orgSlug,
                                 })
                                 if (!code.sentToEmail) {
                                   throw new Error('No email found')
@@ -291,16 +292,14 @@ export const MailInvitationCodesList = async (
                                 const me = await getMyUserOrThrow()
                                 await upsertInviteCodeAndSendMail({
                                   receiverEmail: code.sentToEmail,
-                                  creator: me,
+                                  user: me,
                                   existingCodeId: code.id,
                                   ...props,
                                 })
                                 streamToast({
                                   title: `Invitation sent to ${code.sentToEmail}`,
                                 })
-                                revalidatePath(
-                                  `/org/${organizationId}/settings/members`,
-                                )
+                                revalidatePath(`/org/${orgId}/settings/members`)
                               })
                             }}
                             title="Resend invitation"
@@ -318,17 +317,20 @@ export const MailInvitationCodesList = async (
                             action={async () => {
                               'use server'
                               return superAction(async () => {
-                                await getMyMembershipOrThrow({
-                                  allowedRoles,
-                                })
+                                const { membership } =
+                                  await getMyMembershipOrThrow({
+                                    allowedRoles,
+                                    orgSlug,
+                                  })
                                 await db
                                   .update(schema.inviteCodes)
                                   .set({
+                                    updatedById: membership.userId,
                                     deletedAt: new Date(),
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))
                                 revalidatePath(
-                                  `/org/${organizationSlug}/settings/members`,
+                                  `/org/${orgSlug}/settings/members`,
                                 )
                               })
                             }}

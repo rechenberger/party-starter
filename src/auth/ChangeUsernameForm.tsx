@@ -26,21 +26,9 @@ export const ChangeUsernameForm = async ({
                 name: data.username,
               })
               .where(eq(schema.users.id, userId))
-              .execute()
-
-            const description = redirectUrl
-              ? 'Redirecting...'
-              : 'Your username has been changed'
 
             revalidatePath('/', 'layout')
-            // streamToast({
-            //   title: 'Username Changed!',
-            //   description,
-            // })
 
-            // if (redirectUrl) {
-            //   await new Promise((res) => setTimeout(res, 1000))
-            // }
             redirect(redirectUrl || '/')
           })
         }}

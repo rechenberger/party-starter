@@ -8,11 +8,14 @@ import {
   text,
   timestamp,
 } from 'drizzle-orm/pg-core'
+import { createdUpdatedAtColumns, idColumn } from './commonColumns'
 
 export type SelectUser = typeof users.$inferSelect
 
 export const users = pgTable('user', {
-  id: text('id').notNull().primaryKey(),
+  id: idColumn(),
+  ...createdUpdatedAtColumns(),
+
   name: text('name'),
   email: text('email').notNull(),
   emailVerified: timestamp('emailVerified', { mode: 'date' }),
@@ -42,11 +45,11 @@ export const accounts = pgTable(
     id_token: text('id_token'),
     session_state: text('session_state'),
   },
-  (account) => ({
-    compoundKey: primaryKey({
+  (account) => [
+    primaryKey({
       columns: [account.provider, account.providerAccountId],
     }),
-  }),
+  ],
 )
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -71,7 +74,5 @@ export const verificationTokens = pgTable(
     token: text('token').notNull(),
     expires: timestamp('expires', { mode: 'date' }).notNull(),
   },
-  (vt) => ({
-    compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
-  }),
+  (vt) => [primaryKey({ columns: [vt.identifier, vt.token] })],
 )

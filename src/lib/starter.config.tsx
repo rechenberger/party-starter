@@ -11,7 +11,7 @@ export const BRAND = {
   logoUrl: 'https://party-starter.vercel.app/logo.svg',
   TextLogo: () => (
     <strong>
-      🎉 Party&nbsp;<span className="text-primary">Starter</span>
+      Party&nbsp;<span className="text-primary">Starter</span>
     </strong>
   ),
   metadata: {

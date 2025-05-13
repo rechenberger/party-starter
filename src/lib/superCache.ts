@@ -1,17 +1,16 @@
-import { revalidateTag } from 'next/cache'
-import { cacheTag } from 'next/dist/server/use-cache/cache-tag'
+import { unstable_cacheTag as cacheTag, revalidateTag } from 'next/cache'
 
-const singleTag = (tag: string) => {
+const singleTag = (tag: string, additionalTagsToRevalidate: string[] = []) => {
+  const tags = [tag, ...additionalTagsToRevalidate]
   return {
-    key: tag,
     tag: () => cacheTag(tag),
-    revalidate: () => revalidateTag(tag),
+    revalidate: () => tags.forEach((tag) => revalidateTag(tag)),
   }
 }
 
 export const superCache = {
-  users: () => singleTag('users'),
-  user: ({ id }: { id: string }) => singleTag(`users:${id}`),
-  orgs: () => singleTag('orgs'),
-  org: ({ id }: { id: string }) => singleTag(`orgs:${id}`),
+  users: () => singleTag(`users`),
+  user: ({ id }: { id: string }) => singleTag(`users:${id}`, [`users`]),
+  orgs: () => singleTag(`orgs`),
+  org: ({ id }: { id: string }) => singleTag(`orgs:${id}`, [`orgs`]),
 }

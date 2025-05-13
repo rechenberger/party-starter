@@ -1,5 +1,6 @@
 import { StartPage } from '@/components/StartPage'
+import { ParamsWrapper } from '@/lib/paramsServerContext'
 
-export default async function Page() {
+export default ParamsWrapper(async () => {
   return <StartPage />
-}
+})

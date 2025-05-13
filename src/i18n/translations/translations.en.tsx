@@ -6,6 +6,9 @@ export const t = {
       </>
     ),
   },
+  login: {
+    forgotPassword: 'Forgot password?',
+  },
   standardWords: {
     users: 'Users',
   },

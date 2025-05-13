@@ -9,6 +9,7 @@ import {
   SidebarRail,
   Sidebar as UiSidebar,
 } from '@/components/ui/sidebar'
+import { getMyLocale } from '@/i18n/getMyLocale'
 import { BRAND, ORGS } from '@/lib/starter.config'
 import Link from 'next/link'
 import * as React from 'react'
@@ -18,20 +19,18 @@ import { SidebarMainSection } from './SidebarMainSection'
 import { SidebarOrgSection } from './SidebarOrgSection'
 import { SidebarOrgSwitcher } from './SidebarOrgSwitcher'
 
-export const Sidebar = ({
+export const Sidebar = async ({
   orgSlug,
   ...props
 }: React.ComponentProps<typeof UiSidebar> & { orgSlug?: string }) => {
+  const locale = await getMyLocale()
   return (
     <UiSidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex flex-row gap-2 items-center p-2">
-            <div className="">
-              <Link href="/">🎉</Link>
-            </div>
             <Link
-              href="/"
+              href={`/${locale}`}
               className="flex flex-row items-center gap-2 w-full overflow-hidden group-data-[collapsible=icon]:hidden"
             >
               <div className="text-xl">

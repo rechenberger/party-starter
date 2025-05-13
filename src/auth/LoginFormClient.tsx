@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
 import { cn } from '@/lib/utils'
 import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
@@ -65,6 +66,8 @@ export const LoginFormClient = ({
   alternatives?: ReactNode
   showAlternativesOnRegister?: boolean
 }) => {
+  const t = useTranslations()
+
   const { trigger, isLoading } = useSuperAction({
     action,
     catchToast: true,
@@ -75,8 +78,8 @@ export const LoginFormClient = ({
   const form = useLoginForm({
     defaultValues: {
       type: 'login',
-      email: process.env.NEXT_PUBLIC_AUTH_DEFAULT_EMAIL,
-      password: process.env.NEXT_PUBLIC_AUTH_DEFAULT_PASSWORD,
+      email: process.env.NEXT_PUBLIC_AUTH_DEFAULT_EMAIL ?? '',
+      password: process.env.NEXT_PUBLIC_AUTH_DEFAULT_PASSWORD ?? '',
     },
     disabled,
   })
@@ -151,7 +154,7 @@ export const LoginFormClient = ({
                           setType('forgotPassword')
                         }}
                       >
-                        Forgot Password?
+                        {t.login.forgotPassword}
                       </Button>
                     )}
                   </div>

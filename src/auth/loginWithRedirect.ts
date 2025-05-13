@@ -1,14 +1,18 @@
 'use server'
 
+import { getMyLocale } from '@/i18n/getMyLocale'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 export const loginWithRedirect = async ({
   forceRedirectUrl,
+  locale: localeInput,
 }: {
   forceRedirectUrl?: string
+  locale?: string
 } = {}) => {
-  let url = `/auth/login`
+  const locale = localeInput ?? (await getMyLocale())
+  let url = `/${locale}/auth/login`
 
   if (forceRedirectUrl) {
     url += `?redirect=${encodeURIComponent(forceRedirectUrl)}`

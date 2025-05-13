@@ -8,6 +8,9 @@ export const t = {
       </>
     ),
   },
+  login: {
+    forgotPassword: 'Passwort vergessen?',
+  },
   standardWords: {
     users: 'Benutzer',
   },

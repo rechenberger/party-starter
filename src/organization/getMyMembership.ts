@@ -9,11 +9,13 @@ import { OrganizationRole } from './organizationRoles'
 
 export const getMyMembership = async ({
   allowedRoles,
+  orgSlug: inputOrgSlug,
 }: {
   allowedRoles?: OrganizationRole[]
+  orgSlug?: string
 } = {}) => {
   const [orgSlug, userId] = await Promise.all([
-    getCurrentOrgSlug(),
+    inputOrgSlug ?? getCurrentOrgSlug(),
     getMyUserId(),
   ])
 

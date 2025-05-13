@@ -29,11 +29,11 @@ import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
 } from '../getMyMembership'
-import { getOrganizationRole, OrganizationRole } from '../organizationRoles'
+import { OrganizationRole, getOrganizationRole } from '../organizationRoles'
 import { sendOrgInviteMail } from '../sendOrgInviteMail'
 import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
-import { getInviteCodeUrl } from './getInviteCodeUrl'
 import { InvitationCodesListProps } from './InvitationCodesList'
+import { getInviteCodeUrl } from './getInviteCodeUrl'
 import { resolveExpiresAt } from './resolveExpiresAt'
 
 const upsertInviteCodeAndSendMail = async ({
@@ -123,7 +123,7 @@ const allowedRoles: OrganizationRole[] = ['admin']
 export const MailInvitationCodesList = async (
   props: InvitationCodesListProps,
 ) => {
-  const { inviteCodes, id: organizationId, slug: organizationSlug } = props
+  const { inviteCodes, id: orgId, slug: orgSlug } = props
 
   await getMyMembershipOrNotFound({
     allowedRoles,
@@ -150,6 +150,7 @@ export const MailInvitationCodesList = async (
                           return superAction(async () => {
                             await getMyMembershipOrThrow({
                               allowedRoles,
+                              orgSlug: props.slug,
                             })
                             const me = await getMyUserOrThrow()
                             await Promise.all(
@@ -163,9 +164,7 @@ export const MailInvitationCodesList = async (
                               }),
                             )
 
-                            revalidatePath(
-                              `/org/${organizationId}/settings/members`,
-                            )
+                            revalidatePath(`/org/${orgId}/settings/members`)
 
                             streamToast({
                               title: `Invitation sent to ${data.receiverEmail.join(
@@ -285,6 +284,7 @@ export const MailInvitationCodesList = async (
                               return superAction(async () => {
                                 await getMyMembershipOrThrow({
                                   allowedRoles,
+                                  orgSlug,
                                 })
                                 if (!code.sentToEmail) {
                                   throw new Error('No email found')
@@ -299,9 +299,7 @@ export const MailInvitationCodesList = async (
                                 streamToast({
                                   title: `Invitation sent to ${code.sentToEmail}`,
                                 })
-                                revalidatePath(
-                                  `/org/${organizationId}/settings/members`,
-                                )
+                                revalidatePath(`/org/${orgId}/settings/members`)
                               })
                             }}
                             title="Resend invitation"
@@ -322,6 +320,7 @@ export const MailInvitationCodesList = async (
                                 const { membership } =
                                   await getMyMembershipOrThrow({
                                     allowedRoles,
+                                    orgSlug,
                                   })
                                 await db
                                   .update(schema.inviteCodes)
@@ -331,7 +330,7 @@ export const MailInvitationCodesList = async (
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))
                                 revalidatePath(
-                                  `/org/${organizationSlug}/settings/members`,
+                                  `/org/${orgSlug}/settings/members`,
                                 )
                               })
                             }}

@@ -22,7 +22,7 @@ const allowedRolesEdit: OrganizationRole[] = ['admin']
 
 export default ParamsWrapper(
   async ({ params }: { params: Promise<{ orgSlug: string }> }) => {
-    const orgSlug = (await params).orgSlug
+    const { orgSlug } = await params
     const { membership: myMembership } = await getMyMembershipOrNotFound({
       allowedRoles: allowedRolesView,
     })
@@ -75,6 +75,7 @@ export default ParamsWrapper(
       return superAction(async () => {
         const { membership } = await getMyMembershipOrThrow({
           allowedRoles: allowedRolesEdit,
+          orgSlug,
         })
 
         if (!organization) {
@@ -130,6 +131,7 @@ export default ParamsWrapper(
         if (myUserId !== data.userId) {
           await getMyMembershipOrThrow({
             allowedRoles: allowedRolesEdit,
+            orgSlug,
           })
         }
 

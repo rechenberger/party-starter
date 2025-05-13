@@ -31,10 +31,10 @@ import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
 } from '../getMyMembership'
-import { getOrganizationRole, OrganizationRole } from '../organizationRoles'
+import { OrganizationRole, getOrganizationRole } from '../organizationRoles'
 import { CreateInviteCodeFormClient } from './CreateInviteCodeFormClient'
-import { getInviteCodeUrl } from './getInviteCodeUrl'
 import { InvitationCodesListProps } from './InvitationCodesList'
+import { getInviteCodeUrl } from './getInviteCodeUrl'
 import { resolveExpiresAt } from './resolveExpiresAt'
 
 const allowedRoles: OrganizationRole[] = ['admin']
@@ -42,7 +42,7 @@ const allowedRoles: OrganizationRole[] = ['admin']
 export const NormalInviteCodesTable = async (
   props: InvitationCodesListProps,
 ) => {
-  const { inviteCodes, id: organizationId, slug: organizationSlug } = props
+  const { inviteCodes, id: orgId, slug: orgSlug } = props
 
   await getMyMembershipOrNotFound({
     allowedRoles,
@@ -66,13 +66,14 @@ export const NormalInviteCodesTable = async (
                       'Create and share the code with others to invite them to this organization.',
                     content: (
                       <CreateInviteCodeFormClient
-                        organizationSlug={organizationSlug}
+                        organizationSlug={orgSlug}
                         action={async (data) => {
                           'use server'
                           return superAction(async () => {
                             const { membership } = await getMyMembershipOrThrow(
                               {
                                 allowedRoles,
+                                orgSlug,
                               },
                             )
                             const expiresAtResolved = resolveExpiresAt(
@@ -81,7 +82,7 @@ export const NormalInviteCodesTable = async (
                             const [code] = await db
                               .insert(schema.inviteCodes)
                               .values({
-                                organizationId: organizationId,
+                                organizationId: orgId,
                                 role: data.role,
                                 expiresAt: expiresAtResolved,
                                 usesMax: data.usesMax,
@@ -93,9 +94,7 @@ export const NormalInviteCodesTable = async (
                                 id: schema.inviteCodes.id,
                               })
 
-                            revalidatePath(
-                              `/org/${organizationId}/settings/members`,
-                            )
+                            revalidatePath(`/org/${orgId}/settings/members`)
                             return {
                               id: code.id,
                             }
@@ -148,7 +147,7 @@ export const NormalInviteCodesTable = async (
                           textToDisplay={code.id}
                           size="vanilla"
                           textToCopy={getInviteCodeUrl({
-                            organizationSlug,
+                            organizationSlug: orgSlug,
                             code: code.id,
                           })}
                         />
@@ -242,6 +241,7 @@ export const NormalInviteCodesTable = async (
                                 const { membership } =
                                   await getMyMembershipOrThrow({
                                     allowedRoles,
+                                    orgSlug,
                                   })
 
                                 await db
@@ -252,7 +252,7 @@ export const NormalInviteCodesTable = async (
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))
                                 revalidatePath(
-                                  `/org/${organizationSlug}/settings/members`,
+                                  `/org/${orgSlug}/settings/members`,
                                 )
                               })
                             }}

@@ -13,6 +13,7 @@ export const createdAtColumn = () =>
 
 export const updatedAtColumn = () =>
   timestamp('updatedAt')
+    .default(sql`CURRENT_TIMESTAMP`)
     .notNull()
     .$onUpdate(() => new Date())
 

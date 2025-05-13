@@ -8,6 +8,7 @@ export const t = {
   },
   login: {
     forgotPassword: 'Forgot password?',
+    confirmPasswordMismatch: 'Passwords do not match',
   },
   standardWords: {
     users: 'Users',

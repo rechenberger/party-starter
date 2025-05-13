@@ -13,6 +13,7 @@ export const useTranslations = () => {
       case 'de':
         return deT
       default:
+        const exhaustiveCheck: never = locale
         throw new Error(`Unsupported locale: ${locale}`)
     }
   }, [locale])

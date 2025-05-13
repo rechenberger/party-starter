@@ -21,41 +21,42 @@ import { ArrowLeft } from 'lucide-react'
 import { ReactNode } from 'react'
 import { z } from 'zod'
 
-const LoginDataSchema = z
-  .discriminatedUnion('type', [
-    z.object({
-      type: z.literal('login'),
-      email: z.string().email().min(1),
-      password: z.string().min(1),
-    }),
-    z.object({
-      type: z.literal('register'),
-      email: z.string().email().min(1),
-      password: z.string().min(1),
-      confirmPassword: z.string().min(1),
-      acceptTerms: z.boolean().refine((v) => !!v, 'required'),
-    }),
-    z.object({
-      type: z.literal('forgotPassword'),
-      email: z.string().email().min(1),
-    }),
-  ])
-  .superRefine((data, ctx) => {
-    if (data.type === 'register') {
-      if (data.password !== data.confirmPassword) {
-        ctx.addIssue({
-          path: ['confirmPassword'],
-          code: 'custom',
-          message: 'Passwords do not match',
-        })
+const LoginDataSchema = () => {
+  const t = useTranslations()
+  return z
+    .discriminatedUnion('type', [
+      z.object({
+        type: z.literal('login'),
+        email: z.string().email().min(1),
+        password: z.string().min(1),
+      }),
+      z.object({
+        type: z.literal('register'),
+        email: z.string().email().min(1),
+        password: z.string().min(1),
+        confirmPassword: z.string().min(1),
+        acceptTerms: z.boolean().refine((v) => !!v, 'required'),
+      }),
+      z.object({
+        type: z.literal('forgotPassword'),
+        email: z.string().email().min(1),
+      }),
+    ])
+    .superRefine((data, ctx) => {
+      if (data.type === 'register') {
+        if (data.password !== data.confirmPassword) {
+          ctx.addIssue({
+            path: ['confirmPassword'],
+            code: 'custom',
+            message: t.login.confirmPasswordMismatch,
+          })
+        }
       }
-    }
-  })
+    })
+}
 
-type LoginData = z.infer<typeof LoginDataSchema>
+type LoginData = z.infer<ReturnType<typeof LoginDataSchema>>
 type LoginType = LoginData['type']
-
-const [useLoginForm] = createZodForm(LoginDataSchema)
 
 export const LoginFormClient = ({
   action,
@@ -68,6 +69,7 @@ export const LoginFormClient = ({
 }) => {
   const t = useTranslations()
 
+  const [useLoginForm] = createZodForm(LoginDataSchema())
   const { trigger, isLoading } = useSuperAction({
     action,
     catchToast: true,
@@ -175,7 +177,11 @@ export const LoginFormClient = ({
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input
+                        type="password"
+                        {...field}
+                        value={field.value ?? ''}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

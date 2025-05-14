@@ -9,7 +9,9 @@ export const DevBadges = () => {
         </div>
       )}
       {isDev() && (
-        <div className="text-sm bg-red-500/50 rounded-md px-2 py-1">DEV</div>
+        <div className="text-sm bg-red-500/50 rounded-md px-2 py-1 w-fit">
+          DEV
+        </div>
       )}
     </>
   )

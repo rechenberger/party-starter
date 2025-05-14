@@ -38,6 +38,9 @@ export const CreateOrgFormClient = ({
   const disabled = isLoading
 
   const form = useCreateOrgForm({
+    defaultValues: {
+      name: '',
+    },
     disabled,
   })
 

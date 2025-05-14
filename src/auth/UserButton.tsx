@@ -8,22 +8,21 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { UserMenuDropDownContent } from '@/components/UserMenuDropDownContent'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, ChevronsUpDown, LogInIcon } from 'lucide-react'
 import { Suspense } from 'react'
 import { getMyUser } from './getMyUser'
 import { loginWithRedirect } from './loginWithRedirect'
 
-export const UserButtonSuspense = () => {
+export const UserButtonSuspense = ({ large }: { large?: boolean }) => {
   return (
     <Suspense fallback={<Skeleton className="w-[38px] h-8" />}>
-      <UserButton />
+      <UserButton large={large} />
     </Suspense>
   )
 }
 
-export const UserButton = async () => {
+export const UserButton = async ({ large }: { large?: boolean }) => {
   const user = await getMyUser()
-
   const showName = false
 
   if (!!user) {
@@ -31,7 +30,7 @@ export const UserButton = async () => {
       <>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="vanilla" size="icon">
+            <Button size="vanilla" variant="vanilla">
               {showName ? (
                 <>
                   <span>{user.name ?? user.email ?? 'You'}</span>
@@ -40,6 +39,17 @@ export const UserButton = async () => {
               ) : (
                 <>
                   <SimpleUserAvatar user={user} />
+                  {large && (
+                    <>
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-medium">
+                          {user.name}
+                        </span>
+                        <span className="truncate text-xs">{user.email}</span>
+                      </div>
+                      <ChevronsUpDown className="ml-auto size-4" />
+                    </>
+                  )}
                 </>
               )}
             </Button>
@@ -60,7 +70,8 @@ export const UserButton = async () => {
         hideIcon
         action={loginWithRedirect}
       >
-        Login
+        <span className="hidden md:block">Login</span>
+        <LogInIcon className="size-4" />
       </ActionButton>
     </>
   )

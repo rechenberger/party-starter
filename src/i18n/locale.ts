@@ -28,3 +28,5 @@ export const localeDefinitions: {
     actionLabel: 'Sprache zu Deutsch wechseln',
   },
 ] as const
+
+export type LocaleDefinition = (typeof localeDefinitions)[number]

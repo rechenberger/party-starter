@@ -1,4 +1,4 @@
-import { KeyRound, LogOut, UserRound } from 'lucide-react'
+import { Globe, KeyRound, LogOut, UserRound } from 'lucide-react'
 
 import { signOut } from '@/auth/auth'
 import {
@@ -9,15 +9,22 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu'
 import { User } from '@/db/schema-zod'
+import { getMyLocale } from '@/i18n/getMyLocale'
+import { localeDefinitions } from '@/i18n/locale'
+import { LocaleSelectButton } from '@/i18n/LocaleSelect'
 import { cn } from '@/lib/utils'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { redirect } from 'next/navigation'
 import { SimpleUserAvatar } from './simple/SimpleUserAvatar'
 
-export const UserMenuDropDownContent = ({
+export const UserMenuDropDownContent = async ({
   user,
 }: {
   user: Pick<User, 'name' | 'email' | 'image'>
@@ -25,6 +32,7 @@ export const UserMenuDropDownContent = ({
   if (!user) {
     return null
   }
+  const currentLocale = await getMyLocale()
   return (
     <>
       <DropdownMenuLabel className="p-0 font-normal">
@@ -70,6 +78,28 @@ export const UserMenuDropDownContent = ({
           </ActionButton>
         </DropdownMenuItem>
       </DropdownMenuGroup>
+      <DropdownMenuSeparator />
+      <DropdownMenuSub>
+        <DropdownMenuSubTrigger>
+          <Globe className="size-4" />
+          <span>Change Language</span>
+        </DropdownMenuSubTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuSubContent>
+            {localeDefinitions.map((locale) => {
+              const isCurrentLocale = locale.locale === currentLocale
+              return (
+                <DropdownMenuItem
+                  key={locale.locale}
+                  disabled={isCurrentLocale}
+                >
+                  <LocaleSelectButton locale={locale} />
+                </DropdownMenuItem>
+              )
+            })}
+          </DropdownMenuSubContent>
+        </DropdownMenuPortal>
+      </DropdownMenuSub>
       <DropdownMenuSeparator />
       <DropdownMenuItem asChild>
         <ActionButton

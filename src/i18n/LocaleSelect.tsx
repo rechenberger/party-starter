@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
-import { localeDefinitions } from './locale'
+import { LocaleDefinition, localeDefinitions } from './locale'
 import { useLocale, useSetLocale } from './useLocale'
 
 export const LocaleSelect = ({ className }: { className?: string }) => {
@@ -39,6 +39,22 @@ export const LocaleSelect = ({ className }: { className?: string }) => {
           ))}
         </SelectContent>
       </Select>
+    </div>
+  )
+}
+
+export const LocaleSelectButton = ({
+  locale,
+}: {
+  locale: LocaleDefinition
+}) => {
+  const setLocale = useSetLocale()
+  return (
+    <div
+      className="w-full cursor-pointer"
+      onClick={() => setLocale(locale.locale)}
+    >
+      {locale.abbreviationLabel}
     </div>
   )
 }

@@ -8,7 +8,7 @@ import { Building2, Github, HomeIcon, UserIcon, UsersIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { DevBadges } from './DevBadges'
-import { MainTopNavEntries } from './MainTopNav'
+import { MainTopNavEntries } from './MainTopNavEntries'
 
 export const MainTop = () => {
   return (

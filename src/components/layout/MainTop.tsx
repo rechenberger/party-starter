@@ -67,6 +67,11 @@ export const MainTopContent = async () => {
       href: '/users',
       hidden: !isAdminOrDev,
     },
+    {
+      name: 'App',
+      href: '/org',
+      hidden: !isLoggedIn,
+    },
   ].filter((entry) => !entry.hidden)
 
   return (

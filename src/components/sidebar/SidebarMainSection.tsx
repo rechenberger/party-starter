@@ -40,6 +40,13 @@ export const SidebarMainSection = async () => {
       {ORGS.isActive && isLoggedIn && (
         <SidebarGroup>
           <SidebarGroupLabel>Organizations</SidebarGroupLabel>
+          {userCanCreateOrg && memberships.length > 0 && (
+            <SidebarGroupAction title="Create Organization">
+              <Link href={`/org/create`}>
+                <Plus className="size-4" />
+              </Link>
+            </SidebarGroupAction>
+          )}
           <SidebarMenu>
             {memberships.map((membership) => (
               <Fragment key={membership.organization.id}>
@@ -58,20 +65,13 @@ export const SidebarMainSection = async () => {
                 </SidebarMenuButton>
               </Fragment>
             ))}
-            {memberships.length === 0 && (
+            {userCanCreateOrg && memberships.length === 0 && (
               <SidebarMenuButton tooltip="Create Organization" asChild>
                 <Link href={`/org/create`}>
                   <Plus size={20} />
                   <span>Create Organization</span>
                 </Link>
               </SidebarMenuButton>
-            )}
-            {userCanCreateOrg && memberships.length > 0 && (
-              <SidebarGroupAction title="Create Organization">
-                <Link href={`/org/create`}>
-                  <Plus className="size-4" />
-                </Link>
-              </SidebarGroupAction>
             )}
           </SidebarMenu>
         </SidebarGroup>

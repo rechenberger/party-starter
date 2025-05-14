@@ -28,7 +28,7 @@ export const SidebarMainSection = async () => {
   return (
     <>
       <SidebarGroup>
-        <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+        {/* <SidebarGroupLabel>Navigation</SidebarGroupLabel> */}
         <SidebarMenu>
           {entries.map((entry) => (
             <Fragment key={entry.href}>

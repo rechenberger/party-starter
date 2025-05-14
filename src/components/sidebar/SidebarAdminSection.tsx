@@ -3,7 +3,6 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
 } from '@/components/ui/sidebar'
 import { getNavEntries } from '../layout/MainTop'
 import { SidebarNavEntry } from './SidebarNavEntry'
@@ -18,9 +17,7 @@ export const SidebarAdminSection = async () => {
       <SidebarGroupLabel>Admin</SidebarGroupLabel>
       <SidebarMenu>
         {adminEntries.map((entry) => (
-          <SidebarMenuButton key={entry.href}>
-            <SidebarNavEntry entry={entry} />
-          </SidebarMenuButton>
+          <SidebarNavEntry entry={entry} key={entry.href} />
         ))}
       </SidebarMenu>
     </SidebarGroup>

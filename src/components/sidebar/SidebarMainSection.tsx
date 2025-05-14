@@ -32,9 +32,7 @@ export const SidebarMainSection = async () => {
         <SidebarMenu>
           {entries.map((entry) => (
             <Fragment key={entry.href}>
-              <SidebarMenuButton tooltip={entry.name}>
-                <SidebarNavEntry entry={entry} />
-              </SidebarMenuButton>
+              <SidebarNavEntry entry={entry} />
             </Fragment>
           ))}
         </SidebarMenu>

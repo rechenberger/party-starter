@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { NavEntry } from '../layout/MainTop'
+import { SidebarMenuButton } from '../ui/sidebar'
 
 export function SidebarNavEntry({ entry }: { entry: NavEntry }) {
   const pathname = usePathname()
@@ -12,21 +13,22 @@ export function SidebarNavEntry({ entry }: { entry: NavEntry }) {
       ? pathname === entry.href
       : pathname?.startsWith(entry.href)
   return (
-    <Link
-      href={entry.href}
-      className={cn(
-        'flex gap-1 items-center',
-        !isActive && 'text-muted-foreground',
-      )}
-    >
-      {entry.icon && (
-        <div
-          className={cn('size-4 flex items-center', isActive && 'text-primary')}
-        >
-          {entry.icon}
-        </div>
-      )}
-      <div>{entry.name}</div>
-    </Link>
+    <SidebarMenuButton size="default" tooltip={entry.name} asChild>
+      <Link href={entry.href}>
+        {entry.icon && (
+          <div
+            className={cn(
+              'size-4 flex items-center',
+              isActive && 'text-primary',
+            )}
+          >
+            {entry.icon}
+          </div>
+        )}
+        <span className={cn(!isActive && 'text-muted-foreground')}>
+          {entry.name}
+        </span>
+      </Link>
+    </SidebarMenuButton>
   )
 }

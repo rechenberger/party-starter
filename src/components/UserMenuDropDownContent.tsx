@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { User } from '@/db/schema-zod'
+import { cn } from '@/lib/utils'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { redirect } from 'next/navigation'
 import { SimpleUserAvatar } from './simple/SimpleUserAvatar'
@@ -31,7 +32,14 @@ export const UserMenuDropDownContent = ({
           <SimpleUserAvatar user={user} />
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-medium">{user.name}</span>
-            <span className="truncate text-xs">{user.email}</span>
+            <span
+              className={cn(
+                'truncate',
+                !!user.name ? 'text-xs font-light' : 'font-medium',
+              )}
+            >
+              {user.email}
+            </span>
           </div>
         </div>
       </DropdownMenuLabel>

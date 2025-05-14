@@ -4,11 +4,11 @@ import { getIsLoggedIn } from '@/auth/getMyUser'
 import { DarkModeToggle } from '@/components/layout/DarkModeToggle'
 import { Button } from '@/components/ui/button'
 import { BRAND } from '@/lib/starter.config'
-import { Github } from 'lucide-react'
+import { Building2, Github, HomeIcon, UserIcon, UsersIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { DevBadges } from './DevBadges'
-import { MainTopNav } from './MainTopNav'
+import { MainTopNavEntries } from './MainTopNav'
 
 export const MainTop = () => {
   return (
@@ -21,7 +21,12 @@ export const MainTop = () => {
         </Link>
         <div className="hidden flex-1 xl:flex items-center gap-2">
           <Suspense fallback={<div className="flex-1" />}>
-            <MainTopContent />
+            <nav
+              className={'flex flex-1 flex-wrap items-center gap-4 lg:gap-6'}
+            >
+              <MainTopContent />
+              <div className="flex-1" />
+            </nav>
           </Suspense>
           <DevBadges />
           <UserButtonSuspense />
@@ -39,7 +44,10 @@ export const MainTop = () => {
       </div>
       <div className="container flex pb-6 xl:hidden items-center gap-2 flex-wrap">
         <Suspense fallback={<div className="flex-1" />}>
-          <MainTopContent />
+          <nav className={'flex flex-1 flex-wrap items-center gap-4 lg:gap-6'}>
+            <MainTopContent />
+            <div className="flex-1" />
+          </nav>
         </Suspense>
         <DevBadges />
         <UserButtonSuspense />
@@ -48,7 +56,7 @@ export const MainTop = () => {
   )
 }
 
-export const MainTopContent = async () => {
+export const getNavEntries = async () => {
   const isAdminOrDev = await getIsAdmin({ allowDev: true })
   const isLoggedIn = await getIsLoggedIn()
 
@@ -56,27 +64,37 @@ export const MainTopContent = async () => {
     {
       name: 'Home',
       href: '/',
+      icon: <HomeIcon />,
     },
     {
       name: 'Me',
       href: '/auth/me',
       hidden: !isLoggedIn,
+      icon: <UserIcon />,
     },
     {
       name: 'Users',
       href: '/users',
       hidden: !isAdminOrDev,
+      hideInSidebar: true,
+      icon: <UsersIcon />,
+      adminOnly: true,
     },
     {
       name: 'App',
       href: '/org',
       hidden: !isLoggedIn,
+      icon: <Building2 />,
     },
   ].filter((entry) => !entry.hidden)
 
-  return (
-    <>
-      <MainTopNav entries={entries} />
-    </>
-  )
+  return entries
+}
+
+export type NavEntry = Awaited<ReturnType<typeof getNavEntries>>[number]
+
+export const MainTopContent = async () => {
+  const entries = await getNavEntries()
+
+  return <MainTopNavEntries entries={entries} />
 }

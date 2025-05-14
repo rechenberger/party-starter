@@ -7,16 +7,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { cn } from '@/lib/utils'
 import { localeDefinitions } from './locale'
 import { useLocale, useSetLocale } from './useLocale'
 
-export const LocaleSelect = () => {
+export const LocaleSelect = ({ className }: { className?: string }) => {
   const locale = useLocale()
   const setLocale = useSetLocale()
   // const t = useTranslationsApp()
 
   return (
-    <div className="text-foreground-dimmed">
+    <div className={cn('text-foreground-dimmed', className)}>
       {/* <Label htmlFor="language">{t.settings.language}</Label> */}
       <Select
         defaultValue={locale}
@@ -24,7 +25,7 @@ export const LocaleSelect = () => {
           setLocale(newLocale)
         }}
       >
-        <SelectTrigger id="language">
+        <SelectTrigger id="language" className="w-full">
           <SelectValue placeholder="Select language..." />
         </SelectTrigger>
         <SelectContent>

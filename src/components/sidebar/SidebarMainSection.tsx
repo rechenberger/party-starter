@@ -1,4 +1,5 @@
 import { getIsLoggedIn } from '@/auth/getMyUser'
+import { LocaleSelect } from '@/i18n/LocaleSelect'
 import { ORGS } from '@/lib/starter.config'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { getMyMemberships } from '@/organization/getMyMemberships'
@@ -76,6 +77,12 @@ export const SidebarMainSection = async () => {
           </SidebarMenu>
         </SidebarGroup>
       )}
+      <SidebarGroup>
+        <SidebarGroupLabel>Language</SidebarGroupLabel>
+        <SidebarMenu>
+          <LocaleSelect className="w-full" />
+        </SidebarMenu>
+      </SidebarGroup>
     </>
   )
 }

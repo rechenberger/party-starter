@@ -11,4 +11,7 @@ export const t = {
   standardWords: {
     users: 'Benutzer',
   },
+  org: {
+    create: 'Organisation erstellen',
+  },
 } satisfies typeof enT

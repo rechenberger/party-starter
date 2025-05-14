@@ -9,4 +9,7 @@ export const t = {
   standardWords: {
     users: 'Users',
   },
+  org: {
+    create: 'Create Organization',
+  },
 }

@@ -1,5 +1,6 @@
 import { UserButtonSuspense } from '@/auth/UserButton'
 import { Button } from '@/components/ui/button'
+import { LocaleSelect } from '@/i18n/LocaleSelect'
 import { BRAND } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import { Github, MenuIcon } from 'lucide-react'
@@ -43,6 +44,7 @@ export const MainTopResponsive = async () => {
                 </Button>
               )}
               <DarkModeToggle />
+              <LocaleSelect />
             </div>
             <SidebarTrigger
               className="md:hidden"

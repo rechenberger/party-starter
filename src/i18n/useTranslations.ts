@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { t as deT } from './translations/translations.server.de'
-import { t as enT } from './translations/translations.server.en'
+import { t as deT } from './translations/translations.de'
+import { t as enT } from './translations/translations.en'
 import { useLocale } from './useLocale'
 
 export const useTranslations = () => {

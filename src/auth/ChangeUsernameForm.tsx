@@ -28,7 +28,6 @@ export const ChangeUsernameForm = async ({
               .where(eq(schema.users.id, userId))
 
             superCache.user({ id: userId }).revalidate()
-            superCache.users().revalidate()
 
             redirect(redirectUrl || '/')
           })

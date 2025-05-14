@@ -131,7 +131,6 @@ export default async function Page({
                             .where(eq(usersTable.id, user.id))
 
                           superCache.user({ id: user.id }).revalidate()
-                          superCache.users().revalidate()
 
                           streamToast({
                             title: isAdmin ? 'Removed admin' : 'Made admin',
@@ -170,7 +169,6 @@ export default async function Page({
                             .execute()
 
                           superCache.user({ id: user.id }).revalidate()
-                          superCache.users().revalidate()
 
                           streamToast({
                             title: 'User deleted',

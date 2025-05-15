@@ -1,5 +1,6 @@
 import { isDev } from '@/auth/dev'
 import { Toaster } from '@/components/ui/toaster'
+import { BASE_URL } from '@/lib/config'
 import { ParamsWrapper } from '@/lib/paramsServerContext'
 import { BRAND } from '@/lib/starter.config'
 import { ActionCommandProvider } from '@/super-action/command/ActionCommandProvider'
@@ -17,6 +18,13 @@ export const metadata: Metadata = {
     template: `${titlePrefix}%s | ${BRAND.name}`,
   },
   description: BRAND.metadata.description,
+  alternates: {
+    canonical: BASE_URL,
+    languages: {
+      'en-US': `${BASE_URL}/en`,
+      'de-DE': `${BASE_URL}/de`,
+    },
+  },
 }
 
 export default ParamsWrapper(

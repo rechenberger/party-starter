@@ -31,7 +31,11 @@ export const LocaleSelect = ({ className }: { className?: string }) => {
         </SelectTrigger>
         <SelectContent>
           {localeDefinitions.map((locale) => (
-            <SelectItem key={locale.locale} value={locale.locale}>
+            <SelectItem
+              key={locale.locale}
+              value={locale.locale}
+              title={locale.actionLabel}
+            >
               <div className="flex flex-row gap-2">
                 {/* <span>{locale.flagEmoji}</span> */}
                 <span>{locale.abbreviationLabel}</span>
@@ -53,6 +57,7 @@ export const LocaleSelectButton = ({
   return (
     <div
       className="w-full cursor-pointer"
+      title={locale.actionLabel}
       onClick={() => setLocale(locale.locale)}
     >
       {locale.abbreviationLabel}

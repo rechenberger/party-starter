@@ -1,5 +1,7 @@
 'use client'
 
+import { setDefaultOptions } from 'date-fns'
+import { de, enUS } from 'date-fns/locale'
 import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useContext } from 'react'
 import { COOKIE_NAME, Locale, LOCALES } from './locale'
@@ -21,6 +23,11 @@ export const useSetLocale = () => {
   return useCallback(
     (locale: Locale) => {
       setCookie(COOKIE_NAME, locale)
+      // update default locale for date-fns
+      setDefaultOptions({
+        locale: locale === 'de' ? de : enUS,
+      })
+
       const isLocalePath = LOCALES.some((locale) =>
         pathname.startsWith(`/${locale}`),
       )

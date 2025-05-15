@@ -29,7 +29,7 @@ import { Organization, OrganizationMembership, User } from '@/db/schema-zod'
 import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { formatDistanceToNow } from 'date-fns'
+import { format, formatDistanceToNow } from 'date-fns'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useMemo, useState } from 'react'
@@ -99,10 +99,7 @@ export const MemberList = ({
               <div>
                 <CardTitle>{organization.name}</CardTitle>
                 <CardDescription>
-                  Created{' '}
-                  {formatDistanceToNow(new Date(organization.createdAt), {
-                    addSuffix: true,
-                  })}
+                  Created {format(organization.createdAt, 'PPP')}
                 </CardDescription>
               </div>
               <Badge variant="outline" className="text-xs">

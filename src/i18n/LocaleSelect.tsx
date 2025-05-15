@@ -24,6 +24,7 @@ export const LocaleSelect = ({ className }: { className?: string }) => {
         onValueChange={(newLocale: typeof locale) => {
           setLocale(newLocale)
         }}
+        value={locale}
       >
         <SelectTrigger id="language" className="w-full">
           <SelectValue placeholder="Select language..." />

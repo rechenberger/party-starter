@@ -1,5 +1,7 @@
 import { isDev } from '@/auth/dev'
 import { Toaster } from '@/components/ui/toaster'
+import { getMyLocale } from '@/i18n/getMyLocale'
+import { DEFAULT_LOCALE } from '@/i18n/locale'
 import { BASE_URL } from '@/lib/config'
 import { ParamsWrapper } from '@/lib/paramsServerContext'
 import { BRAND } from '@/lib/starter.config'
@@ -18,19 +20,15 @@ export const metadata: Metadata = {
     template: `${titlePrefix}%s | ${BRAND.name}`,
   },
   description: BRAND.metadata.description,
-  alternates: {
-    canonical: BASE_URL,
-    languages: {
-      'en-US': `${BASE_URL}/en`,
-      'de-DE': `${BASE_URL}/de`,
-    },
-  },
+
+  metadataBase: new URL(BASE_URL),
 }
 
 export default ParamsWrapper(
   async ({ children }: { children: React.ReactNode }) => {
+    const locale = await getMyLocale()
     return (
-      <html lang="en" suppressHydrationWarning>
+      <html lang={locale ?? DEFAULT_LOCALE} suppressHydrationWarning>
         <body className="bg-background min-h-[100svh] flex flex-col">
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <SessionProvider>{children}</SessionProvider>

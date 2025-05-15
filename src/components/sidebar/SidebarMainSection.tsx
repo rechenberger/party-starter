@@ -77,12 +77,14 @@ export const SidebarMainSection = async () => {
           </SidebarMenu>
         </SidebarGroup>
       )}
-      <SidebarGroup>
-        <SidebarGroupLabel>Language</SidebarGroupLabel>
-        <SidebarMenu>
-          <LocaleSelect className="w-full" />
-        </SidebarMenu>
-      </SidebarGroup>
+      {!isLoggedIn && (
+        <SidebarGroup>
+          <SidebarGroupLabel>Language</SidebarGroupLabel>
+          <SidebarMenu>
+            <LocaleSelect className="w-full" />
+          </SidebarMenu>
+        </SidebarGroup>
+      )}
     </>
   )
 }

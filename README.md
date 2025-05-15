@@ -33,9 +33,7 @@
 - Email
   - Specify an SMTP server
   - `EMAIL_FROM`="moin@party-starter.de"
-  - `SMTP_URL`="sandbox.smtp.mailtrap.io"
-  - `SMTP_USER`=""
-  - `SMTP_PASSWORD`=""
+  - `SMTP_URL`="smtp://[user]:[password]@sandbox.smtp.mailtrap.io:[port]"
 - `pnpm db:push` to push schema to DB
 
 ## Run

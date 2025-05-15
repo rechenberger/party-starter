@@ -55,7 +55,10 @@ const SuperDialog = ({
           }
         }}
       >
-        <DialogContent aria-describedby={undefined}>
+        <DialogContent
+          aria-describedby={undefined}
+          className={dialog.className}
+        >
           {dialog.title && (
             <DialogHeader>
               <DialogTitle>{dialog.title}</DialogTitle>

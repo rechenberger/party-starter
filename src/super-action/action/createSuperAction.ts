@@ -16,6 +16,7 @@ export type SuperActionToast = {
 
 export type SuperActionDialog = {
   title?: string
+  description?: ReactNode
   content?: ReactNode
   confirm?: string
   cancel?: string

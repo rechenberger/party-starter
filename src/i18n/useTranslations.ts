@@ -1,0 +1,19 @@
+import { useMemo } from 'react'
+import { t as deT } from './translations/translations.server.de'
+import { t as enT } from './translations/translations.server.en'
+import { useLocale } from './useLocale'
+
+export const useTranslations = () => {
+  const locale = useLocale()
+
+  return useMemo(() => {
+    switch (locale) {
+      case 'en':
+        return enT
+      case 'de':
+        return deT
+      default:
+        throw new Error(`Unsupported locale: ${locale}`)
+    }
+  }, [locale])
+}

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -58,6 +59,9 @@ const SuperDialog = ({
           {dialog.title && (
             <DialogHeader>
               <DialogTitle>{dialog.title}</DialogTitle>
+              {dialog.description && (
+                <DialogDescription>{dialog.description}</DialogDescription>
+              )}
             </DialogHeader>
           )}
           {dialog.content}

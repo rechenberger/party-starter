@@ -1,13 +1,10 @@
-import { MainTop } from '@/components/layout/MainTop'
+import { MainTopLayout } from '@/components/layout/MainTopLayout'
+import { SidebarLayout } from '@/components/sidebar/SidebarLayout'
+import { SIDEBAR } from '@/lib/starter.config'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <MainTop />
-      <hr />
-      <div className="container flex flex-col gap-8 py-8 flex-1">
-        {children}
-      </div>
-    </>
-  )
+  if (SIDEBAR.activeInMain) {
+    return <SidebarLayout>{children}</SidebarLayout>
+  }
+  return <MainTopLayout>{children}</MainTopLayout>
 }

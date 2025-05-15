@@ -39,10 +39,14 @@ export const getMyUserOrThrow = async () => {
   return user
 }
 
-export const getMyUserOrLogin = async () => {
+export const getMyUserOrLogin = async ({
+  forceRedirectUrl,
+}: {
+  forceRedirectUrl?: string
+} = {}) => {
   const user = await getMyUser()
   if (!user) {
-    await loginWithRedirect()
+    await loginWithRedirect({ forceRedirectUrl })
     throw new Error('User not found')
   }
   return user

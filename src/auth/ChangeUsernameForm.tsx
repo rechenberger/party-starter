@@ -1,8 +1,8 @@
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { superCache } from '@/lib/superCache'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { eq } from 'drizzle-orm'
-import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { ChangeUsernameFormClient } from './ChangeUsernameFormClient'
 import { getMyUser, getMyUserIdOrThrow } from './getMyUser'
@@ -27,7 +27,7 @@ export const ChangeUsernameForm = async ({
               })
               .where(eq(schema.users.id, userId))
 
-            revalidatePath('/', 'layout')
+            superCache.user({ id: userId }).revalidate()
 
             redirect(redirectUrl || '/')
           })

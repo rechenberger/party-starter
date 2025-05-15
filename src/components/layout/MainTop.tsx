@@ -3,6 +3,7 @@ import { getIsAdmin } from '@/auth/getIsAdmin'
 import { getIsLoggedIn } from '@/auth/getMyUser'
 import { DarkModeToggle } from '@/components/layout/DarkModeToggle'
 import { Button } from '@/components/ui/button'
+import { getMyLocale } from '@/i18n/getMyLocale'
 import { BRAND } from '@/lib/starter.config'
 import { Github } from 'lucide-react'
 import Link from 'next/link'
@@ -10,11 +11,12 @@ import { Suspense } from 'react'
 import { DevBadges } from './DevBadges'
 import { MainTopNav } from './MainTopNav'
 
-export const MainTop = () => {
+export const MainTop = async () => {
+  const locale = await getMyLocale()
   return (
     <>
       <div className="container flex flex-row items-center justify-between gap-6 py-6">
-        <Link href="/" className="flex flex-row items-center gap-3">
+        <Link href={`/${locale}`} className="flex flex-row items-center gap-3">
           <div className="text-xl">
             <BRAND.TextLogo />
           </div>
@@ -51,15 +53,15 @@ export const MainTop = () => {
 export const MainTopContent = async () => {
   const isAdminOrDev = await getIsAdmin({ allowDev: true })
   const isLoggedIn = await getIsLoggedIn()
-
+  const locale = await getMyLocale()
   const entries = [
     {
       name: 'Home',
-      href: '/',
+      href: `/${locale}`,
     },
     {
       name: 'Me',
-      href: '/auth/me',
+      href: `/auth/me`,
       hidden: !isLoggedIn,
     },
     {

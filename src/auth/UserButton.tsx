@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
+import { getMyLocale } from '@/i18n/getMyLocale'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { ChevronDown, KeyRound, LogOut, User } from 'lucide-react'
 import { redirect } from 'next/navigation'
@@ -18,7 +19,7 @@ import {
   loginWithRedirect,
 } from './loginWithRedirect'
 
-export const UserButtonSuspense = () => {
+export const UserButtonSuspense = async () => {
   return (
     <Suspense fallback={<Skeleton className="w-[38px] h-8" />}>
       <UserButton />
@@ -28,7 +29,7 @@ export const UserButtonSuspense = () => {
 
 export const UserButton = async () => {
   const session = await auth()
-
+  const locale = await getMyLocale()
   const showName = false
 
   if (!!session?.user) {
@@ -89,7 +90,7 @@ export const UserButton = async () => {
                   if (response.ok) {
                     redirect(url)
                   } else {
-                    redirect('/')
+                    redirect(`/${locale}`)
                   }
                 }}
               >
@@ -109,7 +110,10 @@ export const UserButton = async () => {
         size="sm"
         variant={'outline'}
         hideIcon
-        action={loginWithRedirect}
+        action={async () => {
+          'use server'
+          await loginWithRedirect({ locale })
+        }}
       >
         Login
       </ActionButton>

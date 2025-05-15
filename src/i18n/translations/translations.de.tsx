@@ -8,6 +8,10 @@ export const t = {
       </>
     ),
   },
+  login: {
+    forgotPassword: 'Passwort vergessen?',
+    confirmPasswordMismatch: 'Passwörter stimmen nicht überein',
+  },
   standardWords: {
     users: 'Benutzer',
   },

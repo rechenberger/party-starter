@@ -1,4 +1,5 @@
 import { db } from '@/db/db'
+import { DEFAULT_LOCALE } from '@/i18n/locale'
 import Nodemailer from '@auth/core/providers/nodemailer'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
 import NextAuth from 'next-auth'
@@ -13,7 +14,9 @@ const hasEmailEnvVars = !!process.env.EMAIL_FROM && !!process.env.SMTP_URL
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db),
   pages: {
-    signIn: '/auth/login',
+    //TODO: make this dynamic
+    signIn: `/${DEFAULT_LOCALE}/auth/login`,
+    verifyRequest: `/${DEFAULT_LOCALE}/auth/check-mail`,
   },
   providers: [
     Discord,

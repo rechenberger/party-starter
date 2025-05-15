@@ -1,20 +1,25 @@
-import { getMyUser } from '@/auth/getMyUser'
+import { getMyUserId } from '@/auth/getMyUser'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { neverNullish, throwError } from '@/lib/neverNullish'
 import { and, eq, inArray } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
-import { OrganizationRole } from '../db/schema-organizations'
 import { getCurrentOrgSlug } from './getCurrentOrgSlug'
+import { OrganizationRole } from './organizationRoles'
 
 export const getMyMembership = async ({
   allowedRoles,
+  orgSlug: inputOrgSlug,
 }: {
   allowedRoles?: OrganizationRole[]
+  orgSlug?: string
 } = {}) => {
-  const [orgSlug, user] = await Promise.all([getCurrentOrgSlug(), getMyUser()])
+  const [orgSlug, userId] = await Promise.all([
+    inputOrgSlug ?? getCurrentOrgSlug(),
+    getMyUserId(),
+  ])
 
-  if (!user || !orgSlug) {
+  if (!userId || !orgSlug) {
     return null
   }
 
@@ -23,7 +28,7 @@ export const getMyMembership = async ({
     with: {
       memberships: {
         where: and(
-          eq(schema.organizationMemberships.userId, user.id),
+          eq(schema.organizationMemberships.userId, userId),
           allowedRoles
             ? inArray(schema.organizationMemberships.role, allowedRoles)
             : undefined,
@@ -31,8 +36,10 @@ export const getMyMembership = async ({
       },
     },
   })
+  const membership = org?.memberships.at(0)
+  const valid = !!org && !!membership
 
-  return org?.memberships.at(0)
+  return valid ? { org, membership } : null
 }
 
 export const getMyMembershipOrThrow = neverNullish(

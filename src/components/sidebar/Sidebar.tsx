@@ -5,11 +5,12 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuItem,
+  SidebarMenuButton,
   SidebarRail,
   Sidebar as UiSidebar,
 } from '@/components/ui/sidebar'
-import { ORGS } from '@/lib/starter.config'
+import { BRAND, ORGS } from '@/lib/starter.config'
+import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
 import { Suspense } from 'react'
@@ -26,21 +27,27 @@ export const Sidebar = ({
     <UiSidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem className="flex flex-row gap-2 items-center p-2">
-            <div className="">
-              <Link href="/">🎉</Link>
-            </div>
+          <SidebarMenuButton
+            className="flex flex-row gap-2 items-center"
+            size="lg"
+            asChild
+          >
             <Link
-              href="/"
-              className="flex flex-row items-center gap-2 w-full overflow-hidden group-data-[collapsible=icon]:hidden"
+              href={`/`}
+              className="flex flex-row items-center gap-2 w-full overflow-hidden"
             >
-              <div className="text-xl">
-                <strong>
-                  Party&nbsp;<span className="text-primary">Starter</span>
-                </strong>
-              </div>
+              <Image
+                src={BRAND.logoUrl}
+                className="p-1"
+                alt={BRAND.name}
+                width={32}
+                height={32}
+              />
+              <span className="text-xl">
+                <BRAND.TextLogo />
+              </span>
             </Link>
-          </SidebarMenuItem>
+          </SidebarMenuButton>
         </SidebarMenu>
 
         {!!orgSlug && ORGS.isActive && (
@@ -52,7 +59,7 @@ export const Sidebar = ({
       <SidebarContent>
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
           {!!orgSlug && ORGS.isActive ? (
-            <SidebarOrgSection orgSlug={orgSlug} />
+            <SidebarOrgSection />
           ) : (
             <SidebarMainSection />
           )}

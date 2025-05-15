@@ -1,15 +1,17 @@
+import { paramsContext } from '@/lib/paramsServerContext'
+import { LOCALIZATION } from '@/lib/starter.config'
 import { match } from '@formatjs/intl-localematcher'
 import Negotiator from 'negotiator'
 import { cookies, headers } from 'next/headers'
 import { DEFAULT_LOCALE, Locale, LOCALES } from './locale'
 
-export const getMyLocale = async ({
-  params,
-}: {
-  params?: Promise<{ locale?: string }>
-}) => {
+export const getMyLocale = async () => {
+  if (!LOCALIZATION.isActive) {
+    return DEFAULT_LOCALE
+  }
+
   const locale =
-    (await getFromParams({ params })) ??
+    (await getFromParams()) ??
     (await getFromCookies()) ??
     (await getFromHeaders())
 
@@ -21,12 +23,9 @@ export const getMyLocale = async ({
   return DEFAULT_LOCALE
 }
 
-const getFromParams = async ({
-  params,
-}: {
-  params?: Promise<{ locale?: string }>
-}) => {
-  const locale = (await params)?.locale
+const getFromParams = async () => {
+  const params = await paramsContext.get()
+  const locale = params?.locale
   const parsedParamLocale = Locale.safeParse(locale)
   if (parsedParamLocale.success) {
     return parsedParamLocale.data

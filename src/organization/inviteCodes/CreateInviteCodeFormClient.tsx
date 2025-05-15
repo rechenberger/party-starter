@@ -17,15 +17,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useToast } from '@/components/ui/use-toast'
 import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
+import { useShowDialog } from '@/super-action/dialog/DialogProvider'
 import { z } from 'zod'
+import { organizationRoleDefinitions } from '../organizationRoles'
+import { ExpirationTime, expirationTimesDefinitions } from './expirationTimes'
+import { getInviteCodeUrl } from './getInviteCodeUrl'
 
 const CreateInviteCodeSchema = z.object({
   role: z.enum(['admin', 'member']),
-  expiresAt: z.enum(['never', '1d', '1w', '1m', '1y']),
-  maxUses: z.coerce.number().optional(),
+  expiresAt: ExpirationTime,
+  usesMax: z.coerce.number().optional(),
+  comment: z.string().optional(),
 })
 
 type CreateInviteCodeData = z.infer<typeof CreateInviteCodeSchema>
@@ -34,23 +40,28 @@ const [useCreateInviteCodeForm] = createZodForm(CreateInviteCodeSchema)
 
 export const CreateInviteCodeFormClient = ({
   action,
+  organizationSlug,
 }: {
+  organizationSlug: string
   action: (
     data: CreateInviteCodeData,
-  ) => SuperActionPromise<void, CreateInviteCodeData>
+  ) => SuperActionPromise<{ id: string }, CreateInviteCodeData>
 }) => {
   const { trigger, isLoading } = useSuperAction({
     action,
     catchToast: true,
   })
 
+  const showDialog = useShowDialog()
+  const { toast } = useToast()
   const disabled = isLoading
 
   const form = useCreateInviteCodeForm({
     defaultValues: {
       role: 'member',
       expiresAt: '1d',
-      maxUses: 1,
+      usesMax: 1,
+      comment: '',
     },
     disabled,
   })
@@ -60,7 +71,19 @@ export const CreateInviteCodeFormClient = ({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(async (formData) => {
-            await trigger(formData)
+            const result = await trigger(formData)
+            if (result?.id) {
+              const url = getInviteCodeUrl({
+                organizationSlug: organizationSlug,
+                code: result.id,
+              })
+
+              navigator.clipboard.writeText(url)
+              showDialog(null)
+              toast({
+                title: 'Invitation Code created and copied to clipboard',
+              })
+            }
           })}
           className="flex flex-col gap-4"
         >
@@ -83,8 +106,11 @@ export const CreateInviteCodeFormClient = ({
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="member">Member</SelectItem>
+                      {organizationRoleDefinitions.map((role) => (
+                        <SelectItem key={role.name} value={role.name}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -111,11 +137,14 @@ export const CreateInviteCodeFormClient = ({
                       <SelectValue placeholder="Select expires at" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="never">Never</SelectItem>
-                      <SelectItem value="1d">1 Day</SelectItem>
-                      <SelectItem value="1w">1 Week</SelectItem>
-                      <SelectItem value="1m">1 Month</SelectItem>
-                      <SelectItem value="1y">1 Year</SelectItem>
+                      {expirationTimesDefinitions.map((expirationTime) => (
+                        <SelectItem
+                          key={expirationTime.value}
+                          value={expirationTime.value}
+                        >
+                          {expirationTime.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -125,12 +154,29 @@ export const CreateInviteCodeFormClient = ({
           />
           <FormField
             control={form.control}
-            name="maxUses"
+            name="usesMax"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Max Uses</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} placeholder="unlimited" />
+                  <Input type="number" {...field} placeholder="Unlimited" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="comment"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Comment</FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    {...field}
+                    placeholder="Add an optional comment for yourself"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -138,7 +184,7 @@ export const CreateInviteCodeFormClient = ({
           />
 
           <Button type="submit" className="mt-2" disabled={disabled}>
-            Create Invite Code
+            Create Invitation Code
           </Button>
         </form>
       </Form>

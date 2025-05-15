@@ -18,10 +18,6 @@ export const SidebarMainSection = async () => {
     canUserCreateOrg(),
   ])
 
-  if (memberships.length === 0) {
-    return null
-  }
-
   return (
     <>
       {ORGS.isActive && (
@@ -31,12 +27,13 @@ export const SidebarMainSection = async () => {
             {memberships.map((membership) => (
               <Fragment key={membership.organization.id}>
                 <SidebarMenuButton
+                  size="lg"
                   tooltip={membership.organization.name}
                   asChild
                 >
                   <Link href={`/org/${membership.organization.slug}`}>
                     <SeededAvatar
-                      size={20}
+                      size={32}
                       value={membership.organization.slug}
                     />
                     <span>{membership.organization.name}</span>

@@ -1,6 +1,8 @@
 import { getMyLocale } from '@/i18n/getMyLocale'
 import { LocaleProvider } from '@/i18n/LocaleContext'
 import { createServerContext } from '@sodefa/next-server-context'
+import { setDefaultOptions } from 'date-fns'
+import { de, enUS } from 'date-fns/locale'
 import { ReactNode } from 'react'
 import { z } from 'zod'
 
@@ -27,6 +29,10 @@ export const ParamsWrapper = <ComponentProps,>(
       .parse(props)
     paramsContext.set(parsedProps.params)
     const locale = await getMyLocale()
+
+    setDefaultOptions({
+      locale: locale === 'en' ? enUS : de,
+    })
     return (
       <LocaleProvider value={locale}>
         <Component {...(props as any)} />

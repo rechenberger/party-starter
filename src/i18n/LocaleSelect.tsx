@@ -7,29 +7,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { localeDefinitions } from './locale'
+import { cn } from '@/lib/utils'
+import { LocaleDefinition, localeDefinitions } from './locale'
 import { useLocale, useSetLocale } from './useLocale'
 
-export const LocaleSelect = () => {
+export const LocaleSelect = ({ className }: { className?: string }) => {
   const locale = useLocale()
   const setLocale = useSetLocale()
   // const t = useTranslationsApp()
 
   return (
-    <div className="w-[300px] max-w-full text-foreground-dimmed">
+    <div className={cn('text-foreground-dimmed', className)}>
       {/* <Label htmlFor="language">{t.settings.language}</Label> */}
       <Select
         defaultValue={locale}
         onValueChange={(newLocale: typeof locale) => {
           setLocale(newLocale)
         }}
+        value={locale}
       >
-        <SelectTrigger id="language">
+        <SelectTrigger id="language" className="w-full">
           <SelectValue placeholder="Select language..." />
         </SelectTrigger>
         <SelectContent>
           {localeDefinitions.map((locale) => (
-            <SelectItem key={locale.locale} value={locale.locale}>
+            <SelectItem
+              key={locale.locale}
+              value={locale.locale}
+              title={locale.actionLabel}
+            >
               <div className="flex flex-row gap-2">
                 {/* <span>{locale.flagEmoji}</span> */}
                 <span>{locale.abbreviationLabel}</span>
@@ -38,6 +44,23 @@ export const LocaleSelect = () => {
           ))}
         </SelectContent>
       </Select>
+    </div>
+  )
+}
+
+export const LocaleSelectButton = ({
+  locale,
+}: {
+  locale: LocaleDefinition
+}) => {
+  const setLocale = useSetLocale()
+  return (
+    <div
+      className="w-full cursor-pointer"
+      title={locale.actionLabel}
+      onClick={() => setLocale(locale.locale)}
+    >
+      {locale.abbreviationLabel}
     </div>
   )
 }

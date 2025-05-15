@@ -1,5 +1,7 @@
+import { getIsLoggedIn } from '@/auth/getMyUser'
 import { UserButtonSuspense } from '@/auth/UserButton'
 import { Button } from '@/components/ui/button'
+import { LocaleSelect } from '@/i18n/LocaleSelect'
 import { BRAND } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import { Github, MenuIcon } from 'lucide-react'
@@ -12,6 +14,7 @@ import { DevBadges } from './DevBadges'
 import { MainTopContent } from './MainTop'
 
 export const MainTopResponsive = async () => {
+  const isLoggedIn = await getIsLoggedIn()
   return (
     <SidebarProvider className="min-h-auto">
       <header className="sticky top-0 z-50 w-full border-b">
@@ -43,6 +46,7 @@ export const MainTopResponsive = async () => {
                 </Button>
               )}
               <DarkModeToggle />
+              {!isLoggedIn && <LocaleSelect />}
             </div>
             <SidebarTrigger
               className="md:hidden"

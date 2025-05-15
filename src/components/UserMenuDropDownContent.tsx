@@ -1,4 +1,4 @@
-import { Globe, KeyRound, LogOut, UserRound } from 'lucide-react'
+import { Check, Globe, KeyRound, LogOut, UserRound } from 'lucide-react'
 
 import { signOut } from '@/auth/auth'
 import {
@@ -94,6 +94,7 @@ export const UserMenuDropDownContent = async ({
                   disabled={isCurrentLocale}
                 >
                   <LocaleSelectButton locale={locale} />
+                  {isCurrentLocale && <Check className="size-4" />}
                 </DropdownMenuItem>
               )
             })}

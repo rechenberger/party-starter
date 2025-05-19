@@ -1,6 +1,8 @@
 import { Locale, localeDefinitions } from '@/i18n/locale'
 import { keyBy, mapValues, replace } from 'lodash-es'
 import { type Metadata, type ResolvingMetadata } from 'next'
+import { getTranslations } from './getTranslations'
+import { TranslationsServerAndClient } from './translations/translations.server.en'
 
 // PUT THIS IN LAYOUT
 export const generateMetadataLocalizedLayout = () => {
@@ -59,12 +61,14 @@ export const generateMetadataLocalized = <
     options: PageProps & {
       parent: ResolvingMetadata
       locale: Locale
+      t: TranslationsServerAndClient
     },
   ) => Promise<Metadata> | Metadata,
 ) => {
   return async (props: PageProps, parent: ResolvingMetadata) => {
     const locale = Locale.parse((await props.params).locale)
-    const metadata = cb ? await cb({ ...props, locale, parent }) : {}
+    const t = await getTranslations(locale)
+    const metadata = cb ? await cb({ ...props, locale, parent, t }) : {}
     return {
       alternates: await generateMetadataLocalizedAlternates({
         params: props.params,

@@ -13,3 +13,5 @@ export const t = {
     create: 'Create Organization',
   },
 }
+
+export type TranslationsClient = typeof t

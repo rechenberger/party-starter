@@ -2,7 +2,7 @@ import { MainTopLayout } from '@/components/layout/MainTopLayout'
 import { localeDefinitions, LOCALES } from '@/i18n/locale'
 import { ParamsWrapper } from '@/lib/paramsServerContext'
 import { keyBy, mapValues } from 'lodash-es'
-import type { Metadata } from 'next'
+import type { Metadata, ResolvingMetadata } from 'next'
 
 export const generateStaticParams = async () => {
   return LOCALES.map((locale) => ({
@@ -12,11 +12,14 @@ export const generateStaticParams = async () => {
 
 export const dynamicParams = false // Not found if not locale
 
-export const generateMetadata = async ({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}) => {
+export const generateMetadata = async (
+  {
+    params,
+  }: {
+    params: Promise<{ locale: string }>
+  },
+  parent: ResolvingMetadata,
+) => {
   const localeFromParams = (await params).locale
   return {
     alternates: {

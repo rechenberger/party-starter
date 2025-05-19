@@ -2,7 +2,7 @@ import { Locale, localeDefinitions } from '@/i18n/locale'
 import { keyBy, mapValues, replace } from 'lodash-es'
 import { type Metadata, type ResolvingMetadata } from 'next'
 
-export const generateLocaleAlternates = async ({
+export const generateMetadataLocalizedAlternates = async ({
   params,
   parent,
 }: {
@@ -43,7 +43,7 @@ export const generateMetadataLocalized = <
     const locale = Locale.parse((await props.params).locale)
     const metadata = cb ? await cb({ ...props, locale, parent }) : {}
     return {
-      alternates: await generateLocaleAlternates({
+      alternates: await generateMetadataLocalizedAlternates({
         params: props.params,
         parent,
       }),

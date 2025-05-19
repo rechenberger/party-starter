@@ -1,5 +1,5 @@
+import { generateMetadataLocalized } from '@/i18n/generateMetadataLocalized'
 import { getTranslations } from '@/i18n/getTranslations'
-import { generateMetadataLocalized } from '../../generateLocaleAlternates'
 
 export const generateMetadata = generateMetadataLocalized(
   async ({ locale }) => {

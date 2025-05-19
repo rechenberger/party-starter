@@ -35,11 +35,6 @@ export const getNavEntries = async () => {
       hidden: !isLoggedIn,
       icon: <Building2 />,
     },
-    {
-      name: 'SEO Test',
-      href: `/${locale}/seotest`,
-      icon: <Building2 />,
-    },
   ].filter((entry) => !entry.hidden)
 
   return entries

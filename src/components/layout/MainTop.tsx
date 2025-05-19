@@ -1,11 +1,13 @@
 import { getIsAdmin } from '@/auth/getIsAdmin'
 import { getIsLoggedIn } from '@/auth/getMyUser'
+import { getMyLocale } from '@/i18n/getMyLocale'
 import { Building2, HomeIcon, UserIcon, UsersIcon } from 'lucide-react'
 import { MainTopNavEntries } from './MainTopNavEntries'
 
 export const getNavEntries = async () => {
   const isAdminOrDev = await getIsAdmin({ allowDev: true })
   const isLoggedIn = await getIsLoggedIn()
+  const locale = await getMyLocale()
 
   const entries = [
     {
@@ -31,6 +33,11 @@ export const getNavEntries = async () => {
       name: 'App',
       href: '/org',
       hidden: !isLoggedIn,
+      icon: <Building2 />,
+    },
+    {
+      name: 'SEO Test',
+      href: `/${locale}/seotest`,
       icon: <Building2 />,
     },
   ].filter((entry) => !entry.hidden)

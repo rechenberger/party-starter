@@ -3,6 +3,7 @@ import { localeDefinitions, LOCALES } from '@/i18n/locale'
 import { ParamsWrapper } from '@/lib/paramsServerContext'
 import { keyBy, mapValues } from 'lodash-es'
 import type { Metadata } from 'next'
+
 export const generateStaticParams = async () => {
   return LOCALES.map((locale) => ({
     locale,

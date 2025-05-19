@@ -2,6 +2,28 @@ import { Locale, localeDefinitions } from '@/i18n/locale'
 import { keyBy, mapValues, replace } from 'lodash-es'
 import { type Metadata, type ResolvingMetadata } from 'next'
 
+// PUT THIS IN LAYOUT
+export const generateMetadataLocalizedLayout = () => {
+  return async ({ params }: { params: Promise<{ locale: string }> }) => {
+    const localeFromParams = (await params).locale
+    return {
+      alternates: {
+        canonical: `./`,
+        languages: mapValues(
+          keyBy(
+            localeDefinitions.filter(
+              (locale) => locale.locale !== localeFromParams,
+            ),
+            'locale',
+          ),
+          (locale) => `${locale.locale}`,
+        ),
+      },
+    } satisfies Metadata
+  }
+}
+
+// TO MAKE THIS WORK
 export const generateMetadataLocalizedAlternates = async ({
   params,
   parent,
@@ -29,6 +51,7 @@ export const generateMetadataLocalizedAlternates = async ({
   return alternates
 }
 
+// HELPER FUNCTION FOR PREMIUM DX
 export const generateMetadataLocalized = <
   PageProps extends { params: Promise<{ locale: string }> },
 >(

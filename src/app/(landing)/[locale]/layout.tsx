@@ -10,6 +10,8 @@ export const generateStaticParams = async () => {
   }))
 }
 
+export const dynamicParams = false // Not found if not locale
+
 export const generateMetadata = async ({
   params,
 }: {

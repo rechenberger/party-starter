@@ -12,7 +12,7 @@ export const getNavEntries = async () => {
   const entries = [
     {
       name: 'Home',
-      href: '/',
+      href: `/${locale}`,
       icon: <HomeIcon />,
     },
     {

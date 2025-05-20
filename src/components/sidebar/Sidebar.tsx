@@ -80,7 +80,7 @@ export const Sidebar = ({
         </Suspense>
       </SidebarContent>
       <SidebarFooter>
-        <DevBadges className="px-2" />
+        <DevBadges className="px-2 group-data-[collapsible=icon]:hidden" />
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
           <SidebarUserSection />
         </Suspense>

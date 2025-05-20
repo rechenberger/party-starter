@@ -13,21 +13,17 @@ export function SidebarNavEntry({ entry }: { entry: NavEntry }) {
       ? pathname === entry.href
       : pathname?.startsWith(entry.href)
   return (
-    <SidebarMenuButton size="default" tooltip={entry.name} asChild>
+    <SidebarMenuButton
+      size="default"
+      tooltip={entry.name}
+      isActive={isActive}
+      asChild
+    >
       <Link href={entry.href}>
         {entry.icon && (
-          <div
-            className={cn(
-              'size-4 flex items-center',
-              isActive && 'text-primary',
-            )}
-          >
-            {entry.icon}
-          </div>
+          <div className={cn('size-4 flex items-center')}>{entry.icon}</div>
         )}
-        <span className={cn(!isActive && 'text-muted-foreground')}>
-          {entry.name}
-        </span>
+        <span>{entry.name}</span>
       </Link>
     </SidebarMenuButton>
   )

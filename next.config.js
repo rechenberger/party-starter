@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+  devIndicators: {
+    position: 'bottom-right',
+  },
+}
 
 module.exports = nextConfig

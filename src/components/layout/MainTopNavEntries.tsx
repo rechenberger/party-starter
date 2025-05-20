@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { NavEntry } from './MainTop'
+import { NavEntry } from './nav'
 
 export function MainTopNavEntries({ entries }: { entries: NavEntry[] }) {
   const pathname = usePathname()

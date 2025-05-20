@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { NavEntry } from '../layout/MainTop'
+import { NavEntry } from '../layout/nav'
 import { SidebarMenuButton } from '../ui/sidebar'
 
 export function SidebarNavEntry({ entry }: { entry: NavEntry }) {

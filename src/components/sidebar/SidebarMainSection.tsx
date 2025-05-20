@@ -6,7 +6,7 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import SeededAvatar from '../SeededAvatar'
-import { getNavEntries } from '../layout/MainTop'
+import { getNavEntries } from '../layout/nav'
 import {
   SidebarGroup,
   SidebarGroupAction,
@@ -27,12 +27,7 @@ export const SidebarMainSection = async ({
     canUserCreateOrg(),
   ])
 
-  let entries = await getNavEntries()
-  if (isLanding) {
-    entries = entries.filter((entry) => entry.showOnLanding)
-  } else {
-    entries = entries.filter((entry) => entry.mainSidebarSection === 'main')
-  }
+  let entries = await getNavEntries({ filter: isLanding ? 'landing' : 'main' })
   return (
     <>
       <SidebarGroup>

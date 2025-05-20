@@ -17,7 +17,13 @@ export const LocaleSelect = ({ className }: { className?: string }) => {
   // const t = useTranslationsApp()
 
   return (
-    <div className={cn('text-foreground-dimmed', className)}>
+    <div
+      className={cn(
+        'text-foreground-dimmed',
+        'min-w-18', // FIXME: This fixes flickering size. Issue: https://github.com/radix-ui/primitives/issues/3431
+        className,
+      )}
+    >
       {/* <Label htmlFor="language">{t.settings.language}</Label> */}
       <Select
         defaultValue={locale}

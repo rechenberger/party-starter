@@ -11,14 +11,14 @@ import { Sidebar } from '../sidebar/Sidebar'
 import { SidebarProvider, SidebarTrigger } from '../ui/sidebar'
 import { DarkModeToggle } from './DarkModeToggle'
 import { DevBadges } from './DevBadges'
-import { MainTopContent } from './MainTop'
+import { MainTopContent } from './MainTopContent'
 
 export const MainTopResponsive = async () => {
   const isLoggedIn = await getIsLoggedIn()
   return (
     <SidebarProvider className="min-h-auto">
       <header className="sticky top-0 z-50 w-full border-b">
-        <div className="container mx-auto flex max-w-6xl items-center gap-2 md:gap-6 py-6">
+        <div className="container flex items-center gap-2 md:gap-6 py-6">
           <SidebarTrigger
             className="md:hidden"
             icon={<MenuIcon className="size-4" />}

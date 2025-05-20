@@ -10,6 +10,7 @@ export type NavEntry = {
   mainSidebarSection?: 'main' | 'admin'
   showOnLanding?: boolean
   hidden?: boolean
+  exactMatch?: boolean
 }
 
 export const getNavEntries = async ({
@@ -28,6 +29,7 @@ export const getNavEntries = async ({
       icon: <Home />,
       mainSidebarSection: isLoggedIn ? undefined : 'main',
       showOnLanding: true,
+      exactMatch: true,
     },
     {
       name: 'Users',

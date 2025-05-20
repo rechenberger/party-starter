@@ -2,16 +2,12 @@
 
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { NavEntry } from '../layout/nav'
+import { useNavEntryState } from '../layout/useNavEntry'
 import { SidebarMenuButton } from '../ui/sidebar'
 
 export function SidebarNavEntry({ entry }: { entry: NavEntry }) {
-  const pathname = usePathname()
-  const isActive =
-    entry.href === '/'
-      ? pathname === entry.href
-      : pathname?.startsWith(entry.href)
+  const { isActive } = useNavEntryState({ entry })
   return (
     <SidebarMenuButton
       size="default"

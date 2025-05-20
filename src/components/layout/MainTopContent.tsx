@@ -1,8 +1,10 @@
-import { MainTopNavEntries } from './MainTopNavEntries'
+import { MainTopNavEntry } from './MainTopNavEntry'
 import { getNavEntries } from './nav'
 
 export const MainTopContent = async () => {
   const entries = await getNavEntries({ filter: 'landing' })
 
-  return <MainTopNavEntries entries={entries} />
+  return entries.map((entry) => (
+    <MainTopNavEntry key={entry.href} entry={entry} />
+  ))
 }

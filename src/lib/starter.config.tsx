@@ -1,4 +1,3 @@
-import { getIsLoggedIn } from '@/auth/getMyUser'
 import { type ExpirationTime } from '@/organization/inviteCodes/expirationTimes'
 
 export const ORGS = {
@@ -47,5 +46,8 @@ export const LOCALIZATION = {
 }
 
 export const SIDEBAR = {
-  activeInMain: async () => await getIsLoggedIn(),
+  activeInMain: async () =>
+    await import('@/auth/getMyUser').then(({ getIsLoggedIn }) =>
+      getIsLoggedIn(),
+    ),
 }

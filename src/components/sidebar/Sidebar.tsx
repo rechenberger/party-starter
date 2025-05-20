@@ -23,8 +23,12 @@ import { SidebarOrgSwitcher } from './SidebarOrgSwitcher'
 
 export const Sidebar = ({
   orgSlug,
+  isLanding,
   ...props
-}: React.ComponentProps<typeof UiSidebar> & { orgSlug?: string }) => {
+}: React.ComponentProps<typeof UiSidebar> & {
+  orgSlug?: string
+  isLanding?: boolean
+}) => {
   return (
     <UiSidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -63,12 +67,14 @@ export const Sidebar = ({
           {!!orgSlug && ORGS.isActive ? (
             <SidebarOrgSection />
           ) : (
-            <SidebarMainSection />
+            <SidebarMainSection isLanding={isLanding} />
           )}
         </Suspense>
-        <Suspense>
-          <SidebarAdminSection />
-        </Suspense>
+        {!isLanding && (
+          <Suspense>
+            <SidebarAdminSection />
+          </Suspense>
+        )}
         <Suspense>
           <SidebarAnonymousSettingsSection />
         </Suspense>

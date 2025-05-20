@@ -1,5 +1,5 @@
-import { getIsLoggedIn } from '@/auth/getMyUser'
 import { UserButtonSuspense } from '@/auth/UserButton'
+import { getIsLoggedIn } from '@/auth/getMyUser'
 import { Button } from '@/components/ui/button'
 import { LocaleSelect } from '@/i18n/LocaleSelect'
 import { BRAND } from '@/lib/starter.config'
@@ -18,7 +18,11 @@ export const MainTopResponsive = async () => {
   return (
     <SidebarProvider className="min-h-auto">
       <header className="sticky top-0 z-50 w-full border-b">
-        <div className="container mx-auto flex max-w-6xl items-center justify-between gap-6 py-6">
+        <div className="container mx-auto flex max-w-6xl items-center gap-2 md:gap-6 py-6">
+          <SidebarTrigger
+            className="md:hidden"
+            icon={<MenuIcon className="size-4" />}
+          />
           <Link href="/" className="flex flex-row items-center gap-3">
             <div className="text-xl">
               <BRAND.TextLogo />
@@ -31,11 +35,11 @@ export const MainTopResponsive = async () => {
               )}
             >
               <MainTopContent />
-              <div className="flex-1" />
             </nav>
           </Suspense>
+          <div className="flex-1 md:hidden" />
           <div className="flex items-center gap-4">
-            <DevBadges />
+            <DevBadges className="max-md:hidden" />
             <UserButtonSuspense />
             <div className="hidden items-center gap-2 text-sm font-medium md:flex">
               {BRAND.github.active && (
@@ -48,12 +52,8 @@ export const MainTopResponsive = async () => {
               <DarkModeToggle />
               {!isLoggedIn && <LocaleSelect />}
             </div>
-            <SidebarTrigger
-              className="md:hidden"
-              icon={<MenuIcon className="size-4" />}
-            />
             <div className="md:hidden">
-              <Sidebar collapsible="icon" />
+              <Sidebar collapsible="icon" isLanding={true} />
             </div>
           </div>
         </div>

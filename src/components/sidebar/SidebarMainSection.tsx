@@ -16,7 +16,11 @@ import {
 } from '../ui/sidebar'
 import { SidebarNavEntry } from './SidebarNavEntry'
 
-export const SidebarMainSection = async () => {
+export const SidebarMainSection = async ({
+  isLanding,
+}: {
+  isLanding?: boolean
+}) => {
   const [isLoggedIn, memberships, userCanCreateOrg] = await Promise.all([
     getIsLoggedIn(),
     getMyMemberships(),
@@ -24,7 +28,11 @@ export const SidebarMainSection = async () => {
   ])
 
   let entries = await getNavEntries()
-  entries = entries.filter((entry) => entry.sidebarSection === 'main')
+  if (isLanding) {
+    // entries = entries.filter((entry) => entry)
+  } else {
+    entries = entries.filter((entry) => entry.sidebarSection === 'main')
+  }
   return (
     <>
       <SidebarGroup>
@@ -37,7 +45,7 @@ export const SidebarMainSection = async () => {
           ))}
         </SidebarMenu>
       </SidebarGroup>
-      {ORGS.isActive && isLoggedIn && (
+      {!isLanding && ORGS.isActive && isLoggedIn && (
         <SidebarGroup>
           <SidebarGroupLabel>Organizations</SidebarGroupLabel>
           {userCanCreateOrg && memberships.length > 0 && (

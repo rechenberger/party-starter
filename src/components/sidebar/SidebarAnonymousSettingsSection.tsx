@@ -4,7 +4,7 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
 } from '@/components/ui/sidebar'
-import { LocaleSelect } from '@/i18n/LocaleSelect'
+import { LocaleSwitcher } from '@/i18n/LocaleSwitcher'
 import { ThemeSwitcher } from '../layout/ThemeSwitcher'
 
 export const SidebarAnonymousSettingsSection = async () => {
@@ -15,7 +15,7 @@ export const SidebarAnonymousSettingsSection = async () => {
       <SidebarGroup className="group-data-[collapsible=icon]:hidden">
         <SidebarGroupLabel>Settings</SidebarGroupLabel>
         <SidebarMenu>
-          <LocaleSelect className="w-full" />
+          <LocaleSwitcher variant="sidebar" />
           <ThemeSwitcher variant="sidebar" />
         </SidebarMenu>
       </SidebarGroup>

@@ -1,4 +1,4 @@
-import { Check, Globe, House, KeyRound, LogOut, UserRound } from 'lucide-react'
+import { House, KeyRound, LogOut, UserRound } from 'lucide-react'
 
 import { signOut } from '@/auth/auth'
 import {
@@ -9,16 +9,11 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu'
 import { User } from '@/db/schema-zod'
-import { LocaleSelectButton } from '@/i18n/LocaleSelect'
+import { LocaleSwitcher } from '@/i18n/LocaleSwitcher'
 import { getMyLocale } from '@/i18n/getMyLocale'
-import { localeDefinitions } from '@/i18n/locale'
 import { LOCALIZATION } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import { ActionButton } from '@/super-action/button/ActionButton'
@@ -82,28 +77,7 @@ export const UserMenuDropDownContent = async ({
         </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
-      <DropdownMenuSub>
-        <DropdownMenuSubTrigger>
-          <Globe className="size-4" />
-          <span>Change Language</span>
-        </DropdownMenuSubTrigger>
-        <DropdownMenuPortal>
-          <DropdownMenuSubContent>
-            {localeDefinitions.map((locale) => {
-              const isCurrentLocale = locale.locale === currentLocale
-              return (
-                <DropdownMenuItem
-                  key={locale.locale}
-                  disabled={isCurrentLocale}
-                >
-                  <LocaleSelectButton locale={locale} />
-                  {isCurrentLocale && <Check className="size-4" />}
-                </DropdownMenuItem>
-              )
-            })}
-          </DropdownMenuSubContent>
-        </DropdownMenuPortal>
-      </DropdownMenuSub>
+      <LocaleSwitcher variant="submenu" />
       <ThemeSwitcher variant="submenu" />
       <DropdownMenuSeparator />
       <DropdownMenuItem asChild>

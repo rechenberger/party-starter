@@ -1,5 +1,4 @@
 import { getIsLoggedIn } from '@/auth/getMyUser'
-import { LocaleSelect } from '@/i18n/LocaleSelect'
 import { ORGS } from '@/lib/starter.config'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { getMyMemberships } from '@/organization/getMyMemberships'
@@ -78,14 +77,6 @@ export const SidebarMainSection = async () => {
         </SidebarGroup>
       )}
       <div className="flex-1" />
-      {!isLoggedIn && (
-        <SidebarGroup>
-          <SidebarGroupLabel>Language</SidebarGroupLabel>
-          <SidebarMenu>
-            <LocaleSelect className="w-full" />
-          </SidebarMenu>
-        </SidebarGroup>
-      )}
     </>
   )
 }

@@ -15,6 +15,7 @@ import Link from 'next/link'
 import * as React from 'react'
 import { Suspense } from 'react'
 import { Skeleton } from '../ui/skeleton'
+import { SidebarAnonymousSettingsSection } from './SidebarAnonymousSettingsSection'
 import { SidebarMainSection } from './SidebarMainSection'
 import { SidebarOrgSection } from './SidebarOrgSection'
 import { SidebarOrgSwitcher } from './SidebarOrgSwitcher'
@@ -66,6 +67,9 @@ export const Sidebar = ({
         </Suspense>
         <Suspense>
           <SidebarAdminSection />
+        </Suspense>
+        <Suspense>
+          <SidebarAnonymousSettingsSection />
         </Suspense>
       </SidebarContent>
       <SidebarFooter>

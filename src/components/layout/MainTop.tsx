@@ -14,6 +14,7 @@ export const getNavEntries = async () => {
       name: 'Home',
       href: `/${locale}`,
       icon: <HomeIcon />,
+      sidebarSection: isLoggedIn ? undefined : 'main',
     },
     {
       name: 'Users',

@@ -7,12 +7,30 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Moon, Sun } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Monitor, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { SidebarMenuButton } from '../ui/sidebar'
 
 export function DarkModeToggle({ variant }: { variant?: 'sidebar' }) {
-  const { setTheme } = useTheme()
+  const { setTheme, theme: currentTheme } = useTheme()
+  const themes = [
+    {
+      label: 'Light',
+      icon: Sun,
+      value: 'light',
+    },
+    {
+      label: 'Dark',
+      icon: Moon,
+      value: 'dark',
+    },
+    {
+      label: 'System',
+      icon: Monitor,
+      value: 'system',
+    },
+  ]
 
   return (
     <DropdownMenu>
@@ -32,15 +50,20 @@ export function DarkModeToggle({ variant }: { variant?: 'sidebar' }) {
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme('light')}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
-          System
-        </DropdownMenuItem>
+        {themes.map((theme) => (
+          <DropdownMenuItem
+            key={theme.value}
+            onClick={() => setTheme(theme.value)}
+          >
+            <theme.icon
+              className={cn(
+                'size-4',
+                theme.value === currentTheme && 'text-primary',
+              )}
+            />
+            {theme.label}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   )

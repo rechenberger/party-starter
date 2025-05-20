@@ -2,12 +2,12 @@ import { UserButtonSuspense } from '@/auth/UserButton'
 import { getIsLoggedIn } from '@/auth/getMyUser'
 import { LocaleSelect } from '@/i18n/LocaleSelect'
 import { Suspense } from 'react'
-import { DarkModeToggle } from './DarkModeToggle'
+import { ThemeSwitcher } from './ThemeSwitcher'
 
 const UserStuffFallback = () => {
   return (
     <>
-      <DarkModeToggle />
+      <ThemeSwitcher />
       <LocaleSelect />
     </>
   )

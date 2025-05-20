@@ -5,7 +5,7 @@ import {
   SidebarMenu,
 } from '@/components/ui/sidebar'
 import { LocaleSelect } from '@/i18n/LocaleSelect'
-import { DarkModeToggle } from '../layout/DarkModeToggle'
+import { ThemeSwitcher } from '../layout/ThemeSwitcher'
 
 export const SidebarAnonymousSettingsSection = async () => {
   const isLoggedIn = await getIsLoggedIn()
@@ -16,7 +16,7 @@ export const SidebarAnonymousSettingsSection = async () => {
         <SidebarGroupLabel>Settings</SidebarGroupLabel>
         <SidebarMenu>
           <LocaleSelect className="w-full" />
-          <DarkModeToggle variant="sidebar" />
+          <ThemeSwitcher variant="sidebar" />
         </SidebarMenu>
       </SidebarGroup>
     </>

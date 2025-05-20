@@ -12,6 +12,9 @@ export const t = {
     users: 'Benutzer',
   },
   org: {
+    organization: 'Organisation',
     create: 'Organisation erstellen',
+    members: 'Mitglieder',
+    orgMembers: 'Organisationsmitglieder',
   },
 } satisfies TranslationsClient

@@ -10,7 +10,10 @@ export const t = {
     users: 'Users',
   },
   org: {
+    organization: 'Organization',
     create: 'Create Organization',
+    members: 'Members',
+    orgMembers: 'Organization Members',
   },
 }
 

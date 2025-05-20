@@ -3,6 +3,7 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
 } from '@/components/ui/sidebar'
+import { getTranslations } from '@/i18n/getTranslations'
 import { getMyMembershipOrNotFound } from '@/organization/getMyMembership'
 import { OrganizationRole } from '@/organization/organizationRoles'
 import { Building2, Home, Laugh, Users } from 'lucide-react'
@@ -14,6 +15,7 @@ const protectedViewRoles: OrganizationRole[] = ['admin']
 
 export const SidebarOrgSection = async () => {
   const { membership, org } = await getMyMembershipOrNotFound()
+  const t = await getTranslations()
 
   const items: NavEntry[] = [
     {
@@ -31,14 +33,14 @@ export const SidebarOrgSection = async () => {
 
   let settings: NavEntry[] = [
     {
-      name: 'Organization',
+      name: t.org.organization,
       href: `/org/${org.slug}/settings`,
       icon: <Building2 />,
       hidden: !protectedViewRoles.includes(membership.role),
       exactMatch: true,
     },
     {
-      name: 'Members',
+      name: t.org.members,
       href: `/org/${org.slug}/settings/members`,
       icon: <Users />,
       hidden: !defaultViewRoles.includes(membership.role),

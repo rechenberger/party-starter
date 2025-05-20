@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/table'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { getDateFnsLocale } from '@/i18n/getDateFnsLocale'
 import { cn } from '@/lib/utils'
 import {
   streamDialog,
@@ -47,6 +48,7 @@ export const NormalInviteCodesTable = async (
   await getMyMembershipOrNotFound({
     allowedRoles,
   })
+  const dateFnsLocale = await getDateFnsLocale()
 
   return (
     <>
@@ -164,13 +166,16 @@ export const NormalInviteCodesTable = async (
                       <TableCell
                         title={
                           code.expiresAt
-                            ? format(code.expiresAt, 'MMM d, yyyy HH:mm')
+                            ? format(code.expiresAt, 'MMM d, yyyy HH:mm', {
+                                locale: dateFnsLocale,
+                              })
                             : 'Never'
                         }
                       >
                         {code.expiresAt ? (
                           formatDistanceToNow(new Date(code.expiresAt), {
                             addSuffix: true,
+                            locale: dateFnsLocale,
                           })
                         ) : (
                           <span className="text-muted-foreground">Never</span>

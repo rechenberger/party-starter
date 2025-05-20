@@ -1,7 +1,5 @@
-import { UserButtonSuspense } from '@/auth/UserButton'
 import { getIsLoggedIn } from '@/auth/getMyUser'
 import { Button } from '@/components/ui/button'
-import { LocaleSelect } from '@/i18n/LocaleSelect'
 import { BRAND } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import { Github, MenuIcon } from 'lucide-react'
@@ -9,9 +7,10 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import { Sidebar } from '../sidebar/Sidebar'
 import { SidebarProvider, SidebarTrigger } from '../ui/sidebar'
-import { DarkModeToggle } from './DarkModeToggle'
 import { DevBadges } from './DevBadges'
+import { MainDashboardButton } from './MainDashboardButton'
 import { MainTopContent } from './MainTopContent'
+import { MainTopUserSettings } from './MainTopUserSettings'
 
 export const MainTop = async () => {
   const isLoggedIn = await getIsLoggedIn()
@@ -44,7 +43,6 @@ export const MainTop = async () => {
           <div className="flex-1 md:hidden" />
           <div className="flex items-center gap-4">
             <DevBadges className="max-md:hidden" />
-            <UserButtonSuspense />
             <div className="hidden items-center gap-2 text-sm font-medium md:flex">
               {BRAND.github.active && (
                 <Button variant={'ghost'} size="icon" asChild>
@@ -53,9 +51,10 @@ export const MainTop = async () => {
                   </Link>
                 </Button>
               )}
-              <DarkModeToggle />
-              {!isLoggedIn && <LocaleSelect />}
+
+              <MainTopUserSettings />
             </div>
+            <MainDashboardButton />
           </div>
         </div>
         <div className="md:hidden">

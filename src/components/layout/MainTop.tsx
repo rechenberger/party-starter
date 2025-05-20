@@ -1,4 +1,3 @@
-import { getIsLoggedIn } from '@/auth/getMyUser'
 import { Button } from '@/components/ui/button'
 import { BRAND } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
@@ -13,7 +12,6 @@ import { MainTopContent } from './MainTopContent'
 import { MainTopUserSettings } from './MainTopUserSettings'
 
 export const MainTop = async () => {
-  const isLoggedIn = await getIsLoggedIn()
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 bg-background/95 backdrop-blur-sm">
       <SidebarProvider className="min-h-auto">

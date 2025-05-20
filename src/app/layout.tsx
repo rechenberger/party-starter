@@ -1,6 +1,5 @@
 import { isDev } from '@/auth/dev'
 import { Toaster } from '@/components/ui/toaster'
-import { DEFAULT_LOCALE } from '@/i18n/locale'
 import { BASE_URL } from '@/lib/config'
 import { BRAND } from '@/lib/starter.config'
 import { ActionCommandProvider } from '@/super-action/command/ActionCommandProvider'
@@ -28,7 +27,7 @@ export default async function Layout({
   children: React.ReactNode
 }) {
   return (
-    <html lang={DEFAULT_LOCALE} suppressHydrationWarning>
+    <html suppressHydrationWarning>
       <body className="bg-background min-h-[100svh] flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SessionProvider>{children}</SessionProvider>

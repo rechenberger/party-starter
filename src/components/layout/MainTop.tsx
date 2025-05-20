@@ -56,10 +56,10 @@ export const MainTop = async () => {
               <DarkModeToggle />
               {!isLoggedIn && <LocaleSelect />}
             </div>
-            <div className="md:hidden">
-              <Sidebar collapsible="icon" isLanding={true} />
-            </div>
           </div>
+        </div>
+        <div className="md:hidden">
+          <Sidebar collapsible="icon" isLanding={true} />
         </div>
       </SidebarProvider>
     </header>

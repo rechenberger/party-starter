@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { ThemeSwitcher } from './layout/ThemeSwitcher'
 import { SimpleUserAvatar } from './simple/SimpleUserAvatar'
 
 export const UserMenuDropDownContent = async ({
@@ -103,6 +104,7 @@ export const UserMenuDropDownContent = async ({
           </DropdownMenuSubContent>
         </DropdownMenuPortal>
       </DropdownMenuSub>
+      <ThemeSwitcher variant="submenu" />
       <DropdownMenuSeparator />
       <DropdownMenuItem asChild>
         <Link href={LOCALIZATION.isActive ? `/${currentLocale}` : '/'}>

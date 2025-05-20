@@ -2,70 +2,70 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
 } from '@/components/ui/sidebar'
+import { getTranslations } from '@/i18n/getTranslations'
 import { getMyMembershipOrNotFound } from '@/organization/getMyMembership'
 import { OrganizationRole } from '@/organization/organizationRoles'
-import { Building2, Laugh, Users } from 'lucide-react'
-import Link from 'next/link'
+import { Building2, Home, Laugh, Users } from 'lucide-react'
+import { NavEntry } from '../layout/nav'
+import { SidebarNavEntry } from './SidebarNavEntry'
 
 const defaultViewRoles: OrganizationRole[] = ['admin', 'member']
 const protectedViewRoles: OrganizationRole[] = ['admin']
 
 export const SidebarOrgSection = async () => {
   const { membership, org } = await getMyMembershipOrNotFound()
+  const t = await getTranslations()
 
-  const items = [
+  const items: NavEntry[] = [
     {
-      title: 'Say Hello',
-      url: `/org/${org.slug}?say=hello`,
-      icon: Laugh,
+      name: 'Dashboard',
+      href: `/org/${org.slug}`,
+      icon: <Home />,
+      exactMatch: true,
+    },
+    {
+      name: 'Say Hello',
+      href: `/org/${org.slug}?say=hello`,
+      icon: <Laugh />,
     },
   ]
 
-  const settings = [
+  let settings: NavEntry[] = [
     {
-      title: 'Organization',
-      url: `/org/${org.slug}/settings`,
-      icon: Building2,
-      show: protectedViewRoles.includes(membership.role),
+      name: t.org.organization,
+      href: `/org/${org.slug}/settings`,
+      icon: <Building2 />,
+      hidden: !protectedViewRoles.includes(membership.role),
+      exactMatch: true,
     },
     {
-      title: 'Members',
-      url: `/org/${org.slug}/settings/members`,
-      icon: Users,
-      show: defaultViewRoles.includes(membership.role),
+      name: t.org.members,
+      href: `/org/${org.slug}/settings/members`,
+      icon: <Users />,
+      hidden: !defaultViewRoles.includes(membership.role),
     },
   ]
 
-  const settingsToShow = settings.filter((setting) => setting.show)
+  settings = settings.filter((setting) => !setting.hidden)
 
   return (
     <>
       <SidebarGroup>
-        <SidebarGroupLabel>Org Stuff for {org.name}</SidebarGroupLabel>
+        <SidebarGroupLabel>{org.name}</SidebarGroupLabel>
         <SidebarMenu>
           {items.map((item) => (
-            <SidebarMenuButton key={item.title} tooltip={item.title} asChild>
-              <Link href={item.url}>
-                {item.icon && <item.icon />}
-                <span>{item.title}</span>
-              </Link>
-            </SidebarMenuButton>
+            <SidebarNavEntry key={item.href} entry={item} />
           ))}
         </SidebarMenu>
       </SidebarGroup>
-      {settingsToShow.length > 0 && (
+      <div className="flex-1" />
+      {settings.length > 0 && (
         <SidebarGroup>
           <SidebarGroupLabel>Settings</SidebarGroupLabel>
           <SidebarMenu>
-            {settingsToShow.map((setting) => (
-              <SidebarMenuButton key={setting.title} asChild>
-                <Link href={setting.url}>
-                  {setting.icon && <setting.icon />}
-                  <span>{setting.title}</span>
-                </Link>
-              </SidebarMenuButton>
+            {settings.map((item) => (
+              <SidebarNavEntry key={item.href} entry={item} />
             ))}
           </SidebarMenu>
         </SidebarGroup>

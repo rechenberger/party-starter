@@ -3,7 +3,7 @@ import { LOCALIZATION } from '@/lib/starter.config'
 import { match } from '@formatjs/intl-localematcher'
 import Negotiator from 'negotiator'
 import { cookies, headers } from 'next/headers'
-import { DEFAULT_LOCALE, Locale, LOCALES } from './locale'
+import { COOKIE_NAME, DEFAULT_LOCALE, Locale, LOCALES } from './locale'
 
 export const getMyLocale = async () => {
   if (!LOCALIZATION.isActive) {
@@ -34,7 +34,8 @@ const getFromParams = async () => {
 
 const getFromCookies = async () => {
   const cookieStore = await cookies()
-  const cookieLocale = cookieStore.get('locale')?.value
+  const cookieLocale = cookieStore.get(COOKIE_NAME)?.value
+
   if (cookieLocale) {
     return cookieLocale
   }

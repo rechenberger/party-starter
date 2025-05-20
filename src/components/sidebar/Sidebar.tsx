@@ -14,15 +14,21 @@ import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
 import { Suspense } from 'react'
+import { DevBadges } from '../layout/DevBadges'
 import { Skeleton } from '../ui/skeleton'
+import { SidebarAnonymousSettingsSection } from './SidebarAnonymousSettingsSection'
 import { SidebarMainSection } from './SidebarMainSection'
 import { SidebarOrgSection } from './SidebarOrgSection'
 import { SidebarOrgSwitcher } from './SidebarOrgSwitcher'
 
 export const Sidebar = ({
   orgSlug,
+  isLanding,
   ...props
-}: React.ComponentProps<typeof UiSidebar> & { orgSlug?: string }) => {
+}: React.ComponentProps<typeof UiSidebar> & {
+  orgSlug?: string
+  isLanding?: boolean
+}) => {
   return (
     <UiSidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -61,14 +67,20 @@ export const Sidebar = ({
           {!!orgSlug && ORGS.isActive ? (
             <SidebarOrgSection />
           ) : (
-            <SidebarMainSection />
+            <SidebarMainSection isLanding={isLanding} />
           )}
+        </Suspense>
+        {!isLanding && (
+          <Suspense>
+            <SidebarAdminSection />
+          </Suspense>
+        )}
+        <Suspense>
+          <SidebarAnonymousSettingsSection />
         </Suspense>
       </SidebarContent>
       <SidebarFooter>
-        <Suspense>
-          <SidebarAdminSection />
-        </Suspense>
+        <DevBadges className="px-2 group-data-[collapsible=icon]:hidden" />
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
           <SidebarUserSection />
         </Suspense>

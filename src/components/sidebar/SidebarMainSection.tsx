@@ -1,3 +1,4 @@
+import { getIsLoggedIn } from '@/auth/getMyUser'
 import { ORGS } from '@/lib/starter.config'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { getMyMemberships } from '@/organization/getMyMemberships'
@@ -5,24 +6,50 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import SeededAvatar from '../SeededAvatar'
+import { getNavEntries } from '../layout/nav'
 import {
   SidebarGroup,
+  SidebarGroupAction,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
 } from '../ui/sidebar'
+import { SidebarNavEntry } from './SidebarNavEntry'
 
-export const SidebarMainSection = async () => {
-  const [memberships, userCanCreateOrg] = await Promise.all([
+export const SidebarMainSection = async ({
+  isLanding,
+}: {
+  isLanding?: boolean
+}) => {
+  const [isLoggedIn, memberships, userCanCreateOrg] = await Promise.all([
+    getIsLoggedIn(),
     getMyMemberships(),
     canUserCreateOrg(),
   ])
 
+  let entries = await getNavEntries({ filter: isLanding ? 'landing' : 'main' })
   return (
     <>
-      {ORGS.isActive && (
+      <SidebarGroup>
+        {/* <SidebarGroupLabel>Navigation</SidebarGroupLabel> */}
+        <SidebarMenu>
+          {entries.map((entry) => (
+            <Fragment key={entry.href}>
+              <SidebarNavEntry entry={entry} />
+            </Fragment>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+      {!isLanding && ORGS.isActive && isLoggedIn && (
         <SidebarGroup>
           <SidebarGroupLabel>Organizations</SidebarGroupLabel>
+          {userCanCreateOrg && memberships.length > 0 && (
+            <SidebarGroupAction title="Create Organization">
+              <Link href={`/org/create`}>
+                <Plus className="size-4" />
+              </Link>
+            </SidebarGroupAction>
+          )}
           <SidebarMenu>
             {memberships.map((membership) => (
               <Fragment key={membership.organization.id}>
@@ -41,7 +68,7 @@ export const SidebarMainSection = async () => {
                 </SidebarMenuButton>
               </Fragment>
             ))}
-            {userCanCreateOrg && (
+            {userCanCreateOrg && memberships.length === 0 && (
               <SidebarMenuButton tooltip="Create Organization" asChild>
                 <Link href={`/org/create`}>
                   <Plus size={20} />
@@ -52,6 +79,7 @@ export const SidebarMainSection = async () => {
           </SidebarMenu>
         </SidebarGroup>
       )}
+      <div className="flex-1" />
     </>
   )
 }

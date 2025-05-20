@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 import { Separator } from './ui/separator'
 import { SidebarTrigger } from './ui/sidebar'
 
-export const TopHeader = ({
+export const TopHeader = async ({
   children,
   disableSeparator = false,
   hideIfSecondTopHeaderExists = false,
@@ -13,7 +13,7 @@ export const TopHeader = ({
   disableSeparator?: boolean
   hideIfSecondTopHeaderExists?: boolean
 }) => {
-  if (!SIDEBAR.activeInMain) {
+  if (!(await SIDEBAR.activeInMain())) {
     return children
   }
 

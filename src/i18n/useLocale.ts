@@ -2,10 +2,8 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useContext } from 'react'
-import { Locale, LOCALES } from './locale'
 import { LocaleContext } from './LocaleContext'
-
-const COOKIE_NAME = 'locale'
+import { COOKIE_NAME, LOCALES, Locale } from './locale'
 
 const setCookie = (name: string, value: string) => {
   document.cookie = `${name}=${value}; path=/; max-age=31536000` // 1 year
@@ -23,6 +21,7 @@ export const useSetLocale = () => {
   return useCallback(
     (locale: Locale) => {
       setCookie(COOKIE_NAME, locale)
+
       const isLocalePath = LOCALES.some((locale) =>
         pathname.startsWith(`/${locale}`),
       )

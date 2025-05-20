@@ -42,7 +42,7 @@ export const ChangeUsernameFormClient = ({
 
   const form = useLoginForm({
     defaultValues: {
-      username,
+      username: username ?? '',
     },
     disabled,
   })

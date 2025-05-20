@@ -2,6 +2,7 @@ import { getMyUserId } from '@/auth/getMyUser'
 import { TopHeader } from '@/components/TopHeader'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { getTranslations } from '@/i18n/getTranslations'
 import { ParamsWrapper } from '@/lib/paramsServerContext'
 import {
   getMyMembershipOrNotFound,
@@ -22,6 +23,8 @@ const allowedRolesEdit: OrganizationRole[] = ['admin']
 
 export default ParamsWrapper(
   async ({ params }: { params: Promise<{ orgSlug: string }> }) => {
+    const t = await getTranslations()
+
     const { orgSlug } = await params
     const { membership: myMembership } = await getMyMembershipOrNotFound({
       allowedRoles: allowedRolesView,
@@ -182,9 +185,7 @@ export default ParamsWrapper(
 
     return (
       <>
-        <TopHeader>
-          Organization Members for {organization?.name ?? orgSlug}
-        </TopHeader>
+        <TopHeader>{t.org.orgMembers}</TopHeader>
         {organization && (
           <>
             <MemberList

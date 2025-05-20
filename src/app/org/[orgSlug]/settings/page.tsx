@@ -49,6 +49,7 @@ export default ParamsWrapper(async () => {
                     'use server'
                     await getMyMembershipOrThrow({
                       allowedRoles,
+                      orgSlug: org.slug,
                     })
 
                     await db

@@ -4,7 +4,7 @@ export const LOCALES = ['en', 'de'] as const
 export const Locale = z.enum(LOCALES)
 export type Locale = z.infer<typeof Locale>
 export const DEFAULT_LOCALE: Locale = 'en'
-export const COOKIE_NAME = 'Next-Locale'
+export const COOKIE_NAME = 'locale'
 
 export const localeDefinitions: {
   locale: Locale

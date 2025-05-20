@@ -55,6 +55,7 @@ export const SidebarOrgSection = async () => {
           ))}
         </SidebarMenu>
       </SidebarGroup>
+      <div className="flex-1" />
       {settingsToShow.length > 0 && (
         <SidebarGroup>
           <SidebarGroupLabel>Settings</SidebarGroupLabel>

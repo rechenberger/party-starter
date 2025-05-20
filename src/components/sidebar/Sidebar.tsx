@@ -64,11 +64,11 @@ export const Sidebar = ({
             <SidebarMainSection />
           )}
         </Suspense>
-      </SidebarContent>
-      <SidebarFooter>
         <Suspense>
           <SidebarAdminSection />
         </Suspense>
+      </SidebarContent>
+      <SidebarFooter>
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
           <SidebarUserSection />
         </Suspense>

@@ -77,6 +77,7 @@ export const SidebarMainSection = async () => {
           </SidebarMenu>
         </SidebarGroup>
       )}
+      <div className="flex-1" />
       {!isLoggedIn && (
         <SidebarGroup>
           <SidebarGroupLabel>Language</SidebarGroupLabel>

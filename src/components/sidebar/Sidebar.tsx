@@ -14,6 +14,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
 import { Suspense } from 'react'
+import { DevBadges } from '../layout/DevBadges'
 import { Skeleton } from '../ui/skeleton'
 import { SidebarAnonymousSettingsSection } from './SidebarAnonymousSettingsSection'
 import { SidebarMainSection } from './SidebarMainSection'
@@ -73,6 +74,7 @@ export const Sidebar = ({
         </Suspense>
       </SidebarContent>
       <SidebarFooter>
+        <DevBadges className="px-2" />
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
           <SidebarUserSection />
         </Suspense>

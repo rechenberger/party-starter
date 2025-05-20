@@ -1,4 +1,4 @@
-import { Check, Globe, KeyRound, LogOut, UserRound } from 'lucide-react'
+import { Check, Globe, House, KeyRound, LogOut, UserRound } from 'lucide-react'
 
 import { signOut } from '@/auth/auth'
 import {
@@ -16,11 +16,13 @@ import {
   DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu'
 import { User } from '@/db/schema-zod'
+import { LocaleSelectButton } from '@/i18n/LocaleSelect'
 import { getMyLocale } from '@/i18n/getMyLocale'
 import { localeDefinitions } from '@/i18n/locale'
-import { LocaleSelectButton } from '@/i18n/LocaleSelect'
+import { LOCALIZATION } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import { ActionButton } from '@/super-action/button/ActionButton'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { SimpleUserAvatar } from './simple/SimpleUserAvatar'
 
@@ -102,6 +104,12 @@ export const UserMenuDropDownContent = async ({
         </DropdownMenuPortal>
       </DropdownMenuSub>
       <DropdownMenuSeparator />
+      <DropdownMenuItem asChild>
+        <Link href={LOCALIZATION.isActive ? `/${currentLocale}` : '/'}>
+          <House className="size-4" />
+          Homepage
+        </Link>
+      </DropdownMenuItem>
       <DropdownMenuItem asChild>
         <ActionButton
           variant={'ghost'}

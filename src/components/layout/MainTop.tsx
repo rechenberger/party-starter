@@ -1,7 +1,7 @@
 import { getIsAdmin } from '@/auth/getIsAdmin'
 import { getIsLoggedIn } from '@/auth/getMyUser'
 import { getMyLocale } from '@/i18n/getMyLocale'
-import { Building2, HomeIcon, UserIcon, UsersIcon } from 'lucide-react'
+import { Building2, HomeIcon, UsersIcon } from 'lucide-react'
 import { MainTopNavEntries } from './MainTopNavEntries'
 
 export const getNavEntries = async () => {
@@ -16,24 +16,18 @@ export const getNavEntries = async () => {
       icon: <HomeIcon />,
     },
     {
-      name: 'Me',
-      href: '/auth/me',
-      hidden: !isLoggedIn,
-      icon: <UserIcon />,
-    },
-    {
       name: 'Users',
       href: '/users',
       hidden: !isAdminOrDev,
-      hideInSidebar: true,
       icon: <UsersIcon />,
-      adminOnly: true,
+      sidebarSection: 'admin',
     },
     {
-      name: 'App',
+      name: 'Dashboard',
       href: '/org',
       hidden: !isLoggedIn,
       icon: <Building2 />,
+      sidebarSection: 'main',
     },
   ].filter((entry) => !entry.hidden)
 

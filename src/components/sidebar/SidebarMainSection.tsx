@@ -6,8 +6,8 @@ import { getMyMemberships } from '@/organization/getMyMemberships'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment } from 'react'
-import { getNavEntries } from '../layout/MainTop'
 import SeededAvatar from '../SeededAvatar'
+import { getNavEntries } from '../layout/MainTop'
 import {
   SidebarGroup,
   SidebarGroupAction,
@@ -25,7 +25,7 @@ export const SidebarMainSection = async () => {
   ])
 
   let entries = await getNavEntries()
-  entries = entries.filter((entry) => !entry.hideInSidebar)
+  entries = entries.filter((entry) => entry.sidebarSection === 'main')
   return (
     <>
       <SidebarGroup>

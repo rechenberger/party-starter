@@ -11,7 +11,9 @@ export const SidebarAdminSection = async () => {
   const isAdminOrDev = await getIsAdmin({ allowDev: true })
   if (!isAdminOrDev) return null
   const entries = await getNavEntries()
-  const adminEntries = entries.filter((entry) => entry.adminOnly)
+  const adminEntries = entries.filter(
+    (entry) => entry.sidebarSection === 'admin',
+  )
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Admin</SidebarGroupLabel>

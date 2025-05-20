@@ -16,8 +16,8 @@ import { MainTopContent } from './MainTopContent'
 export const MainTop = async () => {
   const isLoggedIn = await getIsLoggedIn()
   return (
-    <SidebarProvider className="min-h-auto">
-      <header className="sticky top-0 z-50 w-full border-b">
+    <header className="sticky top-0 z-50 w-full border-b-2 bg-background/95 backdrop-blur-sm">
+      <SidebarProvider className="min-h-auto">
         <div className="container flex items-center gap-2 md:gap-6 py-6">
           <SidebarTrigger
             className="md:hidden"
@@ -57,7 +57,7 @@ export const MainTop = async () => {
             </div>
           </div>
         </div>
-      </header>
-    </SidebarProvider>
+      </SidebarProvider>
+    </header>
   )
 }

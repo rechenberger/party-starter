@@ -25,7 +25,7 @@ export const getNavEntries = async () => {
     },
     {
       name: 'Dashboard',
-      href: '/org',
+      href: '/app',
       hidden: !isLoggedIn,
       icon: <Building2 />,
       sidebarSection: 'main',

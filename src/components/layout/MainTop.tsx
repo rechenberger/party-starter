@@ -13,7 +13,7 @@ import { DarkModeToggle } from './DarkModeToggle'
 import { DevBadges } from './DevBadges'
 import { MainTopContent } from './MainTopContent'
 
-export const MainTopResponsive = async () => {
+export const MainTop = async () => {
   const isLoggedIn = await getIsLoggedIn()
   return (
     <SidebarProvider className="min-h-auto">

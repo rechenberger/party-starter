@@ -3,6 +3,15 @@ import { getIsLoggedIn } from '@/auth/getMyUser'
 import { getMyLocale } from '@/i18n/getMyLocale'
 import { Building2, Home, Users } from 'lucide-react'
 
+export type NavEntry = {
+  name: string
+  href: string
+  icon: React.ReactNode
+  mainSidebarSection?: 'main' | 'admin'
+  showOnLanding?: boolean
+  hidden?: boolean
+}
+
 export const getNavEntries = async ({
   filter,
 }: {
@@ -12,7 +21,7 @@ export const getNavEntries = async ({
   const isLoggedIn = await getIsLoggedIn()
   const locale = await getMyLocale()
 
-  const entries = [
+  let entries: NavEntry[] = [
     {
       name: 'Home',
       href: `/${locale}`,
@@ -36,7 +45,9 @@ export const getNavEntries = async ({
       mainSidebarSection: 'main',
       showOnLanding: false,
     },
-  ].filter((entry) => !entry.hidden)
+  ]
+
+  entries = entries.filter((entry) => !entry.hidden)
 
   if (filter === 'landing') {
     return entries.filter((entry) => entry.showOnLanding)
@@ -44,5 +55,3 @@ export const getNavEntries = async ({
     return entries.filter((entry) => entry.mainSidebarSection === filter)
   }
 }
-
-export type NavEntry = Awaited<ReturnType<typeof getNavEntries>>[number]

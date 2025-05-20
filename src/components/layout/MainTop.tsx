@@ -23,7 +23,11 @@ export const MainTop = async () => {
             className="md:hidden"
             icon={<MenuIcon className="size-4" />}
           />
-          <Link href="/" className="flex flex-row items-center gap-3">
+          <Link
+            href="/"
+            prefetch={false}
+            className="flex flex-row items-center gap-3"
+          >
             <div className="text-xl">
               <BRAND.TextLogo />
             </div>

@@ -15,6 +15,7 @@ export const getNavEntries = async () => {
       href: `/${locale}`,
       icon: <HomeIcon />,
       mainSidebarSection: isLoggedIn ? undefined : 'main',
+      showOnLanding: true,
     },
     {
       name: 'Users',
@@ -22,6 +23,7 @@ export const getNavEntries = async () => {
       hidden: !isAdminOrDev,
       icon: <UsersIcon />,
       mainSidebarSection: 'admin',
+      showOnLanding: true,
     },
     {
       name: 'Dashboard',
@@ -29,6 +31,7 @@ export const getNavEntries = async () => {
       hidden: !isLoggedIn,
       icon: <Building2 />,
       mainSidebarSection: 'main',
+      showOnLanding: false,
     },
   ].filter((entry) => !entry.hidden)
 
@@ -38,7 +41,8 @@ export const getNavEntries = async () => {
 export type NavEntry = Awaited<ReturnType<typeof getNavEntries>>[number]
 
 export const MainTopContent = async () => {
-  const entries = await getNavEntries()
+  let entries = await getNavEntries()
+  entries = entries.filter((entry) => entry.showOnLanding)
 
   return <MainTopNavEntries entries={entries} />
 }

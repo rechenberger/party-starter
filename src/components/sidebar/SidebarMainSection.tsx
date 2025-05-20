@@ -29,7 +29,7 @@ export const SidebarMainSection = async ({
 
   let entries = await getNavEntries()
   if (isLanding) {
-    // entries = entries.filter((entry) => entry)
+    entries = entries.filter((entry) => entry.showOnLanding)
   } else {
     entries = entries.filter((entry) => entry.mainSidebarSection === 'main')
   }

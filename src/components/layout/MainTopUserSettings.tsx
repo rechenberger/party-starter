@@ -4,7 +4,7 @@ import { LocaleSwitcher } from '@/i18n/LocaleSwitcher'
 import { Suspense } from 'react'
 import { ThemeSwitcher } from './ThemeSwitcher'
 
-const UserStuffFallback = () => {
+const Fallback = () => {
   return (
     <>
       <LocaleSwitcher />
@@ -13,7 +13,7 @@ const UserStuffFallback = () => {
   )
 }
 
-const UserStuff = async () => {
+const UserSettings = async () => {
   const isLoggedIn = await getIsLoggedIn()
   if (isLoggedIn) {
     return (
@@ -22,13 +22,13 @@ const UserStuff = async () => {
       </>
     )
   }
-  return <UserStuffFallback />
+  return <Fallback />
 }
 
 export const MainTopUserSettings = () => {
   return (
-    <Suspense fallback={<UserStuffFallback />}>
-      <UserStuff />
+    <Suspense fallback={<Fallback />}>
+      <UserSettings />
     </Suspense>
   )
 }

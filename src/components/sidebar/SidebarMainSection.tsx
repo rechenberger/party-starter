@@ -31,7 +31,7 @@ export const SidebarMainSection = async ({
   if (isLanding) {
     // entries = entries.filter((entry) => entry)
   } else {
-    entries = entries.filter((entry) => entry.sidebarSection === 'main')
+    entries = entries.filter((entry) => entry.mainSidebarSection === 'main')
   }
   return (
     <>

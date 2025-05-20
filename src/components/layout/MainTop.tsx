@@ -14,21 +14,21 @@ export const getNavEntries = async () => {
       name: 'Home',
       href: `/${locale}`,
       icon: <HomeIcon />,
-      sidebarSection: isLoggedIn ? undefined : 'main',
+      mainSidebarSection: isLoggedIn ? undefined : 'main',
     },
     {
       name: 'Users',
       href: '/users',
       hidden: !isAdminOrDev,
       icon: <UsersIcon />,
-      sidebarSection: 'admin',
+      mainSidebarSection: 'admin',
     },
     {
       name: 'Dashboard',
       href: '/app',
       hidden: !isLoggedIn,
       icon: <Building2 />,
-      sidebarSection: 'main',
+      mainSidebarSection: 'main',
     },
   ].filter((entry) => !entry.hidden)
 

@@ -13,8 +13,10 @@ import { SidebarNavEntry } from './SidebarNavEntry'
 const defaultViewRoles: OrganizationRole[] = ['admin', 'member']
 const protectedViewRoles: OrganizationRole[] = ['admin']
 
-export const SidebarOrgSection = async () => {
-  const { membership, org } = await getMyMembershipOrNotFound()
+export const SidebarOrgSection = async ({ orgSlug }: { orgSlug: string }) => {
+  const { membership, org } = await getMyMembershipOrNotFound({
+    orgSlug,
+  })
   const t = await getTranslations()
 
   const items: NavEntry[] = [

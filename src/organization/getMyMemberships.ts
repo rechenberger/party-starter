@@ -14,6 +14,9 @@ export const getMemberships = async ({ userId }: { userId: string }) => {
     },
   })
   superCache.userOrgMemberships({ userId }).tag()
+  for (const membership of memberships) {
+    superCache.org({ id: membership.organization.id }).tag()
+  }
 
   return memberships
 }

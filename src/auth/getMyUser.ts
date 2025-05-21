@@ -26,14 +26,14 @@ export const getIsLoggedIn = async () => {
 
 export const getUserById = async (id: string) => {
   'use cache'
+  superCache.user({ id }).tag()
+
   const user = await db.query.users.findFirst({
     where: eq(users.id, id),
   })
   if (!user) {
-    superCache.users().tag()
     return undefined
   }
-  superCache.user({ id: user.id }).tag()
   return omit(user, ['passwordHash'])
 }
 

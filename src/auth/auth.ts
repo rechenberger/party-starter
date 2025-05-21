@@ -56,21 +56,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   events: {
     createUser: ({ user }) => {
-      superCache.users().revalidate()
       if (user.id) {
         superCache.user({ id: user.id }).revalidate()
+      } else {
+        superCache.users().revalidate()
       }
     },
     linkAccount: ({ user }) => {
-      superCache.users().revalidate()
       if (user.id) {
         superCache.user({ id: user.id }).revalidate()
+      } else {
+        superCache.users().revalidate()
       }
     },
     updateUser: ({ user }) => {
-      superCache.users().revalidate()
       if (user.id) {
         superCache.user({ id: user.id }).revalidate()
+      } else {
+        superCache.users().revalidate()
       }
     },
   },

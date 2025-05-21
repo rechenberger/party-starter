@@ -64,7 +64,7 @@ export const getMyMembership = async ({
   if (!userId || !orgSlug) {
     return null
   }
-  return getMembership({
+  return await getMembership({
     allowedRoles,
     orgSlug,
     userId,

@@ -1,5 +1,6 @@
 import { db } from '@/db/db'
 import { users } from '@/db/schema-auth'
+import { superCache } from '@/lib/superCache'
 import { eq } from 'drizzle-orm'
 import { omit } from 'lodash-es'
 import { auth } from './auth'
@@ -23,14 +24,23 @@ export const getIsLoggedIn = async () => {
   return !!userId
 }
 
+export const getUserById = async (id: string) => {
+  'use cache'
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, id),
+  })
+  if (!user) {
+    superCache.users().tag()
+    return undefined
+  }
+  superCache.user({ id: user.id }).tag()
+  return omit(user, ['passwordHash'])
+}
+
 export const getMyUser = async () => {
   const userId = await getMyUserId()
-  if (!userId) return null
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, userId),
-  })
-  const parsed = omit(user, ['passwordHash'])
-  return parsed
+  if (!userId) return undefined
+  return getUserById(userId)
 }
 
 export const getMyUserOrThrow = async () => {

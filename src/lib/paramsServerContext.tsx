@@ -26,7 +26,9 @@ export const ParamsWrapper = <ComponentProps,>(
       })
       .parse(props)
     paramsContext.set(parsedProps.params)
+
     const locale = await getMyLocale()
+
     return (
       <LocaleProvider value={locale}>
         <Component {...(props as any)} />

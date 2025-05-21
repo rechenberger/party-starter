@@ -1,4 +1,4 @@
-import { type t as enT } from './translations.en'
+import { TranslationsClient } from './translations.en'
 
 export const t = {
   welcome: {
@@ -11,4 +11,10 @@ export const t = {
   standardWords: {
     users: 'Benutzer',
   },
-} satisfies typeof enT
+  org: {
+    organization: 'Organisation',
+    create: 'Organisation erstellen',
+    members: 'Mitglieder',
+    orgMembers: 'Organisationsmitglieder',
+  },
+} satisfies TranslationsClient

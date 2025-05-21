@@ -9,4 +9,12 @@ export const t = {
   standardWords: {
     users: 'Users',
   },
+  org: {
+    organization: 'Organization',
+    create: 'Create Organization',
+    members: 'Members',
+    orgMembers: 'Organization Members',
+  },
 }
+
+export type TranslationsClient = typeof t

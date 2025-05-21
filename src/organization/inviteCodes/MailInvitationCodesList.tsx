@@ -13,6 +13,7 @@ import {
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { User } from '@/db/schema-zod'
+import { getDateFnsLocale } from '@/i18n/getDateFnsLocale'
 import { ORGS } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import {
@@ -129,6 +130,8 @@ export const MailInvitationCodesList = async (
     allowedRoles,
   })
 
+  const dateFnsLocale = await getDateFnsLocale()
+
   return (
     <>
       <Card>
@@ -241,12 +244,15 @@ export const MailInvitationCodesList = async (
                       <TableCell
                         title={
                           code.updatedAt
-                            ? format(code.updatedAt, 'MMM d, yyyy HH:mm')
+                            ? format(code.updatedAt, 'MMM d, yyyy HH:mm', {
+                                locale: dateFnsLocale,
+                              })
                             : 'Never'
                         }
                       >
                         {formatDistanceToNow(new Date(code.updatedAt), {
                           addSuffix: true,
+                          locale: dateFnsLocale,
                         })}
                       </TableCell>
                       <TableCell>

@@ -26,16 +26,17 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Organization, OrganizationMembership, User } from '@/db/schema-zod'
+import { useDateFnsLocale } from '@/i18n/useDateFnsLocale'
 import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { formatDistanceToNow } from 'date-fns'
+import { format, formatDistanceToNow } from 'date-fns'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useMemo, useState } from 'react'
 import {
-  getOrganizationRole,
   OrganizationRole,
+  getOrganizationRole,
   organizationRoleDefinitions,
 } from './organizationRoles'
 
@@ -64,6 +65,7 @@ export const MemberList = ({
   }>
   isAdmin: boolean
 }) => {
+  const dateFnsLocale = useDateFnsLocale()
   const { data: session } = useSession()
   const myUserId = session?.user?.id
 
@@ -100,8 +102,8 @@ export const MemberList = ({
                 <CardTitle>{organization.name}</CardTitle>
                 <CardDescription>
                   Created{' '}
-                  {formatDistanceToNow(new Date(organization.createdAt), {
-                    addSuffix: true,
+                  {format(organization.createdAt, 'PPP', {
+                    locale: dateFnsLocale,
                   })}
                 </CardDescription>
               </div>
@@ -163,6 +165,7 @@ export const MemberList = ({
                       <TableCell className="text-muted-foreground">
                         {formatDistanceToNow(new Date(membership.createdAt), {
                           addSuffix: true,
+                          locale: dateFnsLocale,
                         })}
                       </TableCell>
                       <TableCell>

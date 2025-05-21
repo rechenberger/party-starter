@@ -45,7 +45,6 @@ export const sendOrgInviteMail = async (params: {
     )
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM,
       to: receiverEmail,
       subject: `Join ${orgName} on ${BRAND.name}`,
       html: emailHtml,

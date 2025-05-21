@@ -26,12 +26,10 @@ export default async function Layout({
   params,
 }: {
   children: React.ReactNode
-  params: Promise<{
-    orgSlug?: string
-    locale?: string
-  }>
+  params: Promise<unknown>
 }) {
-  console.log({ params: await params })
+  await params
+  // console.log({ params: await params })
 
   return (
     <html suppressHydrationWarning>

@@ -22,7 +22,7 @@ import {
 import { streamRevalidatePath } from '@/super-action/action/streamRevalidatePath'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { ActionWrapper } from '@/super-action/button/ActionWrapper'
-import { eq } from 'drizzle-orm'
+import { asc, eq } from 'drizzle-orm'
 import { Check } from 'lucide-react'
 import { Metadata } from 'next'
 import { Fragment } from 'react'
@@ -40,6 +40,7 @@ const getUsers = async ({ filter }: { filter?: 'admins' }) => {
       accounts: true,
     },
     where: filter === 'admins' ? eq(usersTable.isAdmin, true) : undefined,
+    orderBy: [asc(usersTable.createdAt)],
   })
 
   return users

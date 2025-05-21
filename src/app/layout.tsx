@@ -28,8 +28,7 @@ export default async function Layout({
   children: React.ReactNode
   params: Promise<unknown>
 }) {
-  await params
-  // console.log({ params: await params })
+  await params // Need to await params here, otherwise ParamsWrapper does not work in dev (turbopack)
 
   return (
     <html suppressHydrationWarning>

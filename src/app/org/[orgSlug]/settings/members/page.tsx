@@ -16,7 +16,6 @@ import { OrganizationRole } from '@/organization/organizationRoles'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { and, desc, eq, isNull } from 'drizzle-orm'
 import { map } from 'lodash-es'
-import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 const allowedRolesView: OrganizationRole[] = ['admin', 'member']
@@ -135,7 +134,6 @@ export default ParamsWrapper(
 
         superCache.orgMembers({ orgId: org.id }).revalidate()
         superCache.userOrgMemberships({ userId: data.userId }).revalidate()
-        revalidatePath('/', 'layout')
       })
     }
     const kickUserAction = async (data: { userId: string }) => {

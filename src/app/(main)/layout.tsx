@@ -7,7 +7,8 @@ export default async function Layout({
 }: {
   children: React.ReactNode
 }) {
-  if (SIDEBAR.activeInMain) {
+  const activeInMain = await SIDEBAR.activeInMain()
+  if (activeInMain) {
     return <SidebarLayout>{children}</SidebarLayout>
   }
   return <MainTopLayout>{children}</MainTopLayout>

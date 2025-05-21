@@ -46,5 +46,8 @@ export const LOCALIZATION = {
 }
 
 export const SIDEBAR = {
-  activeInMain: true,
+  activeInMain: async () =>
+    await import('@/auth/getMyUser').then(({ getIsLoggedIn }) =>
+      getIsLoggedIn(),
+    ),
 }

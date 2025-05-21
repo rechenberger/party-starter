@@ -1,3 +1,4 @@
+import { superCache } from '@/lib/superCache'
 import {
   streamToast,
   superAction,
@@ -28,6 +29,8 @@ export const ChangePasswordForm = async ({
             const description = redirectUrl
               ? 'Redirecting...'
               : 'Your password has been changed'
+
+            superCache.user({ id: userId }).revalidate()
 
             streamToast({
               title: 'Password Changed!',

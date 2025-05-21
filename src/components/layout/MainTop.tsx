@@ -1,79 +1,64 @@
-import { UserButtonSuspense } from '@/auth/UserButton'
-import { getIsAdmin } from '@/auth/getIsAdmin'
-import { getIsLoggedIn } from '@/auth/getMyUser'
-import { DarkModeToggle } from '@/components/layout/DarkModeToggle'
 import { Button } from '@/components/ui/button'
-import { getMyLocale } from '@/i18n/getMyLocale'
 import { BRAND } from '@/lib/starter.config'
-import { Github } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Github, MenuIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Suspense } from 'react'
+import { Sidebar } from '../sidebar/Sidebar'
+import { SidebarProvider, SidebarTrigger } from '../ui/sidebar'
 import { DevBadges } from './DevBadges'
-import { MainTopNav } from './MainTopNav'
+import { MainDashboardButton } from './MainDashboardButton'
+import { MainTopContent } from './MainTopContent'
+import { MainTopUserSettings } from './MainTopUserSettings'
 
 export const MainTop = async () => {
-  const locale = await getMyLocale()
   return (
-    <>
-      <div className="container flex flex-row items-center justify-between gap-6 py-6">
-        <Link href={`/${locale}`} className="flex flex-row items-center gap-3">
-          <div className="text-xl">
-            <BRAND.TextLogo />
-          </div>
-        </Link>
-        <div className="hidden flex-1 xl:flex items-center gap-2">
+    <header className="sticky top-0 z-50 w-full border-b-2 bg-background/95 backdrop-blur-sm">
+      <SidebarProvider className="min-h-auto">
+        <div className="container flex items-center gap-2 md:gap-6 py-6">
+          <SidebarTrigger
+            className="md:hidden"
+            icon={<MenuIcon className="size-4" />}
+          />
+          <Link
+            href="/"
+            prefetch={false}
+            className="flex flex-row items-center gap-3"
+          >
+            <div className="text-xl">
+              <BRAND.TextLogo />
+            </div>
+          </Link>
           <Suspense fallback={<div className="flex-1" />}>
-            <MainTopContent />
+            <nav
+              className={cn(
+                'hidden md:flex flex-1 flex-wrap items-center gap-4 lg:gap-6',
+              )}
+            >
+              <MainTopContent />
+            </nav>
           </Suspense>
-          <DevBadges />
-          <UserButtonSuspense />
-        </div>
-        <div className="flex flex-row">
-          {BRAND.github.active && (
-            <Button variant={'ghost'} size="icon" asChild>
-              <Link href={BRAND.github.url} target="_blank">
-                <Github />
-              </Link>
-            </Button>
-          )}
-          <DarkModeToggle />
-        </div>
-      </div>
-      <div className="container flex pb-6 xl:hidden items-center gap-2 flex-wrap">
-        <Suspense fallback={<div className="flex-1" />}>
-          <MainTopContent />
-        </Suspense>
-        <DevBadges />
-        <UserButtonSuspense />
-      </div>
-    </>
-  )
-}
+          <div className="flex-1 md:hidden" />
+          <div className="flex items-center gap-4">
+            <DevBadges className="max-md:hidden" />
+            <div className="hidden items-center gap-2 text-sm font-medium md:flex">
+              {BRAND.github.active && (
+                <Button variant={'ghost'} size="icon" asChild>
+                  <Link href={BRAND.github.url} target="_blank">
+                    <Github />
+                  </Link>
+                </Button>
+              )}
 
-export const MainTopContent = async () => {
-  const isAdminOrDev = await getIsAdmin({ allowDev: true })
-  const isLoggedIn = await getIsLoggedIn()
-  const locale = await getMyLocale()
-  const entries = [
-    {
-      name: 'Home',
-      href: `/${locale}`,
-    },
-    {
-      name: 'Me',
-      href: `/auth/me`,
-      hidden: !isLoggedIn,
-    },
-    {
-      name: 'Users',
-      href: '/users',
-      hidden: !isAdminOrDev,
-    },
-  ].filter((entry) => !entry.hidden)
-
-  return (
-    <>
-      <MainTopNav entries={entries} />
-    </>
+              <MainTopUserSettings />
+            </div>
+            <MainDashboardButton />
+          </div>
+        </div>
+        <div className="md:hidden">
+          <Sidebar collapsible="icon" isLanding={true} />
+        </div>
+      </SidebarProvider>
+    </header>
   )
 }

@@ -5,6 +5,7 @@ import { t as clientT } from './translations.en'
 
 const serverT = {}
 
-export type serverT = typeof serverT
+export type TranslationsServerOnly = typeof serverT
 
 export const t = mergeDeep(serverT, clientT)
+export type TranslationsServerAndClient = typeof t

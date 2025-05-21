@@ -1,5 +1,5 @@
 import { db } from '@/db/db'
-import { DEFAULT_LOCALE } from '@/i18n/locale'
+import { superCache } from '@/lib/superCache'
 import Nodemailer from '@auth/core/providers/nodemailer'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
 import NextAuth from 'next-auth'
@@ -15,8 +15,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db),
   pages: {
     //TODO: make this dynamic
-    signIn: `/${DEFAULT_LOCALE}/auth/login`,
-    verifyRequest: `/${DEFAULT_LOCALE}/auth/check-mail`,
+    signIn: `/auth/login`,
+    verifyRequest: `/auth/check-mail`,
   },
   providers: [
     Discord,
@@ -54,6 +54,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.sub as string
       }
       return session
+    },
+  },
+  events: {
+    createUser: ({ user }) => {
+      if (user.id) {
+        superCache.user({ id: user.id }).revalidate()
+      } else {
+        superCache.users().revalidate()
+      }
+    },
+    linkAccount: ({ user }) => {
+      if (user.id) {
+        superCache.user({ id: user.id }).revalidate()
+      } else {
+        superCache.users().revalidate()
+      }
+    },
+    updateUser: ({ user }) => {
+      if (user.id) {
+        superCache.user({ id: user.id }).revalidate()
+      } else {
+        superCache.users().revalidate()
+      }
     },
   },
 })

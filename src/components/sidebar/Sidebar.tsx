@@ -9,22 +9,26 @@ import {
   SidebarRail,
   Sidebar as UiSidebar,
 } from '@/components/ui/sidebar'
-import { getMyLocale } from '@/i18n/getMyLocale'
 import { BRAND, ORGS } from '@/lib/starter.config'
 import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
 import { Suspense } from 'react'
+import { DevBadges } from '../layout/DevBadges'
 import { Skeleton } from '../ui/skeleton'
+import { SidebarAnonymousSettingsSection } from './SidebarAnonymousSettingsSection'
 import { SidebarMainSection } from './SidebarMainSection'
 import { SidebarOrgSection } from './SidebarOrgSection'
 import { SidebarOrgSwitcher } from './SidebarOrgSwitcher'
 
 export const Sidebar = async ({
   orgSlug,
+  isLanding,
   ...props
-}: React.ComponentProps<typeof UiSidebar> & { orgSlug?: string }) => {
-  const locale = await getMyLocale()
+}: React.ComponentProps<typeof UiSidebar> & {
+  orgSlug?: string
+  isLanding?: boolean
+}) => {
   return (
     <UiSidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -35,7 +39,7 @@ export const Sidebar = async ({
             asChild
           >
             <Link
-              href={`/${locale}`}
+              href={`/`}
               className="flex flex-row items-center gap-2 w-full overflow-hidden"
             >
               <Image
@@ -63,14 +67,20 @@ export const Sidebar = async ({
           {!!orgSlug && ORGS.isActive ? (
             <SidebarOrgSection />
           ) : (
-            <SidebarMainSection />
+            <SidebarMainSection isLanding={isLanding} />
           )}
+        </Suspense>
+        {!isLanding && (
+          <Suspense>
+            <SidebarAdminSection />
+          </Suspense>
+        )}
+        <Suspense>
+          <SidebarAnonymousSettingsSection />
         </Suspense>
       </SidebarContent>
       <SidebarFooter>
-        <Suspense>
-          <SidebarAdminSection />
-        </Suspense>
+        <DevBadges className="px-2 group-data-[collapsible=icon]:hidden" />
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
           <SidebarUserSection />
         </Suspense>

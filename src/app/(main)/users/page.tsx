@@ -1,9 +1,9 @@
 import { notFoundIfNotAdmin, throwIfNotAdmin } from '@/auth/getIsAdmin'
 import { getMyUserId } from '@/auth/getMyUser'
 import { impersonate } from '@/auth/impersonate'
+import { TopHeader } from '@/components/TopHeader'
 import { LocalDateTime } from '@/components/demo/LocalDateTime'
 import { SimpleParamSelect } from '@/components/simple/SimpleParamSelect'
-import { TopHeader } from '@/components/TopHeader'
 import {
   Card,
   CardContent,
@@ -14,6 +14,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { db } from '@/db/db'
 import { users as usersTable } from '@/db/schema-auth'
+import { superCache } from '@/lib/superCache'
 import {
   streamToast,
   superAction,
@@ -21,15 +22,28 @@ import {
 import { streamRevalidatePath } from '@/super-action/action/streamRevalidatePath'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { ActionWrapper } from '@/super-action/button/ActionWrapper'
-import { eq } from 'drizzle-orm'
+import { asc, eq } from 'drizzle-orm'
 import { Check } from 'lucide-react'
 import { Metadata } from 'next'
-import { revalidatePath } from 'next/cache'
 import { Fragment } from 'react'
 import { CreateUserButton } from './CreateUserButton'
 
 export const metadata: Metadata = {
   title: 'Users',
+}
+
+const getUsers = async ({ filter }: { filter?: 'admins' }) => {
+  'use cache'
+  superCache.users().tag()
+  const users = await db.query.users.findMany({
+    with: {
+      accounts: true,
+    },
+    where: filter === 'admins' ? eq(usersTable.isAdmin, true) : undefined,
+    orderBy: [asc(usersTable.createdAt)],
+  })
+
+  return users
 }
 
 export default async function Page({
@@ -42,12 +56,7 @@ export default async function Page({
   const { filter } = await searchParams
   await notFoundIfNotAdmin({ allowDev: true })
   const myUserId = await getMyUserId()
-  const users = await db.query.users.findMany({
-    with: {
-      accounts: true,
-    },
-    where: filter === 'admins' ? eq(usersTable.isAdmin, true) : undefined,
-  })
+  const users = await getUsers({ filter })
 
   return (
     <>
@@ -121,13 +130,15 @@ export default async function Page({
                             .update(usersTable)
                             .set({ isAdmin: !isAdmin })
                             .where(eq(usersTable.id, user.id))
+
+                          superCache.user({ id: user.id }).revalidate()
+
                           streamToast({
                             title: isAdmin ? 'Removed admin' : 'Made admin',
                             description: `User ${user.email} is now ${
                               isAdmin ? 'not' : ''
                             } an admin`,
                           })
-                          revalidatePath('/users')
                         })
                       }}
                       command={{
@@ -157,11 +168,13 @@ export default async function Page({
                             .delete(usersTable)
                             .where(eq(usersTable.id, user.id))
                             .execute()
+
+                          superCache.all().revalidate()
+
                           streamToast({
                             title: 'User deleted',
                             description: `Bye ${user.email} 👋`,
                           })
-                          revalidatePath('/users')
                         })
                       }}
                       command={{

@@ -1,5 +1,6 @@
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { superCache } from '@/lib/superCache'
 import { Credentials } from './credentialsSchema'
 import { hashPassword } from './password'
 
@@ -18,4 +19,6 @@ export const registerUser = async (credentials: Credentials) => {
     email: credentials.email,
     passwordHash,
   })
+
+  superCache.users().tag()
 }

@@ -20,5 +20,5 @@ export const registerUser = async (credentials: Credentials) => {
     passwordHash,
   })
 
-  superCache.users().tag()
+  superCache.users().revalidate()
 }

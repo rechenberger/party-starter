@@ -15,6 +15,7 @@ import { schema } from '@/db/schema-export'
 import { User } from '@/db/schema-zod'
 import { getDateFnsLocale } from '@/i18n/getDateFnsLocale'
 import { ORGS } from '@/lib/starter.config'
+import { superCache } from '@/lib/superCache'
 import { cn } from '@/lib/utils'
 import {
   streamDialog,
@@ -167,7 +168,7 @@ export const MailInvitationCodesList = async (
                               }),
                             )
 
-                            revalidatePath(`/org/${orgId}/settings/members`)
+                            superCache.orgMembers({ orgId }).revalidate()
 
                             streamToast({
                               title: `Invitation sent to ${data.receiverEmail.join(
@@ -302,10 +303,10 @@ export const MailInvitationCodesList = async (
                                   existingCodeId: code.id,
                                   ...props,
                                 })
+                                superCache.orgMembers({ orgId }).revalidate()
                                 streamToast({
                                   title: `Invitation sent to ${code.sentToEmail}`,
                                 })
-                                revalidatePath(`/org/${orgId}/settings/members`)
                               })
                             }}
                             title="Resend invitation"

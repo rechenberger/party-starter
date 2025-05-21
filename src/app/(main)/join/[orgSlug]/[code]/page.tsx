@@ -1,3 +1,4 @@
+import { getMyUserOrLogin } from '@/auth/getMyUser'
 import SeededAvatar from '@/components/SeededAvatar'
 import { Alert, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -19,7 +20,6 @@ import { ActionButton } from '@/super-action/button/ActionButton'
 import { eq } from 'drizzle-orm'
 import { find } from 'lodash-es'
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
-import { revalidatePath } from 'next/cache'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 
@@ -30,7 +30,15 @@ export default async function JoinOrgPage({
 }) {
   const { orgSlug, code } = await params
 
-  const { error, organization, inviteCode, user } = await getInviteCode({
+  const user = await getMyUserOrLogin({
+    forceRedirectUrl: `/join/${orgSlug}/${code}`,
+  })
+
+  const {
+    error,
+    org: organization,
+    inviteCode,
+  } = await getInviteCode({
     orgSlug,
     code,
   })
@@ -142,8 +150,14 @@ export default async function JoinOrgPage({
           action={async () => {
             'use server'
             return superAction(async () => {
-              const { error, organization, inviteCode, user } =
-                await getInviteCode({ orgSlug, code })
+              const user = await getMyUserOrLogin({
+                forceRedirectUrl: `/join/${orgSlug}/${code}`,
+              })
+
+              const { error, org, inviteCode } = await getInviteCode({
+                orgSlug,
+                code,
+              })
 
               if (error) {
                 throw new Error(error)
@@ -157,7 +171,7 @@ export default async function JoinOrgPage({
                   })
                   .where(eq(schema.inviteCodes.id, inviteCode.id)),
                 db.insert(schema.organizationMemberships).values({
-                  organizationId: organization.id,
+                  organizationId: org.id,
                   userId: user.id,
                   role: inviteCode.role,
                   invitationCodeId: inviteCode.id,
@@ -165,9 +179,7 @@ export default async function JoinOrgPage({
               ])
 
               superCache.userOrgMemberships({ userId: user.id }).revalidate()
-              superCache.orgMembers({ orgId: organization.id }).revalidate()
-
-              revalidatePath(`/join/${organization.slug}/${code}`)
+              superCache.orgMembers({ orgId: org.id }).revalidate()
             })
           }}
         >
@@ -193,9 +205,7 @@ const JoinCardOrgInfo = ({
   inviteCode,
   code,
 }: {
-  organization: NonNullable<
-    Awaited<ReturnType<typeof getInviteCode>>['organization']
-  >
+  organization: NonNullable<Awaited<ReturnType<typeof getInviteCode>>['org']>
   inviteCode: NonNullable<
     Awaited<ReturnType<typeof getInviteCode>>['inviteCode']
   >

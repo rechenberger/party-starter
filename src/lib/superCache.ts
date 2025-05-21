@@ -20,10 +20,10 @@ export const superCache = {
   users: () => singleTag(`users`),
   user: ({ id }: { id: string }) => singleTag(`users:${id}`, [`users`]),
   orgs: () => singleTag(`orgs`),
-  org: ({ id }: { id: string }) => singleTag(`orgs:${id}`, [`orgs`]),
-  orgMembersAll: () => singleTag(`orgs:members`),
+  org: ({ id }: { id: string }) => singleTag(`org:${id}`, [`orgs`]),
+  orgMembersAll: () => singleTag(`orgMembersAll`),
   orgMembers: ({ orgId }: { orgId: string }) =>
-    singleTag(`orgs:${orgId}:members`, [`orgs:members`]),
+    singleTag(`orgMembers:${orgId}`, [`orgMembersAll`]),
   userOrgMemberships: ({ userId }: { userId: string }) =>
-    singleTag(`user:${userId}:orgs:memberships`, [`orgs:members`]),
+    singleTag(`userOrgMemberships:${userId}`, [`orgMembersAll`]),
 }

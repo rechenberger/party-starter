@@ -23,9 +23,16 @@ export const metadata: Metadata = {
 
 export default async function Layout({
   children,
+  params,
 }: {
   children: React.ReactNode
+  params: Promise<{
+    orgSlug?: string
+    locale?: string
+  }>
 }) {
+  console.log({ params: await params })
+
   return (
     <html suppressHydrationWarning>
       <body className="bg-background min-h-[100svh] flex flex-col">

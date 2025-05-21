@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { ParamsWrapper } from '@/lib/paramsServerContext'
+import { superCache } from '@/lib/superCache'
 import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
@@ -55,6 +56,8 @@ export default ParamsWrapper(async () => {
                     await db
                       .delete(schema.organizations)
                       .where(eq(schema.organizations.slug, org.slug))
+
+                    superCache.all().revalidate()
 
                     redirect('/')
                   }}

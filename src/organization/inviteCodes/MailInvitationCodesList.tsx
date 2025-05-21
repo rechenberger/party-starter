@@ -15,6 +15,7 @@ import { schema } from '@/db/schema-export'
 import { User } from '@/db/schema-zod'
 import { getDateFnsLocale } from '@/i18n/getDateFnsLocale'
 import { ORGS } from '@/lib/starter.config'
+import { superCache } from '@/lib/superCache'
 import { cn } from '@/lib/utils'
 import {
   streamDialog,
@@ -25,7 +26,6 @@ import { ActionButton } from '@/super-action/button/ActionButton'
 import { format, formatDistanceToNow } from 'date-fns'
 import { and, desc, eq, or } from 'drizzle-orm'
 import { Mail, Trash2 } from 'lucide-react'
-import { revalidatePath } from 'next/cache'
 import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
@@ -42,9 +42,9 @@ const upsertInviteCodeAndSendMail = async ({
   role,
   user,
   existingCodeId,
-  id: organizationId,
-  slug: organizationSlug,
-  name: organizationName,
+  id: orgId,
+  slug: orgSlug,
+  name: orgName,
 }: {
   receiverEmail: string
   user: Pick<User, 'id' | 'email' | 'name'>
@@ -68,7 +68,7 @@ const upsertInviteCodeAndSendMail = async ({
         existingCodeId ? eq(schema.inviteCodes.id, existingCodeId) : undefined,
         and(
           eq(schema.inviteCodes.sentToEmail, receiverEmail),
-          eq(schema.inviteCodes.organizationId, organizationId),
+          eq(schema.inviteCodes.organizationId, orgId),
         ),
       ),
     )
@@ -84,7 +84,7 @@ const upsertInviteCodeAndSendMail = async ({
     .insert(schema.inviteCodes)
     .values({
       id: existingCode?.id,
-      organizationId: organizationId,
+      organizationId: orgId,
       role: role ?? existingCode.role,
       expiresAt: resolveExpiresAt(ORGS.defaultExpirationEmailInvitation),
       usesMax: 1,
@@ -104,15 +104,16 @@ const upsertInviteCodeAndSendMail = async ({
     })
     .returning({ id: schema.inviteCodes.id, role: schema.inviteCodes.role })
 
+  superCache.orgMembers({ orgId }).revalidate()
   const newCode = newCodeRes[0]
 
   await sendOrgInviteMail({
     receiverEmail,
     invitedByEmail: user.email,
     invitedByUsername: user.name,
-    orgName: organizationName,
+    orgName: orgName,
     inviteLink: getInviteCodeUrl({
-      organizationSlug: organizationSlug,
+      organizationSlug: orgSlug,
       code: newCode.id,
     }),
     role: newCode.role,
@@ -166,8 +167,6 @@ export const MailInvitationCodesList = async (
                                 })
                               }),
                             )
-
-                            revalidatePath(`/org/${orgId}/settings/members`)
 
                             streamToast({
                               title: `Invitation sent to ${data.receiverEmail.join(
@@ -305,7 +304,6 @@ export const MailInvitationCodesList = async (
                                 streamToast({
                                   title: `Invitation sent to ${code.sentToEmail}`,
                                 })
-                                revalidatePath(`/org/${orgId}/settings/members`)
                               })
                             }}
                             title="Resend invitation"
@@ -335,9 +333,7 @@ export const MailInvitationCodesList = async (
                                     deletedAt: new Date(),
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))
-                                revalidatePath(
-                                  `/org/${orgSlug}/settings/members`,
-                                )
+                                superCache.orgMembers({ orgId }).revalidate()
                               })
                             }}
                             title="Delete code"

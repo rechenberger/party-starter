@@ -18,6 +18,7 @@ import {
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { getDateFnsLocale } from '@/i18n/getDateFnsLocale'
+import { superCache } from '@/lib/superCache'
 import { cn } from '@/lib/utils'
 import {
   streamDialog,
@@ -27,7 +28,6 @@ import { ActionButton } from '@/super-action/button/ActionButton'
 import { format, formatDistanceToNow } from 'date-fns'
 import { eq } from 'drizzle-orm'
 import { Info, PlusCircle, Trash2 } from 'lucide-react'
-import { revalidatePath } from 'next/cache'
 import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
@@ -96,7 +96,8 @@ export const NormalInviteCodesTable = async (
                                 id: schema.inviteCodes.id,
                               })
 
-                            revalidatePath(`/org/${orgId}/settings/members`)
+                            superCache.orgMembers({ orgId }).revalidate()
+
                             return {
                               id: code.id,
                             }
@@ -256,9 +257,8 @@ export const NormalInviteCodesTable = async (
                                     updatedById: membership.userId,
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))
-                                revalidatePath(
-                                  `/org/${orgSlug}/settings/members`,
-                                )
+
+                                superCache.orgMembers({ orgId }).revalidate()
                               })
                             }}
                             title="Delete code"

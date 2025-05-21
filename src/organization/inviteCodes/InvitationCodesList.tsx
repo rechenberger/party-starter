@@ -1,9 +1,10 @@
 import { InviteCode, User } from '@/db/schema-zod'
 import { getMyMembershipOrNotFound } from '../getMyMembership'
 import { OrganizationRole } from '../organizationRoles'
-import { getEnhancedInviteCode } from './getInviteCode'
 import { MailInvitationCodesList } from './MailInvitationCodesList'
 import { NormalInviteCodesTable } from './NormalInviteCodesTable'
+import { getEnhancedInviteCode } from './getInviteCode'
+
 const allowedRoles: OrganizationRole[] = ['admin']
 
 export type EnhancedInviteCodeForList = ReturnType<
@@ -24,6 +25,7 @@ export type InvitationCodesListProps = {
 export const InvitationCodesList = async (props: InvitationCodesListProps) => {
   await getMyMembershipOrNotFound({
     allowedRoles,
+    orgSlug: props.slug,
   })
 
   const { inviteCodes } = props

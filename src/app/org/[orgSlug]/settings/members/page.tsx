@@ -28,6 +28,7 @@ export default ParamsWrapper(
     const { orgSlug } = await params
     const { membership: myMembership } = await getMyMembershipOrNotFound({
       allowedRoles: allowedRolesView,
+      orgSlug,
     })
 
     const isAdmin = myMembership.role === 'admin'

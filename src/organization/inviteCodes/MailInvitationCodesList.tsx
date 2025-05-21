@@ -42,9 +42,9 @@ const upsertInviteCodeAndSendMail = async ({
   role,
   user,
   existingCodeId,
-  id: organizationId,
-  slug: organizationSlug,
-  name: organizationName,
+  id: orgId,
+  slug: orgSlug,
+  name: orgName,
 }: {
   receiverEmail: string
   user: Pick<User, 'id' | 'email' | 'name'>
@@ -68,7 +68,7 @@ const upsertInviteCodeAndSendMail = async ({
         existingCodeId ? eq(schema.inviteCodes.id, existingCodeId) : undefined,
         and(
           eq(schema.inviteCodes.sentToEmail, receiverEmail),
-          eq(schema.inviteCodes.organizationId, organizationId),
+          eq(schema.inviteCodes.organizationId, orgId),
         ),
       ),
     )
@@ -84,7 +84,7 @@ const upsertInviteCodeAndSendMail = async ({
     .insert(schema.inviteCodes)
     .values({
       id: existingCode?.id,
-      organizationId: organizationId,
+      organizationId: orgId,
       role: role ?? existingCode.role,
       expiresAt: resolveExpiresAt(ORGS.defaultExpirationEmailInvitation),
       usesMax: 1,
@@ -104,15 +104,16 @@ const upsertInviteCodeAndSendMail = async ({
     })
     .returning({ id: schema.inviteCodes.id, role: schema.inviteCodes.role })
 
+  superCache.orgMembers({ orgId }).revalidate()
   const newCode = newCodeRes[0]
 
   await sendOrgInviteMail({
     receiverEmail,
     invitedByEmail: user.email,
     invitedByUsername: user.name,
-    orgName: organizationName,
+    orgName: orgName,
     inviteLink: getInviteCodeUrl({
-      organizationSlug: organizationSlug,
+      organizationSlug: orgSlug,
       code: newCode.id,
     }),
     role: newCode.role,
@@ -166,8 +167,6 @@ export const MailInvitationCodesList = async (
                                 })
                               }),
                             )
-
-                            superCache.orgMembers({ orgId }).revalidate()
 
                             streamToast({
                               title: `Invitation sent to ${data.receiverEmail.join(
@@ -302,7 +301,6 @@ export const MailInvitationCodesList = async (
                                   existingCodeId: code.id,
                                   ...props,
                                 })
-                                superCache.orgMembers({ orgId }).revalidate()
                                 streamToast({
                                   title: `Invitation sent to ${code.sentToEmail}`,
                                 })

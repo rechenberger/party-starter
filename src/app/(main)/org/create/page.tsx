@@ -3,9 +3,9 @@ import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { slugify } from '@/lib/slugify'
 import { ORGS } from '@/lib/starter.config'
+import { superCache } from '@/lib/superCache'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { superAction } from '@/super-action/action/createSuperAction'
-import { revalidatePath } from 'next/cache'
 import { notFound, redirect } from 'next/navigation'
 import { CreateOrgFormClient } from './CreateOrgFormClient'
 import { NameSchema } from './NameSchema'
@@ -54,7 +54,10 @@ export default async function CreateOrg() {
               role: 'admin',
             })
 
-            revalidatePath('/', 'layout')
+            superCache.org({ id: org.id }).revalidate()
+            superCache.orgMembers({ orgId: org.id }).revalidate()
+            superCache.userOrgMemberships({ userId }).revalidate()
+
             redirect(`/org/${org.slug}`)
           })
         }}

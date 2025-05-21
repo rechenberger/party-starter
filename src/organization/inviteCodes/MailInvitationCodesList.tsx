@@ -26,7 +26,6 @@ import { ActionButton } from '@/super-action/button/ActionButton'
 import { format, formatDistanceToNow } from 'date-fns'
 import { and, desc, eq, or } from 'drizzle-orm'
 import { Mail, Trash2 } from 'lucide-react'
-import { revalidatePath } from 'next/cache'
 import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
@@ -336,9 +335,7 @@ export const MailInvitationCodesList = async (
                                     deletedAt: new Date(),
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))
-                                revalidatePath(
-                                  `/org/${orgSlug}/settings/members`,
-                                )
+                                superCache.orgMembers({ orgId }).revalidate()
                               })
                             }}
                             title="Delete code"

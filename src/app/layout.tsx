@@ -23,9 +23,13 @@ export const metadata: Metadata = {
 
 export default async function Layout({
   children,
+  params,
 }: {
   children: React.ReactNode
+  params: Promise<unknown>
 }) {
+  await params // Need to await params here, otherwise ParamsWrapper does not work in dev (turbopack)
+
   return (
     <html suppressHydrationWarning>
       <body className="bg-background min-h-[100svh] flex flex-col">

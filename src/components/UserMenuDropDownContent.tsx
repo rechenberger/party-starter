@@ -95,13 +95,15 @@ export const UserMenuDropDownContent = async ({
           action={async () => {
             'use server'
             const signOutResponse = await signOut({ redirect: false })
-            const url = signOutResponse.redirect
-            const response = await fetch(url)
-            if (response.ok) {
-              redirect(url)
-            } else {
-              redirect('/')
-            }
+            // This only works if we dont have any loading.tsx (because sites always return status code 200 when loading):
+            // const url = signOutResponse.redirect
+            // const response = await fetch(url)
+            // if (response.ok) {
+            //   redirect(url)
+            // } else {
+            //   redirect('/')
+            // }
+            redirect('/')
           }}
         >
           <LogOut className="size-4" />

@@ -128,6 +128,7 @@ export const MailInvitationCodesList = async (
 
   await getMyMembershipOrNotFound({
     allowedRoles,
+    orgSlug,
   })
 
   const dateFnsLocale = await getDateFnsLocale()

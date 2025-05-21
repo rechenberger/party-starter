@@ -47,6 +47,7 @@ export const NormalInviteCodesTable = async (
 
   await getMyMembershipOrNotFound({
     allowedRoles,
+    orgSlug,
   })
   const dateFnsLocale = await getDateFnsLocale()
 

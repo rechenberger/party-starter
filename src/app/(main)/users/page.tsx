@@ -169,7 +169,7 @@ export default async function Page({
                             .where(eq(usersTable.id, user.id))
                             .execute()
 
-                          superCache.user({ id: user.id }).revalidate()
+                          superCache.all().revalidate()
 
                           streamToast({
                             title: 'User deleted',

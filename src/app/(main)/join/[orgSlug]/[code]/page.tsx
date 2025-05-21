@@ -34,11 +34,7 @@ export default async function JoinOrgPage({
     forceRedirectUrl: `/join/${orgSlug}/${code}`,
   })
 
-  const {
-    error,
-    org: organization,
-    inviteCode,
-  } = await getInviteCode({
+  const { error, org, inviteCode } = await getInviteCode({
     orgSlug,
     code,
   })
@@ -51,10 +47,7 @@ export default async function JoinOrgPage({
     return notFound()
   }
 
-  const alreadyOrgMember = !!find(
-    organization.memberships,
-    (m) => m.userId === user.id,
-  )
+  const alreadyOrgMember = !!find(org.memberships, (m) => m.userId === user.id)
 
   // Card if already joined the team
   if (alreadyOrgMember) {
@@ -65,13 +58,11 @@ export default async function JoinOrgPage({
             <CheckCircle2 className="h-5 w-5 text-green-500" />
             <CardTitle>Successfully Joined!</CardTitle>
           </div>
-          <CardDescription>
-            You are now a member of {organization.name}.
-          </CardDescription>
+          <CardDescription>You are now a member of {org.name}.</CardDescription>
         </CardHeader>
         <CardContent>
           <JoinCardOrgInfo
-            organization={organization}
+            organization={org}
             inviteCode={inviteCode}
             code={code}
           />
@@ -81,7 +72,7 @@ export default async function JoinOrgPage({
           </p>
         </CardContent>
         <CardFooter>
-          <Link href={`/org/${organization.slug}`} className="w-full">
+          <Link href={`/org/${org.slug}`} className="w-full">
             <Button className="w-full">Go to Organization</Button>
           </Link>
         </CardFooter>
@@ -113,7 +104,7 @@ export default async function JoinOrgPage({
           </Alert>
 
           <JoinCardOrgInfo
-            organization={organization}
+            organization={org}
             inviteCode={inviteCode}
             code={code}
           />
@@ -138,7 +129,7 @@ export default async function JoinOrgPage({
       </CardHeader>
       <CardContent>
         <JoinCardOrgInfo
-          organization={organization}
+          organization={org}
           inviteCode={inviteCode}
           code={code}
         />

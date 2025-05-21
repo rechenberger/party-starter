@@ -1,7 +1,22 @@
 import { getMyUser } from '@/auth/getMyUser'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { superCache } from '@/lib/superCache'
 import { eq } from 'drizzle-orm'
+
+export const getMemberships = async ({ userId }: { userId: string }) => {
+  'use cache'
+
+  const memberships = await db.query.organizationMemberships.findMany({
+    where: eq(schema.organizationMemberships.userId, userId),
+    with: {
+      organization: true,
+    },
+  })
+  superCache.userOrgMemberships({ userId }).tag()
+
+  return memberships
+}
 
 export const getMyMemberships = async () => {
   const user = await getMyUser()
@@ -10,12 +25,5 @@ export const getMyMemberships = async () => {
     return []
   }
 
-  const memberships = await db.query.organizationMemberships.findMany({
-    where: eq(schema.organizationMemberships.userId, user.id),
-    with: {
-      organization: true,
-    },
-  })
-
-  return memberships
+  return getMemberships({ userId: user.id })
 }

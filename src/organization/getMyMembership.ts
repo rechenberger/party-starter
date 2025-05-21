@@ -2,10 +2,52 @@ import { getMyUserId } from '@/auth/getMyUser'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { neverNullish, throwError } from '@/lib/neverNullish'
+import { superCache } from '@/lib/superCache'
 import { and, eq, inArray } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { getCurrentOrgSlug } from './getCurrentOrgSlug'
 import { OrganizationRole } from './organizationRoles'
+
+export const getMembership = async ({
+  allowedRoles,
+  orgSlug,
+  userId,
+}: {
+  allowedRoles?: OrganizationRole[]
+  orgSlug: string
+  userId: string
+}) => {
+  'use cache'
+  const org = await db.query.organizations.findFirst({
+    where: eq(schema.organizations.slug, orgSlug),
+    with: {
+      memberships: {
+        where: and(
+          eq(schema.organizationMemberships.userId, userId),
+          allowedRoles
+            ? inArray(schema.organizationMemberships.role, allowedRoles)
+            : undefined,
+        ),
+      },
+    },
+  })
+
+  if (!org) {
+    superCache.orgs().tag()
+    return null
+  }
+
+  superCache.org({ id: org.id }).tag()
+  superCache.orgMembers({ orgId: org.id }).tag()
+  superCache.userOrgMemberships({ userId }).tag()
+
+  const membership = org?.memberships.at(0)
+  if (!membership) {
+    return null
+  }
+
+  return { org, membership }
+}
 
 export const getMyMembership = async ({
   allowedRoles,
@@ -22,24 +64,11 @@ export const getMyMembership = async ({
   if (!userId || !orgSlug) {
     return null
   }
-
-  const org = await db.query.organizations.findFirst({
-    where: eq(schema.organizations.slug, orgSlug),
-    with: {
-      memberships: {
-        where: and(
-          eq(schema.organizationMemberships.userId, userId),
-          allowedRoles
-            ? inArray(schema.organizationMemberships.role, allowedRoles)
-            : undefined,
-        ),
-      },
-    },
+  return getMembership({
+    allowedRoles,
+    orgSlug,
+    userId,
   })
-  const membership = org?.memberships.at(0)
-  const valid = !!org && !!membership
-
-  return valid ? { org, membership } : null
 }
 
 export const getMyMembershipOrThrow = neverNullish(

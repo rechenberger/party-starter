@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/card'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { superCache } from '@/lib/superCache'
 import { getInviteCode } from '@/organization/inviteCodes/getInviteCode'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
@@ -162,6 +163,10 @@ export default async function JoinOrgPage({
                   invitationCodeId: inviteCode.id,
                 }),
               ])
+
+              superCache.userOrgMemberships({ userId: user.id }).revalidate()
+              superCache.orgMembers({ orgId: organization.id }).revalidate()
+
               revalidatePath(`/join/${organization.slug}/${code}`)
             })
           }}

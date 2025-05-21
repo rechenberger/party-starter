@@ -24,4 +24,6 @@ export const superCache = {
   orgMembersAll: () => singleTag(`orgs:members`),
   orgMembers: ({ orgId }: { orgId: string }) =>
     singleTag(`orgs:${orgId}:members`, [`orgs:members`]),
+  userOrgMemberships: ({ userId }: { userId: string }) =>
+    singleTag(`user:${userId}:orgs:memberships`, [`orgs:members`]),
 }

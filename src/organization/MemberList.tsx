@@ -1,5 +1,6 @@
 'use client'
 
+import { LocalFormatToNow } from '@/components/dates/LocalFormatToNow'
 import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -172,6 +173,7 @@ export const MemberList = ({
                           addSuffix: true,
                           locale: dateFnsLocale,
                         })}
+                        <LocalFormatToNow date={membership.createdAt} />
                       </TableCell>
                       <TableCell>
                         {isAdmin && (

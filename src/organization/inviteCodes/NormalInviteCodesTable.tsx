@@ -1,5 +1,5 @@
 import { CopyToClipboardButton } from '@/components/CopyToClipboardButton'
-import { LocalFormatToNow } from '@/components/dates/LocalFormatToNow'
+import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
 import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,7 +18,6 @@ import {
 } from '@/components/ui/table'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
-import { getDateFnsLocale } from '@/i18n/getDateFnsLocale'
 import { superCache } from '@/lib/superCache'
 import { cn } from '@/lib/utils'
 import {
@@ -26,7 +25,6 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { format, formatDistanceToNow } from 'date-fns'
 import { eq } from 'drizzle-orm'
 import { Info, PlusCircle, Trash2 } from 'lucide-react'
 import {
@@ -49,7 +47,7 @@ export const NormalInviteCodesTable = async (
   await getMyMembershipOrNotFound({
     allowedRoles,
   })
-  const dateFnsLocale = await getDateFnsLocale()
+  // const dateFnsLocale = await getDateFnsLocale()
 
   return (
     <>
@@ -165,26 +163,16 @@ export const NormalInviteCodesTable = async (
                           {getOrganizationRole(code.role).label}
                         </Badge>
                       </TableCell>
-                      <TableCell
-                        title={
-                          code.expiresAt
-                            ? format(code.expiresAt, 'PPp', {
-                                locale: dateFnsLocale,
-                              })
-                            : 'Never'
-                        }
-                      >
-                        {code.expiresAt?.toString()}
+                      <TableCell>
                         {code.expiresAt ? (
-                          formatDistanceToNow(new Date(code.expiresAt), {
-                            addSuffix: true,
-                            locale: dateFnsLocale,
-                          })
+                          <DateFnsFormatDistanceToNow
+                            date={code.expiresAt}
+                            options={{
+                              addSuffix: true,
+                            }}
+                          />
                         ) : (
                           <span className="text-muted-foreground">Never</span>
-                        )}
-                        {!!code.expiresAt && (
-                          <LocalFormatToNow date={code.expiresAt} />
                         )}
                       </TableCell>
                       <TableCell>

@@ -2,7 +2,7 @@ import { notFoundIfNotAdmin, throwIfNotAdmin } from '@/auth/getIsAdmin'
 import { getMyUserId } from '@/auth/getMyUser'
 import { impersonate } from '@/auth/impersonate'
 import { TopHeader } from '@/components/TopHeader'
-import { LocalDateTime } from '@/components/demo/LocalDateTime'
+import { DateFnsFormat } from '@/components/date-fns-client/DateFnsFormat'
 import { SimpleParamSelect } from '@/components/simple/SimpleParamSelect'
 import {
   Card,
@@ -110,8 +110,9 @@ export default async function Page({
                       {user.emailVerified ? (
                         <>
                           Verified{' '}
-                          <LocalDateTime
-                            datetime={user.emailVerified.toISOString()}
+                          <DateFnsFormat
+                            date={user.emailVerified}
+                            format="Ppp"
                           />
                         </>
                       ) : (

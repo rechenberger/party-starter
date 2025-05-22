@@ -1,4 +1,5 @@
 import { getMyUserOrThrow } from '@/auth/getMyUser'
+import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
 import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -23,7 +24,6 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { format, formatDistanceToNow } from 'date-fns'
 import { and, desc, eq, or } from 'drizzle-orm'
 import { Mail, Trash2 } from 'lucide-react'
 import {
@@ -240,19 +240,13 @@ export const MailInvitationCodesList = async (
                           {getOrganizationRole(code.role).label}
                         </Badge>
                       </TableCell>
-                      <TableCell
-                        title={
-                          code.updatedAt
-                            ? format(code.updatedAt, 'PPp', {
-                                locale: dateFnsLocale,
-                              })
-                            : 'Never'
-                        }
-                      >
-                        {formatDistanceToNow(new Date(code.updatedAt), {
-                          addSuffix: true,
-                          locale: dateFnsLocale,
-                        })}
+                      <TableCell>
+                        <DateFnsFormatDistanceToNow
+                          date={code.createdAt}
+                          options={{
+                            addSuffix: true,
+                          }}
+                        />
                       </TableCell>
                       <TableCell>
                         {code.updatedBy && (

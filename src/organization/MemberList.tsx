@@ -1,6 +1,6 @@
 'use client'
 
-import { LocalFormatToNow } from '@/components/dates/LocalFormatToNow'
+import { DateFnsFormat } from '@/components/date-fns-client/DateFnsFormat'
 import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -27,11 +27,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Organization, OrganizationMembership, User } from '@/db/schema-zod'
-import { useDateFnsLocale } from '@/i18n/useDateFnsLocale'
 import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { format, formatDistanceToNow } from 'date-fns'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useMemo, useState } from 'react'
@@ -41,6 +39,7 @@ import {
   organizationRoleDefinitions,
 } from './organizationRoles'
 
+import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
 type MembershipWithUser = Pick<
   OrganizationMembership,
   'userId' | 'role' | 'createdAt'
@@ -66,7 +65,6 @@ export const MemberList = ({
   }>
   isAdmin: boolean
 }) => {
-  const dateFnsLocale = useDateFnsLocale()
   const { data: session } = useSession()
   const myUserId = session?.user?.id
 
@@ -103,9 +101,7 @@ export const MemberList = ({
                 <CardTitle>{organization.name}</CardTitle>
                 <CardDescription>
                   Created{' '}
-                  {format(organization.createdAt, 'PPP', {
-                    locale: dateFnsLocale,
-                  })}
+                  <DateFnsFormat date={organization.createdAt} format="PPP" />
                 </CardDescription>
               </div>
               <Badge variant="outline" className="text-xs">
@@ -163,17 +159,13 @@ export const MemberList = ({
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell
-                        className="text-muted-foreground"
-                        title={format(membership.createdAt, 'PPp', {
-                          locale: dateFnsLocale,
-                        })}
-                      >
-                        {formatDistanceToNow(new Date(membership.createdAt), {
-                          addSuffix: true,
-                          locale: dateFnsLocale,
-                        })}
-                        <LocalFormatToNow date={membership.createdAt} />
+                      <TableCell className="text-muted-foreground">
+                        <DateFnsFormatDistanceToNow
+                          date={membership.createdAt}
+                          options={{
+                            addSuffix: true,
+                          }}
+                        />
                       </TableCell>
                       <TableCell>
                         {isAdmin && (

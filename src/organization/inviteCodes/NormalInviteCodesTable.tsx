@@ -173,6 +173,7 @@ export const NormalInviteCodesTable = async (
                             : 'Never'
                         }
                       >
+                        {code.expiresAt?.toString()}
                         {code.expiresAt ? (
                           formatDistanceToNow(new Date(code.expiresAt), {
                             addSuffix: true,

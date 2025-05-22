@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { TranslationsClient } from '@/i18n/translations/translations.en'
 import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
 import { cn } from '@/lib/utils'
@@ -21,8 +22,7 @@ import { ArrowLeft } from 'lucide-react'
 import { ReactNode } from 'react'
 import { z } from 'zod'
 
-const LoginDataSchema = () => {
-  const t = useTranslations()
+const LoginData = ({ t }: { t: TranslationsClient }) => {
   return z
     .discriminatedUnion('type', [
       z.object({
@@ -55,7 +55,7 @@ const LoginDataSchema = () => {
     })
 }
 
-type LoginData = z.infer<ReturnType<typeof LoginDataSchema>>
+type LoginData = z.infer<ReturnType<typeof LoginData>>
 type LoginType = LoginData['type']
 
 export const LoginFormClient = ({
@@ -69,7 +69,7 @@ export const LoginFormClient = ({
 }) => {
   const t = useTranslations()
 
-  const [useLoginForm] = createZodForm(LoginDataSchema())
+  const [useLoginForm] = createZodForm(LoginData({ t }))
   const { trigger, isLoading } = useSuperAction({
     action,
     catchToast: true,

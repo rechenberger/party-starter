@@ -243,7 +243,7 @@ export const MailInvitationCodesList = async (
                       <TableCell
                         title={
                           code.updatedAt
-                            ? format(code.updatedAt, 'MMM d, yyyy HH:mm', {
+                            ? format(code.updatedAt, 'PPp', {
                                 locale: dateFnsLocale,
                               })
                             : 'Never'

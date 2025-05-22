@@ -167,7 +167,7 @@ export const NormalInviteCodesTable = async (
                       <TableCell
                         title={
                           code.expiresAt
-                            ? format(code.expiresAt, 'MMM d, yyyy HH:mm', {
+                            ? format(code.expiresAt, 'PPp', {
                                 locale: dateFnsLocale,
                               })
                             : 'Never'

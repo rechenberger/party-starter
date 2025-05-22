@@ -162,7 +162,12 @@ export const MemberList = ({
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell
+                        className="text-muted-foreground"
+                        title={format(membership.createdAt, 'PPp', {
+                          locale: dateFnsLocale,
+                        })}
+                      >
                         {formatDistanceToNow(new Date(membership.createdAt), {
                           addSuffix: true,
                           locale: dateFnsLocale,

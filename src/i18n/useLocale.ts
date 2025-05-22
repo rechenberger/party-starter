@@ -6,7 +6,7 @@ import { LocaleContext } from './LocaleContext'
 import { COOKIE_NAME, LOCALES, Locale } from './locale'
 
 const setCookie = (name: string, value: string) => {
-  document.cookie = `${name}=${value}; path=/; max-age=31536000` // 1 year
+  document.cookie = `${name}=${value}; path=/; max-age=31536000; samesite=lax;` // 1 year
 }
 
 export const useLocale = () => {

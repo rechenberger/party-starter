@@ -14,7 +14,6 @@ const hasEmailEnvVars = !!process.env.EMAIL_FROM && !!process.env.SMTP_URL
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db),
   pages: {
-    //TODO: make this dynamic
     signIn: `/auth/login`,
     verifyRequest: `/auth/check-mail`,
   },

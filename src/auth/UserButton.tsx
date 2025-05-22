@@ -68,10 +68,7 @@ export const UserButton = async ({ large }: { large?: boolean }) => {
         size="sm"
         variant={'outline'}
         hideIcon
-        action={async () => {
-          'use server'
-          await loginWithRedirect()
-        }}
+        action={loginWithRedirect}
       >
         <span className="hidden md:block">Login</span>
         <LogInIcon className="size-4" />

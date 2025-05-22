@@ -1,10 +1,6 @@
 import { MainTop } from './MainTop'
 
-export const MainTopLayout = async ({
-  children,
-}: {
-  children: React.ReactNode
-}) => {
+export const MainTopLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <MainTop />

@@ -21,7 +21,7 @@ import { SidebarMainSection } from './SidebarMainSection'
 import { SidebarOrgSection } from './SidebarOrgSection'
 import { SidebarOrgSwitcher } from './SidebarOrgSwitcher'
 
-export const Sidebar = async ({
+export const Sidebar = ({
   orgSlug,
   isLanding,
   ...props

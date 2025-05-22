@@ -1,16 +1,11 @@
 'use client'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { AlertCircle } from 'lucide-react'
+import { ErrorPage } from '@/components/ErrorPage'
 
 export default function Page({ error }: { error: Error }) {
   return (
-    <Alert variant="default">
-      <AlertCircle className="h-4 w-4" />
-      <AlertTitle>Error</AlertTitle>
-      <AlertDescription>
-        {error.message || 'An error occurred.'}
-      </AlertDescription>
-    </Alert>
+    <div className="flex h-screen w-screen items-center justify-center">
+      <ErrorPage error={error} />
+    </div>
   )
 }

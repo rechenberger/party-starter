@@ -5,7 +5,6 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { revalidatePath } from 'next/cache'
 
 export const CreateUserButton = () => {
   return (
@@ -28,7 +27,6 @@ export const CreateUserButton = () => {
                         }
                         await registerUser(credentials)
                         streamDialog(null)
-                        revalidatePath('/users')
                       })
                     }}
                   />

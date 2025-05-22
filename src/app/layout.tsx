@@ -1,31 +1,40 @@
 import { isDev } from '@/auth/dev'
 import { Toaster } from '@/components/ui/toaster'
+import { BASE_URL } from '@/lib/config'
+import { BRAND } from '@/lib/starter.config'
 import { ActionCommandProvider } from '@/super-action/command/ActionCommandProvider'
 import { DialogProvider } from '@/super-action/dialog/DialogProvider'
 import type { Metadata } from 'next'
+import { SessionProvider } from 'next-auth/react'
 import { ThemeProvider } from 'next-themes'
-import './globals.css'
+import '../app/globals.css'
 
 const titlePrefix = isDev() ? '[DEV] ' : ''
 
 export const metadata: Metadata = {
   title: {
-    default: `${titlePrefix}Party Starter`,
-    template: `${titlePrefix}%s | Party Starter`,
+    default: `${titlePrefix}${BRAND.name}`,
+    template: `${titlePrefix}%s | ${BRAND.name}`,
   },
-  description: 'by Tristan Rechenberger',
+  description: BRAND.metadata.description,
+
+  metadataBase: new URL(BASE_URL),
 }
 
-export default function RootLayout({
+export default async function Layout({
   children,
+  params,
 }: {
   children: React.ReactNode
+  params: Promise<unknown>
 }) {
+  await params // Need to await params here, otherwise ParamsWrapper does not work in dev (turbopack)
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html suppressHydrationWarning>
       <body className="bg-background min-h-[100svh] flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
+          <SessionProvider>{children}</SessionProvider>
           <ActionCommandProvider />
           <Toaster />
           <DialogProvider />

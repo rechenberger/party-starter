@@ -47,7 +47,10 @@ export const useSuperAction = <Result = undefined, Input = undefined>(
       }
       setIsLoading(true)
 
-      const response = await action(input)
+      const response = await action(input).catch((e) => {
+        setIsLoading(false)
+        throw e
+      })
 
       if (response && 'superAction' in response) {
         const result = await consumeSuperActionResponse({

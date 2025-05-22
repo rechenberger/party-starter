@@ -19,11 +19,13 @@ export default async function Page({
 
   return (
     <>
+      <div className="flex-1" />
       <Card className="self-center w-full max-w-md flex flex-col gap-4">
         <CardContent className="flex flex-col gap-4 pt-6">
           <ChangePasswordForm redirectUrl={redirectUrl} />
         </CardContent>
       </Card>
+      <div className="flex-1" />
     </>
   )
 }

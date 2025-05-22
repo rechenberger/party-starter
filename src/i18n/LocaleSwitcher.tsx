@@ -1,0 +1,89 @@
+'use client'
+
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { SidebarMenuButton } from '@/components/ui/sidebar'
+import { Check } from 'lucide-react'
+import { localeDefinitions } from './locale'
+import { useLocale, useSetLocale } from './useLocale'
+
+const LocaleIcon = ({ locale }: { locale: string }) => {
+  return (
+    <span className="text-xs font-bold uppercase text-foreground/80">
+      {locale}
+    </span>
+  )
+}
+
+export function LocaleSwitcher({
+  variant,
+}: {
+  variant?: 'sidebar' | 'submenu'
+}) {
+  const locale = useLocale()
+  const setLocale = useSetLocale()
+
+  const icon = <LocaleIcon locale={locale} />
+
+  const label = 'Change Language'
+
+  const dropdownMenuItems = (
+    <>
+      {localeDefinitions.map((l) => (
+        <DropdownMenuItem
+          key={l.locale}
+          onClick={() => setLocale(l.locale)}
+          disabled={l.locale === locale}
+        >
+          <LocaleIcon locale={l.locale} />
+          <span className="flex-1">{l.nativeName}</span>
+          {l.locale === locale && <Check className="size-4" />}
+        </DropdownMenuItem>
+      ))}
+    </>
+  )
+
+  if (variant === 'submenu') {
+    return (
+      <>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            {icon}
+            <span>{label}</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>{dropdownMenuItems}</DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
+      </>
+    )
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        {variant === 'sidebar' ? (
+          <SidebarMenuButton>
+            {icon}
+            <span>{label}</span>
+          </SidebarMenuButton>
+        ) : (
+          <Button variant="ghost" size="icon">
+            {icon}
+            <span className="sr-only">{label}</span>
+          </Button>
+        )}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">{dropdownMenuItems}</DropdownMenuContent>
+    </DropdownMenu>
+  )
+}

@@ -30,8 +30,7 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
                     content: (
                       <>
                         <p>
-                          We sent you another verification email to
-                          {data.email}.
+                          {`We have sent you another verification email to ${data.email}`}
                         </p>
                         <p>
                           Please open the email and click sign in to verify your

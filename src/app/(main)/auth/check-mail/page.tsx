@@ -20,6 +20,8 @@ export default ParamsWrapper(async () => {
           <CardTitle>Check your emails</CardTitle>
           <CardDescription>
             We have sent you an email to verify your email address.
+            <br />
+            You can close this browser window now.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">

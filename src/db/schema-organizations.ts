@@ -55,7 +55,7 @@ export const inviteCodes = pgTable(
 
     role: organizationRoleType('role').notNull(),
     comment: text('comment'),
-    expiresAt: timestamp('expiresAt'),
+    expiresAt: timestamp('expiresAt', { withTimezone: true }),
     usesMax: integer('usesMax'),
     usesCurrent: integer('usesCurrent'),
     sentToEmail: text('sentToEmail'),

@@ -6,13 +6,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { getMyLocale } from '@/i18n/getMyLocale'
-import { ParamsWrapper } from '@/lib/paramsServerContext'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
-export default ParamsWrapper(async () => {
-  const locale = await getMyLocale()
+export default async function Page() {
   return (
     <>
       <Card className="self-center w-full max-w-md flex flex-col gap-4">
@@ -25,7 +22,7 @@ export default ParamsWrapper(async () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <Link href={`/${locale}`}>
+          <Link href={`/`} prefetch={false}>
             <Button variant="default">
               <ArrowLeft className="size-4" /> Home
             </Button>
@@ -34,4 +31,4 @@ export default ParamsWrapper(async () => {
       </Card>
     </>
   )
-})
+}

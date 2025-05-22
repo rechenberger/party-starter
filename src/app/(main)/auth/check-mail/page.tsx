@@ -1,13 +1,9 @@
-import { Button } from '@/components/ui/button'
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
 
 export default async function Page() {
   return (
@@ -21,13 +17,6 @@ export default async function Page() {
             You can close this browser window now.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <Link href={`/`} prefetch={false}>
-            <Button variant="default">
-              <ArrowLeft className="size-4" /> Home
-            </Button>
-          </Link>
-        </CardContent>
       </Card>
     </>
   )

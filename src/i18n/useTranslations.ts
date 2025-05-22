@@ -14,7 +14,7 @@ export const useTranslations = () => {
         return deT
       default:
         const exhaustiveCheck: never = locale
-        throw new Error(`Unsupported locale: ${locale}`)
+        throw new Error(`Unsupported locale: ${exhaustiveCheck}`)
     }
   }, [locale])
 }

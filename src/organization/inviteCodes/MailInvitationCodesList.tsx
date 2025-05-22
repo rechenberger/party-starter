@@ -242,7 +242,7 @@ export const MailInvitationCodesList = async (
                       </TableCell>
                       <TableCell>
                         <DateFnsFormatDistanceToNow
-                          date={code.createdAt}
+                          date={code.updatedAt}
                           options={{
                             addSuffix: true,
                           }}

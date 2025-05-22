@@ -47,7 +47,7 @@ export const inviteCodes = pgTable(
     id: idColumn(),
     ...createdUpdatedAtByColumns(),
 
-    deletedAt: timestamp('deletedAt'),
+    deletedAt: timestamp('deletedAt', { withTimezone: true }),
 
     organizationId: text('organizationId')
       .notNull()

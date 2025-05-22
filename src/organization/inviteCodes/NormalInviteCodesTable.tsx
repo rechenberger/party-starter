@@ -1,4 +1,5 @@
 import { CopyToClipboardButton } from '@/components/CopyToClipboardButton'
+import { LocalFormatToNow } from '@/components/dates/LocalFormatToNow'
 import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -181,6 +182,9 @@ export const NormalInviteCodesTable = async (
                           })
                         ) : (
                           <span className="text-muted-foreground">Never</span>
+                        )}
+                        {!!code.expiresAt && (
+                          <LocalFormatToNow date={code.expiresAt} />
                         )}
                       </TableCell>
                       <TableCell>

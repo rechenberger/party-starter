@@ -1,4 +1,4 @@
-import { Locale as DateFnsLocale, de, enUS } from 'date-fns/locale'
+import { type Locale as DateFnsLocale, de, enUS } from 'date-fns/locale'
 import { z } from 'zod'
 
 export const LOCALES = ['en', 'de'] as const

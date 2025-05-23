@@ -48,7 +48,7 @@ const LoginData = ({ t }: { t: TranslationsClient }) => {
           ctx.addIssue({
             path: ['confirmPassword'],
             code: 'custom',
-            message: t.login.confirmPasswordMismatch,
+            message: t.auth.confirmPasswordMismatch,
           })
         }
       }
@@ -95,10 +95,10 @@ export const LoginFormClient = ({
 
   const mainLabel =
     type === 'forgotPassword'
-      ? 'Forgot Password'
+      ? t.auth.forgotPassword
       : type === 'register'
-        ? 'Register'
-        : 'Login'
+        ? t.auth.registerTitle
+        : t.auth.loginTitle
 
   return (
     <>
@@ -133,7 +133,7 @@ export const LoginFormClient = ({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t.standardWords.email}</FormLabel>
                     <FormControl>
                       <Input type="email" {...field} />
                     </FormControl>
@@ -148,7 +148,9 @@ export const LoginFormClient = ({
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex flex-row gap-4 items-end">
-                        <FormLabel className="flex-1">Password</FormLabel>
+                        <FormLabel className="flex-1">
+                          {t.standardWords.password}
+                        </FormLabel>
                         {type === 'login' && (
                           <Button
                             type="button"
@@ -160,7 +162,7 @@ export const LoginFormClient = ({
                               setType('forgotPassword')
                             }}
                           >
-                            {t.login.forgotPassword}
+                            {t.auth.forgotPassword}
                           </Button>
                         )}
                       </div>
@@ -179,7 +181,7 @@ export const LoginFormClient = ({
                     name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
+                        <FormLabel>{t.standardWords.confirmPassword}</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
@@ -204,7 +206,7 @@ export const LoginFormClient = ({
                           />
                         </FormControl>
                         <FormLabel className="flex-1 m-0">
-                          Accept Terms
+                          {t.auth.acceptTerms}
                         </FormLabel>
                         <FormMessage />
                       </FormItem>
@@ -222,7 +224,9 @@ export const LoginFormClient = ({
                   }}
                   disabled={disabled}
                 >
-                  {type === 'login' ? 'Register' : 'Back to Login'}
+                  {type === 'login'
+                    ? t.auth.registerAction
+                    : t.auth.backToLogin}
                 </Button>
                 <Button type="submit" className="flex-1" disabled={disabled}>
                   {mainLabel}
@@ -237,7 +241,7 @@ export const LoginFormClient = ({
               <>
                 <div className="flex flex-row items-center my-2">
                   <hr className="flex-1" />
-                  <span className="mx-4 text-border">or</span>
+                  <span className="mx-4 text-border">{t.standardWords.or}</span>
                   <hr className="flex-1" />
                 </div>
                 {alternatives}

@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
@@ -27,11 +28,9 @@ const [useLoginForm] = createZodForm(ChangeUsernameSchema)
 export const ChangeUsernameFormClient = ({
   action,
   username,
-  redirectUrl,
 }: {
   action: SuperActionWithInput<ChangeUsernameSchema>
   username?: string
-  redirectUrl?: string
 }) => {
   const { trigger, isLoading } = useSuperAction({
     action,
@@ -46,11 +45,12 @@ export const ChangeUsernameFormClient = ({
     },
     disabled,
   })
+  const t = useTranslations()
 
   return (
     <>
       <div className="mb-2">
-        <CardTitle>Change Username</CardTitle>
+        <CardTitle>{t.userManagement.changeUsernameTitle}</CardTitle>
       </div>
       <Form {...form}>
         <form
@@ -64,7 +64,7 @@ export const ChangeUsernameFormClient = ({
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Username</FormLabel>
+                <FormLabel>{t.standardWords.username}</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -74,7 +74,7 @@ export const ChangeUsernameFormClient = ({
           />
           <div className="flex flex-row gap-2 mt-4 justify-end">
             <Button type="submit" disabled={disabled}>
-              Change Username
+              {t.userManagement.changeUsernameAction}
             </Button>
           </div>
         </form>

@@ -4,18 +4,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { getTranslations } from '@/i18n/getTranslations'
 
 export default async function Page() {
+  const t = await getTranslations()
   return (
     <>
       <Card className="self-center w-full max-w-md flex flex-col gap-4">
         <CardHeader>
-          <CardTitle>Check your emails</CardTitle>
-          <CardDescription>
-            We have sent you an email to verify your email address.
-            <br />
-            You can close this browser window now.
-          </CardDescription>
+          <CardTitle>{t.auth.checkMailTitle}</CardTitle>
+          <CardDescription>{t.auth.checkMailDescription}</CardDescription>
         </CardHeader>
       </Card>
     </>

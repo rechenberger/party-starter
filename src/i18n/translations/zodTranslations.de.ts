@@ -8,13 +8,15 @@ export const zodErrorTranslationsDe = {
       `${expected} erwartet, ${received} erhalten`,
     invalid_type_received_undefined: 'Darf nicht leer sein',
     invalid_type_received_null: 'Darf nicht leer sein',
-    invalid_literal: 'Ungültiger Literalwert, {{expected}} erwartet',
-    unrecognized_keys: 'Unbekannte Schlüssel im Objekt: {{- keys}}',
+    invalid_literal: (expected: string) =>
+      `Ungültiger Literalwert, ${expected} erwartet`,
+    unrecognized_keys: (keys: string) =>
+      `Unbekannte Schlüssel im Objekt: ${keys}`,
     invalid_union: 'Ungültige Eingabe',
-    invalid_union_discriminator:
-      'Ungültiger Diskriminatorwert, {{- options}} erwartet',
-    invalid_enum_value:
-      "Ungültiger Enum-Wert. {{- options}} erwartet, '{{received}}' erhalten",
+    invalid_union_discriminator: (options: string) =>
+      `Ungültiger Diskriminatorwert, ${options} erwartet`,
+    invalid_enum_value: (options: string, received: string) =>
+      `Ungültiger Enum-Wert, ${options} erwartet, '${received}' erhalten`,
     invalid_arguments: 'Ungültige Funktionsargumente',
     invalid_return_type: 'Ungültiger Funktionsrückgabewert',
     invalid_date: 'Ungültiges Datum',
@@ -24,14 +26,20 @@ export const zodErrorTranslationsDe = {
     not_multiple_of: 'Zahl muss ein Vielfaches von {{multipleOf}} sein',
     not_finite: 'Zahl muss endlich sein',
     invalid_string: {
-      email: 'Ungültige {{validation}}',
-      url: 'Ungültige {{validation}}',
-      uuid: 'Ungültige {{validation}}',
-      cuid: 'Ungültige {{validation}}',
-      regex: 'Ungültig',
-      datetime: 'Ungültiger {{validation}}',
-      startsWith: 'Ungültige Eingabe: muss mit "{{startsWith}}" beginnen',
-      endsWith: 'Ungültige Eingabe: muss mit "{{endsWith}}" enden',
+      email: (validation: string) => `Ungültige ${validation}`,
+      url: (validation: string) => `Ungültige ${validation}`,
+      uuid: (validation: string) => `Ungültige ${validation}`,
+      cuid: (validation: string) => `Ungültige ${validation}`,
+      regex: (_: string) => 'Ungültig',
+      datetime: (validation: string) => `Ungültige ${validation}`,
+      emoji: (validation: string) => `Ungültige ${validation}`,
+      cuid2: (validation: string) => `Ungültige ${validation}`,
+      ulid: (validation: string) => `Ungültige ${validation}`,
+      ip: (validation: string) => `Ungültige ${validation}`,
+      startsWith: (startsWith: string) =>
+        `Ungültige Eingabe: muss mit "${startsWith}" beginnen`,
+      endsWith: (endsWith: string) =>
+        `Ungültige Eingabe: muss mit "${endsWith}" enden`,
     },
     too_small: {
       array: {
@@ -106,6 +114,10 @@ export const zodErrorTranslationsDe = {
     cuid: 'CUID',
     regex: 'Regex',
     datetime: 'Datums- und Uhrzeitwert',
+    emoji: 'Emoji',
+    cuid2: 'CUID2',
+    ulid: 'ULID',
+    ip: 'IP-Adresse',
   },
   types: {
     function: 'Funktion',

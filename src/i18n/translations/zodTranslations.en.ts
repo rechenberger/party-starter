@@ -6,13 +6,15 @@ export const zodErrorTranslationsEn = {
       `Expected ${expected}, received ${received}`,
     invalid_type_received_undefined: 'Required',
     invalid_type_received_null: 'Required',
-    invalid_literal: 'Invalid literal value, expected {{expected}}',
-    unrecognized_keys: 'Unrecognized key(s) in object: {{- keys}}',
+    invalid_literal: (expected: string) =>
+      `Invalid literal value, expected ${expected}`,
+    unrecognized_keys: (keys: string) =>
+      `Unrecognized key(s) in object: ${keys}`,
     invalid_union: 'Invalid input',
-    invalid_union_discriminator:
-      'Invalid discriminator value. Expected {{- options}}',
-    invalid_enum_value:
-      "Invalid enum value. Expected {{- options}}, received '{{received}}'",
+    invalid_union_discriminator: (options: string) =>
+      `Invalid discriminator value. Expected ${options}`,
+    invalid_enum_value: (options: string, received: string) =>
+      `Invalid enum value. Expected ${options}, received '${received}'`,
     invalid_arguments: 'Invalid function arguments',
     invalid_return_type: 'Invalid function return type',
     invalid_date: 'Invalid date',
@@ -21,14 +23,20 @@ export const zodErrorTranslationsEn = {
     not_multiple_of: 'Number must be a multiple of {{multipleOf}}',
     not_finite: 'Number must be finite',
     invalid_string: {
-      email: 'Invalid {{validation}}',
-      url: 'Invalid {{validation}}',
-      uuid: 'Invalid {{validation}}',
-      cuid: 'Invalid {{validation}}',
-      regex: 'Invalid',
-      datetime: 'Invalid {{validation}}',
-      startsWith: 'Invalid input: must start with "{{startsWith}}"',
-      endsWith: 'Invalid input: must end with "{{endsWith}}"',
+      email: (validation: string) => `Invalid ${validation}`,
+      url: (validation: string) => `Invalid ${validation}`,
+      uuid: (validation: string) => `Invalid ${validation}`,
+      cuid: (validation: string) => `Invalid ${validation}`,
+      regex: (_: string) => 'Invalid',
+      datetime: (validation: string) => `Invalid ${validation}`,
+      emoji: (validation: string) => `Invalid ${validation}`,
+      cuid2: (validation: string) => `Invalid ${validation}`,
+      ulid: (validation: string) => `Invalid ${validation}`,
+      ip: (validation: string) => `Invalid ${validation}`,
+      startsWith: (startsWith: string) =>
+        `Invalid input: must start with "${startsWith}"`,
+      endsWith: (endsWith: string) =>
+        `Invalid input: must end with "${endsWith}"`,
     },
     too_small: {
       array: {
@@ -103,6 +111,10 @@ export const zodErrorTranslationsEn = {
     cuid: 'cuid',
     regex: 'regex',
     datetime: 'datetime',
+    emoji: 'emoji',
+    cuid2: 'cuid2',
+    ulid: 'ulid',
+    ip: 'ip',
   },
   types: {
     function: 'function',

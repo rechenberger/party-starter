@@ -117,6 +117,8 @@ export const t = {
     create: 'Organisation erstellen',
     selectOrganization: 'Organisation auswählen',
     settings: 'Einstellungen',
+    dashboardTopHeader: (orgName: string) => `Dashboard für ${orgName}`,
+    settingsTopHeader: (orgName: string) => `Einstellungen für ${orgName}`,
     members: {
       title: 'Mitglieder',
       description: 'Mitglieder der Organisation',

@@ -112,6 +112,8 @@ export const t = {
     orgMembers: 'Organization Members',
     selectOrganization: 'Select an organization',
     settings: 'Settings',
+    dashboardTopHeader: (orgName: string) => `Dashboard for ${orgName}`,
+    settingsTopHeader: (orgName: string) => `Settings for ${orgName}`,
     members: {
       title: 'Members',
       description: 'Members of the organization',

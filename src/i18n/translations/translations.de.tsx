@@ -132,5 +132,6 @@ export const t = {
     },
     missingPermission:
       'Sie sind nicht berechtigt, eine Organisation zu erstellen',
+    membershipNotFound: 'Mitgliedschaft nicht gefunden',
   },
 } satisfies TranslationsClient

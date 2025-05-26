@@ -124,6 +124,7 @@ export const t = {
       placeholder: 'Enter organization name',
     },
     missingPermission: 'You are not allowed to create an organization',
+    membershipNotFound: 'Membership not found',
   },
 }
 

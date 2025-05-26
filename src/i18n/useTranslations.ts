@@ -5,7 +5,6 @@ import { useLocale } from './useLocale'
 
 export const useTranslations = () => {
   const locale = useLocale()
-  console.log('locale', locale)
   return useMemo(() => {
     switch (locale) {
       case 'en':

@@ -14,6 +14,7 @@ import {
 import { User } from '@/db/schema-zod'
 import { LocaleSwitcher } from '@/i18n/LocaleSwitcher'
 import { getMyLocale } from '@/i18n/getMyLocale'
+import { getTranslations } from '@/i18n/getTranslations'
 import { LOCALIZATION } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import { ActionButton } from '@/super-action/button/ActionButton'
@@ -30,6 +31,7 @@ export const UserMenuDropDownContent = async ({
   if (!user) {
     return null
   }
+  const t = await getTranslations()
   const currentLocale = await getMyLocale()
   return (
     <>
@@ -60,7 +62,7 @@ export const UserMenuDropDownContent = async ({
             action={changeUsernameWithRedirect}
           >
             <UserRound className="size-4" />
-            Change Username
+            {t.userManagement.changeUsernameAction}
           </ActionButton>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
@@ -72,7 +74,7 @@ export const UserMenuDropDownContent = async ({
             action={changePasswordWithRedirect}
           >
             <KeyRound className="size-4" />
-            Change Password
+            {t.userManagement.changePasswordAction}
           </ActionButton>
         </DropdownMenuItem>
       </DropdownMenuGroup>
@@ -83,7 +85,7 @@ export const UserMenuDropDownContent = async ({
       <DropdownMenuItem asChild>
         <Link href={LOCALIZATION.isActive ? `/${currentLocale}` : '/'}>
           <House className="size-4" />
-          Homepage
+          {t.standardWords.homepage}
         </Link>
       </DropdownMenuItem>
       <DropdownMenuItem asChild>
@@ -107,7 +109,7 @@ export const UserMenuDropDownContent = async ({
           }}
         >
           <LogOut className="size-4" />
-          Logout
+          {t.standardWords.logout}
         </ActionButton>
       </DropdownMenuItem>
     </>

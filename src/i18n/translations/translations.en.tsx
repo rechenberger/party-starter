@@ -51,6 +51,15 @@ export const t = {
     copyToClipboard: 'Copy to clipboard',
     unknown: 'Unknown',
     created: 'Created',
+    homepage: 'Homepage',
+    logout: 'Logout',
+    changeLanguage: 'Change Language',
+    changeTheme: 'Change Theme',
+    theme: {
+      light: 'Light',
+      dark: 'Dark',
+      system: 'System',
+    },
   },
   auth: {
     checkMailTitle: 'Check your emails',
@@ -232,13 +241,10 @@ export const t = {
       },
     },
   },
-  //#region roles
   roles: {
     admin: 'Admin',
     member: 'Member',
   },
-  //#endregion
-  //#region expirationTimes
   expirationTimes: {
     oneDay: '1 Day',
     oneWeek: '1 Week',
@@ -246,7 +252,11 @@ export const t = {
     oneYear: '1 Year',
     never: 'Never',
   },
-  //#endregion
+  nav: {
+    home: 'Home',
+    users: 'Users',
+    dashboard: 'Dashboard',
+  },
 }
 
 export type TranslationsClient = typeof t

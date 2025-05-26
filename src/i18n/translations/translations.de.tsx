@@ -53,6 +53,15 @@ export const t = {
     copyToClipboard: 'In die Zwischenablage kopieren',
     unknown: 'Unbekannt',
     created: 'Erstellt',
+    homepage: 'Homepage',
+    logout: 'Ausloggen',
+    changeLanguage: 'Sprache ändern',
+    changeTheme: 'Theme ändern',
+    theme: {
+      light: 'Hell',
+      dark: 'Dunkel',
+      system: 'System',
+    },
   },
   auth: {
     checkMailTitle: 'Überprüfen Sie Ihre E-Mails',
@@ -253,5 +262,10 @@ export const t = {
     oneMonth: '1 Monat',
     oneYear: '1 Jahr',
     never: 'Nie',
+  },
+  nav: {
+    home: 'Home',
+    users: 'Benutzer',
+    dashboard: 'Dashboard',
   },
 } satisfies TranslationsClient

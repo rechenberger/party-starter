@@ -18,9 +18,22 @@ export const t = {
     changePasswordAction: 'Passwort ändern',
     changeUsernameTitle: 'Benutzername ändern',
     changeUsernameAction: 'Benutzername ändern',
+    loginAs: 'Einloggen als',
+    currentUser: 'Aktueller Benutzer',
     createUser: {
       title: 'Benutzer erstellen',
       create: 'Benutzer erstellen',
+    },
+    deleteUser: {
+      title: (name: string) => `Benutzer ${name} löschen`,
+      success: (name: string) => `Benutzer ${name} gelöscht`,
+      delete: 'Löschen',
+      confirmation: {
+        title: 'Wirklich löschen?',
+        content: (name: string) =>
+          `Dies wird den Benutzer ${name} unwiderruflich löschen`,
+        confirm: 'Benutzer löschen',
+      },
     },
   },
   standardWords: {
@@ -33,6 +46,9 @@ export const t = {
     or: 'oder',
     email: 'E-Mail',
     cancel: 'Abbrechen',
+    areYouSure: 'Sind Sie sicher?',
+    yes: 'Ja',
+    no: 'Nein',
   },
   auth: {
     checkMailTitle: 'Überprüfen Sie Ihre E-Mails',
@@ -62,6 +78,25 @@ export const t = {
     registerAction: 'Registrieren',
     backToLogin: 'Zurück zur Anmeldung',
     acceptTerms: 'Nutzungsbedingungen akzeptieren',
+  },
+  users: {
+    title: 'Benutzer',
+    emailVerified: 'E-Mail bestätigt',
+    emailNotVerified: 'E-Mail nicht bestätigt',
+    admin: 'Admin',
+    removeAdmin: (email: string) => `Admin von ${email} entfernen`,
+    makeAdmin: (email: string) => `${email} zu Admin machen`,
+    removedAdmin: 'Admin entfernt',
+    madeAdmin: 'Admin gemacht',
+    removeAdminDescription: (email: string) => (
+      <>
+        Benutzer {email} ist <b>kein</b> Admin mehr
+      </>
+    ),
+    makeAdminDescription: (email: string) =>
+      `Benutzer ${email} ist jetzt ein Admin`,
+    allUsers: 'Alle Benutzer',
+    admins: 'Admins',
   },
   org: {
     organization: 'Organisation',

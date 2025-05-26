@@ -1,6 +1,7 @@
 'use client'
 
 import { toast } from '@/components/ui/use-toast'
+import { useTranslations } from '@/i18n/useTranslations'
 import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import { useShowDialog } from '../dialog/DialogProvider'
@@ -25,6 +26,7 @@ export const useSuperAction = <Result = undefined, Input = undefined>(
 
   const router = useRouter()
   const showDialog = useShowDialog()
+  const t = useTranslations()
 
   const trigger = useCallback(
     async (input: Input, evt?: MouseEvent) => {
@@ -38,9 +40,9 @@ export const useSuperAction = <Result = undefined, Input = undefined>(
         const dialogOptions =
           typeof askForConfirmation === 'object' ? askForConfirmation : {}
         const res = await showDialog({
-          title: 'Are you sure?',
-          confirm: 'Yes',
-          cancel: 'No',
+          title: t.standardWords.areYouSure,
+          confirm: t.standardWords.yes,
+          cancel: t.standardWords.cancel,
           ...dialogOptions,
         })
         if (!res) return

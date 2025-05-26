@@ -29,9 +29,7 @@ import { organizationRoleDefinitions } from '../organizationRoles'
 
 const CreateInviteCodeEmailSchema = z.object({
   role: z.enum(['admin', 'member']),
-  receiverEmail: z
-    .array(z.string().email('Not a valid email address'))
-    .min(1, 'At least one email address is required'),
+  receiverEmail: z.array(z.string().email()).min(1),
 })
 
 export type CreateInviteCodeEmailData = z.infer<

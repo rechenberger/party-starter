@@ -52,6 +52,7 @@ export const t = {
     copiedToClipboard: 'In die Zwischenablage kopiert',
     copyToClipboard: 'In die Zwischenablage kopieren',
     unknown: 'Unbekannt',
+    created: 'Erstellt',
   },
   auth: {
     checkMailTitle: 'Überprüfen Sie Ihre E-Mails',
@@ -104,8 +105,43 @@ export const t = {
   org: {
     organization: 'Organisation',
     create: 'Organisation erstellen',
-    members: 'Mitglieder',
+    members: {
+      title: 'Mitglieder',
+      description: 'Mitglieder der Organisation',
+      searchPlaceholder: 'Mitglied suchen...',
+      noMembers:
+        'Keine Mitglieder gefunden. Erstellen Sie ein Mitglied, um zu beginnen.',
+      member: 'Mitglied',
+      members: 'Mitglieder',
+      role: 'Rolle',
+      joined: 'Beigetreten',
+      actions: 'Aktionen',
+    },
     orgMembers: 'Organisationsmitglieder',
+    leave: {
+      title: 'Organisation verlassen',
+      content:
+        'Sind Sie sicher, dass Sie diese Organisation verlassen möchten?',
+      action: 'Organisation verlassen',
+      confirmation: {
+        title: 'Wirklich verlassen?',
+        content:
+          'Sind Sie sicher, dass Sie diese Organisation verlassen möchten?',
+        confirm: 'Organisation verlassen',
+      },
+    },
+    kick: {
+      title: 'Benutzer entfernen',
+      content:
+        'Sind Sie sicher, dass Sie diesen Benutzer aus dieser Organisation entfernen möchten?',
+      action: 'Benutzer entfernen',
+      confirmation: {
+        title: 'Wirklich entfernen?',
+        content: (name: string) =>
+          `Sind Sie sicher, dass Sie ${name} aus dieser Organisation entfernen möchten?`,
+        confirm: 'Benutzer entfernen',
+      },
+    },
     join: {
       successTitle: 'Erfolgreich beigetreten!',
       successDescription: (organizationName: string) =>
@@ -185,7 +221,7 @@ export const t = {
         'Keine Einladungscodes gefunden. Erstellen Sie einen, um zu beginnen.',
       receiver: 'Empfänger',
       status: 'Status',
-      sentAt: 'Gesendet am',
+      sentAt: 'Gesendet',
       sentBy: 'Gesendet von',
       noMailInvitations:
         'Keine E-Mail Einladungen gefunden. Erstellen Sie eine, um zu beginnen.',

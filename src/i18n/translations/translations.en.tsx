@@ -50,6 +50,7 @@ export const t = {
     copiedToClipboard: 'Copied to clipboard',
     copyToClipboard: 'Copy to clipboard',
     unknown: 'Unknown',
+    created: 'Created',
   },
   auth: {
     checkMailTitle: 'Check your emails',
@@ -98,8 +99,40 @@ export const t = {
   org: {
     organization: 'Organization',
     create: 'Create Organization',
-    members: 'Members',
     orgMembers: 'Organization Members',
+    members: {
+      title: 'Members',
+      description: 'Members of the organization',
+      searchPlaceholder: 'Search members by name or email...',
+      noMembers: 'No members found. Create one to get started.',
+      member: 'Member',
+      members: 'Members',
+      role: 'Role',
+      joined: 'Joined',
+      actions: 'Actions',
+    },
+    leave: {
+      title: 'Leave Organization',
+      content: 'Are you sure you want to leave this organization?',
+      action: 'Leave Organization',
+      confirmation: {
+        title: 'Really leave?',
+        content: 'Are you sure you want to leave this organization?',
+        confirm: 'Leave Organization',
+      },
+    },
+    kick: {
+      title: 'Kick User',
+      content:
+        'Are you sure you want to kick this user from this organization?',
+      action: 'Kick User',
+      confirmation: {
+        title: 'Really kick?',
+        content: (name: string) =>
+          `Are you sure you want to kick ${name} from this organization?`,
+        confirm: 'Kick User',
+      },
+    },
     join: {
       successTitle: 'Successfully Joined!',
       successDescription: (organizationName: string) =>

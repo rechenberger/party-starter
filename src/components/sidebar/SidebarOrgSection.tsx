@@ -40,7 +40,7 @@ export const SidebarOrgSection = async () => {
       exactMatch: true,
     },
     {
-      name: t.org.members,
+      name: t.org.members.title,
       href: `/org/${org.slug}/settings/members`,
       icon: <Users />,
       hidden: !defaultViewRoles.includes(membership.role),

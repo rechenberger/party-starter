@@ -5,10 +5,12 @@ export const organizationRoleDefinitions = [
   {
     name: 'admin',
     label: 'Admin',
+    i18nKey: 'admin',
   },
   {
     name: 'member',
     label: 'Member',
+    i18nKey: 'member',
   },
 ] as const
 

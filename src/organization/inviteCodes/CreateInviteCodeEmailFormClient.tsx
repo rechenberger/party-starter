@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
@@ -52,6 +53,8 @@ export const CreateInviteCodeEmailFormClient = ({
     action,
     catchToast: true,
   })
+
+  const t = useTranslations()
 
   const form = useCreateInviteCodeEmailForm({
     defaultValues: {
@@ -91,7 +94,7 @@ export const CreateInviteCodeEmailFormClient = ({
             name="role"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Role</FormLabel>
+                <FormLabel>{t.inviteCodes.createForm.role}</FormLabel>
                 <FormControl>
                   <Select
                     {...field}
@@ -102,12 +105,14 @@ export const CreateInviteCodeEmailFormClient = ({
                     }}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select role" />
+                      <SelectValue
+                        placeholder={t.inviteCodes.createForm.selectRole}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {map(organizationRoleDefinitions, (role) => (
                         <SelectItem key={role.name} value={role.name}>
-                          {role.label}
+                          {t.roles[role.i18nKey]}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -118,7 +123,7 @@ export const CreateInviteCodeEmailFormClient = ({
             )}
           />
           <FormItem>
-            <FormLabel>Receiver</FormLabel>
+            <FormLabel>{t.inviteCodes.createForm.receiver}</FormLabel>
             <div className="flex flex-col gap-2">
               <InputWithButton
                 inputProps={{
@@ -185,12 +190,14 @@ export const CreateInviteCodeEmailFormClient = ({
                   data-slot="form-message"
                   className={'text-destructive text-sm'}
                 >
-                  At least one email address is invalid
+                  {t.inviteCodes.createForm.atLeastOneEmailInvalid}
                 </p>
               )}
           </FormItem>
           <Button type="submit" className="" disabled={isLoading}>
-            {isLoading ? 'Sending...' : 'Send Invitation'}
+            {isLoading
+              ? t.inviteCodes.createForm.sending
+              : t.inviteCodes.createForm.sendInvitation}
           </Button>
         </form>
       </Form>

@@ -49,6 +49,9 @@ export const t = {
     areYouSure: 'Sind Sie sicher?',
     yes: 'Ja',
     no: 'Nein',
+    copiedToClipboard: 'In die Zwischenablage kopiert',
+    copyToClipboard: 'In die Zwischenablage kopieren',
+    unknown: 'Unbekannt',
   },
   auth: {
     checkMailTitle: 'Überprüfen Sie Ihre E-Mails',
@@ -133,5 +136,83 @@ export const t = {
     missingPermission:
       'Sie sind nicht berechtigt, eine Organisation zu erstellen',
     membershipNotFound: 'Mitgliedschaft nicht gefunden',
+  },
+  inviteCodes: {
+    normalCodes: {
+      title: 'Einladungscodes',
+      create: 'Einladungscode erstellen',
+      createDescription:
+        'Erstellen Sie einen Einladungscode und teilen Sie ihn mit anderen, um sie in diese Organisation einzuladen.',
+    },
+    mailInvitations: {
+      title: 'E-Mail Einladungen',
+      create: 'E-Mail Einladung erstellen',
+      createDescription:
+        'Erstellen Sie eine E-Mail Einladung und senden Sie sie an eine E-Mail Adresse, um sie in diese Organisation einzuladen.',
+      createSuccess: (emails: string) => `Einladung an ${emails} gesendet`,
+      resendConfirmation: {
+        title: 'Einladung erneut senden',
+        content: (sentToEmail: string) =>
+          `Sind Sie sicher, dass Sie die Einladung an ${sentToEmail} erneut senden möchten?`,
+      },
+      noEmailFound: 'Keine E-Mail Adresse gefunden',
+    },
+    createForm: {
+      success: 'Einladungscode erstellt und in die Zwischenablage kopiert',
+      role: 'Rolle',
+      selectRole: 'Rolle auswählen',
+      expiresAt: 'Ablaufdatum',
+      selectExpiresAt: 'Ablaufdatum auswählen',
+      usesMax: 'Maximale Anzahl an Verwendungen',
+      usesMaxPlaceholder: 'Unbegrenzt',
+      comment: 'Kommentar',
+      commentPlaceholder: 'Fügen einen optionalen Kommentar hinzu',
+      create: 'Einladungscode erstellen',
+      receiver: 'Empfänger',
+      atLeastOneEmailInvalid: 'Mindestens eine E-Mail Adresse ist ungültig',
+      sending: 'Senden...',
+      sendInvitation: 'Einladung senden',
+    },
+    table: {
+      code: 'Code',
+      role: 'Rolle',
+      expires: 'Ablaufdatum',
+      usesLeft: 'Verbl. Verw.',
+      updatedBy: 'Aktualisiert von',
+      comment: 'Kommentar',
+      actions: 'Aktionen',
+      noInvitationCodes:
+        'Keine Einladungscodes gefunden. Erstellen Sie einen, um zu beginnen.',
+      receiver: 'Empfänger',
+      status: 'Status',
+      sentAt: 'Gesendet am',
+      sentBy: 'Gesendet von',
+      noMailInvitations:
+        'Keine E-Mail Einladungen gefunden. Erstellen Sie eine, um zu beginnen.',
+    },
+    status: {
+      pending: 'Ausstehend',
+      accepted: 'Akzeptiert',
+      expired: 'Abgelaufen',
+    },
+    delete: {
+      action: 'Einladungscode löschen',
+      confirmation: {
+        title: 'Wirklich löschen?',
+        content: 'Dies wird den Einladungscode unwiderruflich löschen',
+        confirm: 'Einladungscode löschen',
+      },
+    },
+  },
+  roles: {
+    admin: 'Admin',
+    member: 'Mitglied',
+  },
+  expirationTimes: {
+    oneDay: '1 Tag',
+    oneWeek: '1 Woche',
+    oneMonth: '1 Monat',
+    oneYear: '1 Jahr',
+    never: 'Nie',
   },
 } satisfies TranslationsClient

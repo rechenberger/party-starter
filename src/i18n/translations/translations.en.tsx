@@ -47,6 +47,9 @@ export const t = {
     areYouSure: 'Are you sure?',
     yes: 'Yes',
     no: 'No',
+    copiedToClipboard: 'Copied to clipboard',
+    copyToClipboard: 'Copy to clipboard',
+    unknown: 'Unknown',
   },
   auth: {
     checkMailTitle: 'Check your emails',
@@ -126,6 +129,88 @@ export const t = {
     missingPermission: 'You are not allowed to create an organization',
     membershipNotFound: 'Membership not found',
   },
+  inviteCodes: {
+    normalCodes: {
+      title: 'Invitation Codes',
+      create: 'Create Invitation Code',
+      createDescription:
+        'Create and share the code with others to invite them to this organization.',
+    },
+    mailInvitations: {
+      title: 'Mail Invitations',
+      create: 'Create Mail Invitation',
+      createDescription:
+        'Create and send an email invitation to a user to join this organization.',
+      createSuccess: (emails: string) => `Invitation sent to ${emails}`,
+      resendConfirmation: {
+        title: 'Resend invitation',
+        content: (sentToEmail: string) =>
+          `Are you sure you want to resend the invitation to ${sentToEmail}?`,
+      },
+      noEmailFound: 'No email found',
+    },
+    createForm: {
+      success: 'Invitation Code created and copied to clipboard',
+      role: 'Role',
+      selectRole: 'Select Role',
+      expiresAt: 'Expires At',
+      selectExpiresAt: 'Select Expires At',
+      usesMax: 'Uses Max',
+      usesMaxPlaceholder: 'Unlimited',
+      comment: 'Comment',
+      commentPlaceholder: 'Add an optional comment for yourself',
+      create: 'Create Invitation Code',
+      receiver: 'Receiver',
+      atLeastOneEmailInvalid: 'At least one email address is invalid',
+      sending: 'Sending...',
+      sendInvitation: 'Send Invitation',
+    },
+    table: {
+      code: 'Code',
+      role: 'Role',
+      expires: 'Expires',
+      usesLeft: 'Uses Left',
+      updatedBy: 'Updated By',
+      comment: 'Comment',
+      actions: 'Actions',
+      noInvitationCodes:
+        'No invitation codes found. Create one to get started.',
+      receiver: 'Receiver',
+      status: 'Status',
+      sentAt: 'Sent At',
+      sentBy: 'Sent By',
+      noMailInvitations:
+        'No mail invitations found. Create one to get started.',
+    },
+    status: {
+      pending: 'Pending',
+      accepted: 'Accepted',
+      expired: 'Expired',
+    },
+    delete: {
+      action: 'Delete Code',
+      confirmation: {
+        title: 'Really delete?',
+        content: 'This will permanently delete the code',
+        confirm: 'Delete Code',
+      },
+    },
+  },
+  //#region roles
+  roles: {
+    admin: 'Admin',
+    member: 'Member',
+  },
+  //#endregion
+  //#region expirationTimes
+  expirationTimes: {
+    oneDay: '1 Day',
+    oneWeek: '1 Week',
+    oneMonth: '1 Month',
+    oneYear: '1 Year',
+    never: 'Never',
+  },
+  //#endregion
 }
 
 export type TranslationsClient = typeof t

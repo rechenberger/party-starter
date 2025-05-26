@@ -1,6 +1,7 @@
 import { getMyUserId } from '@/auth/getMyUser'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { getTranslations } from '@/i18n/getTranslations'
 import { neverNullish, throwError } from '@/lib/neverNullish'
 import { superCache } from '@/lib/superCache'
 import { and, eq, inArray } from 'drizzle-orm'
@@ -73,7 +74,9 @@ export const getMyMembership = async ({
 
 export const getMyMembershipOrThrow = neverNullish(
   getMyMembership,
-  throwError('Membership not found'),
+  async () => {
+    const t = await getTranslations()
+    return throwError(t.org.membershipNotFound)()
+  },
 )
-
 export const getMyMembershipOrNotFound = neverNullish(getMyMembership, notFound)

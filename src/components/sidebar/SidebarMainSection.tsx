@@ -1,4 +1,5 @@
 import { getIsLoggedIn } from '@/auth/getMyUser'
+import { getTranslations } from '@/i18n/getTranslations'
 import { ORGS } from '@/lib/starter.config'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { getMyMemberships } from '@/organization/getMyMemberships'
@@ -26,6 +27,7 @@ export const SidebarMainSection = async ({
     getMyMemberships(),
     canUserCreateOrg(),
   ])
+  const t = await getTranslations()
 
   let entries = await getNavEntries({ filter: isLanding ? 'landing' : 'main' })
   return (
@@ -42,9 +44,9 @@ export const SidebarMainSection = async ({
       </SidebarGroup>
       {!isLanding && ORGS.isActive && isLoggedIn && (
         <SidebarGroup>
-          <SidebarGroupLabel>Organizations</SidebarGroupLabel>
+          <SidebarGroupLabel>{t.org.organizations}</SidebarGroupLabel>
           {userCanCreateOrg && memberships.length > 0 && (
-            <SidebarGroupAction title="Create Organization">
+            <SidebarGroupAction title={t.org.createOrg.create}>
               <Link href={`/org/create`}>
                 <Plus className="size-4" />
               </Link>
@@ -69,10 +71,10 @@ export const SidebarMainSection = async ({
               </Fragment>
             ))}
             {userCanCreateOrg && memberships.length === 0 && (
-              <SidebarMenuButton tooltip="Create Organization" asChild>
+              <SidebarMenuButton tooltip={t.org.createOrg.create} asChild>
                 <Link href={`/org/create`}>
                   <Plus size={20} />
-                  <span>Create Organization</span>
+                  <span>{t.org.createOrg.create}</span>
                 </Link>
               </SidebarMenuButton>
             )}

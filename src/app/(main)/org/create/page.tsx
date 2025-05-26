@@ -1,6 +1,7 @@
 import { getMyUserIdOrThrow } from '@/auth/getMyUser'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { getTranslations } from '@/i18n/getTranslations'
 import { slugify } from '@/lib/slugify'
 import { ORGS } from '@/lib/starter.config'
 import { superCache } from '@/lib/superCache'
@@ -21,6 +22,8 @@ export default async function CreateOrg() {
     notFound()
   }
 
+  const t = await getTranslations()
+
   return (
     <>
       <CreateOrgFormClient
@@ -35,7 +38,7 @@ export default async function CreateOrg() {
 
             const userCanCreateOrg = await canUserCreateOrg()
             if (!userCanCreateOrg) {
-              throw new Error('User cannot create an organization')
+              throw new Error(t.org.missingPermission)
             }
 
             const userId = await getMyUserIdOrThrow()

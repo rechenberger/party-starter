@@ -14,7 +14,9 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { db } from '@/db/db'
 import { users as usersTable } from '@/db/schema-auth'
+import { getTranslations } from '@/i18n/getTranslations'
 import { superCache } from '@/lib/superCache'
+import { cn } from '@/lib/utils'
 import {
   streamToast,
   superAction,
@@ -57,19 +59,19 @@ export default async function Page({
   await notFoundIfNotAdmin({ allowDev: true })
   const myUserId = await getMyUserId()
   const users = await getUsers({ filter })
-
+  const t = await getTranslations()
   return (
     <>
       <TopHeader>
         <div className="flex w-full flex-row justify-between gap-2 items-center">
-          <CardTitle className="flex-1">Users</CardTitle>
+          <CardTitle className="flex-1">{t.users.title}</CardTitle>
           <div className="flex flex-col md:flex-row gap-2 items-center">
             <SimpleParamSelect
               paramKey="filter"
               component="tabs"
               options={[
-                { value: null, label: 'All Users' },
-                { value: 'admins', label: 'Admins' },
+                { value: null, label: t.users.allUsers },
+                { value: 'admins', label: t.users.admins },
               ]}
             />
           </div>
@@ -85,9 +87,10 @@ export default async function Page({
           for (const account of user.accounts) {
             tags.push(account.provider)
           }
+          const isCurrentUser = myUserId === user.id
           return (
             <Fragment key={user.id}>
-              <Card>
+              <Card className={cn(isCurrentUser && 'border-primary')}>
                 <CardHeader>
                   <CardTitle>{user.name ?? user.email}</CardTitle>
                   <CardDescription>{user.id}</CardDescription>
@@ -109,24 +112,29 @@ export default async function Page({
                     <div className="text-muted-foreground">
                       {user.emailVerified ? (
                         <>
-                          Verified{' '}
+                          {t.users.emailVerified}{' '}
                           <DateFnsFormat
                             date={user.emailVerified}
                             format="Ppp"
                           />
                         </>
                       ) : (
-                        <>Not verified</>
+                        <>{t.users.emailNotVerified}</>
                       )}
                     </div>
                   </div>
                   <label className="">
-                    <div className="flex-1">Admin</div>
+                    <div className="flex-1">{t.users.admin}</div>
                     <ActionWrapper
-                      askForConfirmation
+                      askForConfirmation={{
+                        title: isAdmin
+                          ? t.users.removeAdmin(user.name ?? user.email)
+                          : t.users.makeAdmin(user.name ?? user.email),
+                      }}
                       action={async () => {
                         'use server'
                         return superAction(async () => {
+                          const t = await getTranslations()
                           await db
                             .update(usersTable)
                             .set({ isAdmin: !isAdmin })
@@ -135,15 +143,17 @@ export default async function Page({
                           superCache.user({ id: user.id }).revalidate()
 
                           streamToast({
-                            title: isAdmin ? 'Removed admin' : 'Made admin',
-                            description: `User ${user.email} is now ${
-                              isAdmin ? 'not' : ''
-                            } an admin`,
+                            title: isAdmin
+                              ? t.users.removedAdmin
+                              : t.users.madeAdmin,
+                            description: isAdmin
+                              ? t.users.removeAdminDescription(user.email)
+                              : t.users.makeAdminDescription(user.email),
                           })
                         })
                       }}
                       command={{
-                        label: `${isAdmin ? 'Remove' : 'Make'} admin: ${
+                        label: `${isAdmin ? t.users.removeAdmin : t.users.makeAdmin}: ${
                           user.email
                         }`,
                       }}
@@ -156,14 +166,18 @@ export default async function Page({
                       size="sm"
                       variant={'outline'}
                       askForConfirmation={{
-                        title: 'Really delete?',
-                        content: `This will delete the user ${user.email}`,
-                        confirm: 'Delete user',
-                        cancel: 'Cancel',
+                        title: t.userManagement.deleteUser.confirmation.title,
+                        content:
+                          t.userManagement.deleteUser.confirmation.content(
+                            user.name ?? user.email,
+                          ),
+                        confirm:
+                          t.userManagement.deleteUser.confirmation.confirm,
                       }}
                       action={async () => {
                         'use server'
                         return superAction(async () => {
+                          const t = await getTranslations()
                           await throwIfNotAdmin({ allowDev: true })
                           await db
                             .delete(usersTable)
@@ -173,22 +187,26 @@ export default async function Page({
                           superCache.all().revalidate()
 
                           streamToast({
-                            title: 'User deleted',
+                            title: t.userManagement.deleteUser.success(
+                              user.name ?? user.email,
+                            ),
                             description: `Bye ${user.email} 👋`,
                           })
                         })
                       }}
                       command={{
-                        label: `Delete user: ${user.email}`,
+                        label: t.userManagement.deleteUser.title(
+                          user.name ?? user.email,
+                        ),
                       }}
                     >
-                      Delete
+                      {t.userManagement.deleteUser.delete}
                     </ActionButton>
                     <ActionButton
                       size="sm"
                       variant={'outline'}
-                      disabled={myUserId === user.id}
-                      icon={myUserId === user.id ? <Check /> : undefined}
+                      disabled={isCurrentUser}
+                      icon={isCurrentUser ? <Check /> : undefined}
                       action={async () => {
                         'use server'
                         return superAction(async () => {
@@ -198,7 +216,9 @@ export default async function Page({
                         })
                       }}
                     >
-                      Login as
+                      {isCurrentUser
+                        ? t.userManagement.currentUser
+                        : t.userManagement.loginAs}
                     </ActionButton>
                   </div>
                 </CardContent>

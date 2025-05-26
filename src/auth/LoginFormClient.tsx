@@ -12,7 +12,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { TranslationsClient } from '@/i18n/translations/translations.en'
 import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
 import { cn } from '@/lib/utils'
@@ -22,40 +21,52 @@ import { ArrowLeft } from 'lucide-react'
 import { ReactNode } from 'react'
 import { z } from 'zod'
 
-const LoginData = ({ t }: { t: TranslationsClient }) => {
-  return z
-    .discriminatedUnion('type', [
-      z.object({
-        type: z.literal('login'),
-        email: z.string().email().min(1),
-        password: z.string().min(1),
+const LoginData = z
+  .discriminatedUnion('type', [
+    z.object({
+      type: z.literal('login'),
+      email: z.string().email().min(1),
+      password: z.string().min(1),
+    }),
+    z.object({
+      type: z.literal('register'),
+      email: z.string().email().min(1),
+      password: z.string().min(1),
+      confirmPassword: z.string().min(1),
+      acceptTerms: z.boolean().refine((v) => v, {
+        params: {
+          i18n: {
+            key: 'auth.acceptTerms',
+          },
+        },
       }),
-      z.object({
-        type: z.literal('register'),
-        email: z.string().email().min(1),
-        password: z.string().min(1),
-        confirmPassword: z.string().min(1),
-        acceptTerms: z.boolean().refine((v) => !!v, 'required'),
-      }),
-      z.object({
-        type: z.literal('forgotPassword'),
-        email: z.string().email().min(1),
-      }),
-    ])
-    .superRefine((data, ctx) => {
-      if (data.type === 'register') {
-        if (data.password !== data.confirmPassword) {
-          ctx.addIssue({
-            path: ['confirmPassword'],
-            code: 'custom',
-            message: t.login.confirmPasswordMismatch,
-          })
-        }
+    }),
+    z.object({
+      type: z.literal('forgotPassword'),
+      email: z.string().email().min(1),
+    }),
+  ])
+  .superRefine((data, ctx) => {
+    if (data.type === 'register') {
+      if (data.password !== data.confirmPassword) {
+        ctx.addIssue({
+          path: ['confirmPassword'],
+          code: 'custom',
+          params: {
+            i18n: {
+              key: 'auth.confirmPasswordMismatch',
+              // values: {
+              //   password: 'lol',
+              // },
+            },
+          },
+          // message: t.auth.confirmPasswordMismatch,
+        })
       }
-    })
-}
+    }
+  })
 
-type LoginData = z.infer<ReturnType<typeof LoginData>>
+type LoginData = z.infer<typeof LoginData>
 type LoginType = LoginData['type']
 
 export const LoginFormClient = ({
@@ -69,7 +80,7 @@ export const LoginFormClient = ({
 }) => {
   const t = useTranslations()
 
-  const [useLoginForm] = createZodForm(LoginData({ t }))
+  const [useLoginForm] = createZodForm(LoginData)
   const { trigger, isLoading } = useSuperAction({
     action,
     catchToast: true,
@@ -95,10 +106,10 @@ export const LoginFormClient = ({
 
   const mainLabel =
     type === 'forgotPassword'
-      ? 'Forgot Password'
+      ? t.auth.forgotPassword
       : type === 'register'
-        ? 'Register'
-        : 'Login'
+        ? t.auth.registerTitle
+        : t.auth.loginTitle
 
   return (
     <>
@@ -133,9 +144,14 @@ export const LoginFormClient = ({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t.standardWords.email}</FormLabel>
                     <FormControl>
-                      <Input type="email" {...field} />
+                      <Input
+                        type="text"
+                        autoComplete="username email"
+                        {...field}
+                        value={field.value ?? ''}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -148,7 +164,9 @@ export const LoginFormClient = ({
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex flex-row gap-4 items-end">
-                        <FormLabel className="flex-1">Password</FormLabel>
+                        <FormLabel className="flex-1">
+                          {t.standardWords.password}
+                        </FormLabel>
                         {type === 'login' && (
                           <Button
                             type="button"
@@ -160,12 +178,20 @@ export const LoginFormClient = ({
                               setType('forgotPassword')
                             }}
                           >
-                            {t.login.forgotPassword}
+                            {t.auth.forgotPassword}
                           </Button>
                         )}
                       </div>
                       <FormControl>
-                        <Input type="password" {...field} />
+                        <Input
+                          type="password"
+                          autoComplete={
+                            type === 'login'
+                              ? 'current-password'
+                              : 'new-password'
+                          }
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -179,10 +205,11 @@ export const LoginFormClient = ({
                     name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
+                        <FormLabel>{t.standardWords.confirmPassword}</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
+                            autoComplete="new-password"
                             {...field}
                             value={field.value ?? ''}
                           />
@@ -194,18 +221,20 @@ export const LoginFormClient = ({
                   <FormField
                     control={form.control}
                     name="acceptTerms"
+                    defaultValue={false}
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center gap-2 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            required
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel className="flex-1 m-0">
-                          Accept Terms
-                        </FormLabel>
+                      <FormItem className="flex flex-col gap-2">
+                        <div className="flex flex-row items-center gap-2 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="flex-1 m-0">
+                            {t.auth.acceptTerms}
+                          </FormLabel>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -222,7 +251,9 @@ export const LoginFormClient = ({
                   }}
                   disabled={disabled}
                 >
-                  {type === 'login' ? 'Register' : 'Back to Login'}
+                  {type === 'login'
+                    ? t.auth.registerAction
+                    : t.auth.backToLogin}
                 </Button>
                 <Button type="submit" className="flex-1" disabled={disabled}>
                   {mainLabel}
@@ -237,7 +268,7 @@ export const LoginFormClient = ({
               <>
                 <div className="flex flex-row items-center my-2">
                   <hr className="flex-1" />
-                  <span className="mx-4 text-border">or</span>
+                  <span className="mx-4 text-border">{t.standardWords.or}</span>
                   <hr className="flex-1" />
                 </div>
                 {alternatives}

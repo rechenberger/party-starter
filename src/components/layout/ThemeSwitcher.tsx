@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenuButton } from '@/components/ui/sidebar'
+import { useTranslations } from '@/i18n/useTranslations'
 import { cn } from '@/lib/utils'
 import { Check, Monitor, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -22,19 +23,20 @@ export function ThemeSwitcher({
   variant?: 'sidebar' | 'submenu'
 }) {
   const { setTheme, theme: currentTheme } = useTheme()
+  const t = useTranslations()
   const themes = [
     {
-      label: 'Light',
+      label: t.standardWords.theme.light,
       icon: Sun,
       value: 'light',
     },
     {
-      label: 'Dark',
+      label: t.standardWords.theme.dark,
       icon: Moon,
       value: 'dark',
     },
     {
-      label: 'System',
+      label: t.standardWords.theme.system,
       icon: Monitor,
       value: 'system',
     },
@@ -47,7 +49,7 @@ export function ThemeSwitcher({
     </>
   )
 
-  const label = 'Change Theme'
+  const label = t.standardWords.changeTheme
 
   const dropdownMenuItems = (
     <>

@@ -1,3 +1,4 @@
+import { DialogProvider } from '@/super-action/dialog/DialogProvider'
 import { TopHeader } from '../TopHeader'
 import { SidebarInset, SidebarProvider } from '../ui/sidebar'
 import { Sidebar } from './Sidebar'
@@ -19,6 +20,8 @@ export const SidebarLayout = async ({
           {children}
         </SidebarInset>
       </SidebarProvider>
+
+      <DialogProvider />
     </>
   )
 }

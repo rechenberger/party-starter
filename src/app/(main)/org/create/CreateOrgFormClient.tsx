@@ -66,9 +66,12 @@ export const CreateOrgFormClient = ({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Organization Name</FormLabel>
+                    <FormLabel>{t.org.createOrg.name}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter organization name" />
+                      <Input
+                        {...field}
+                        placeholder={t.org.createOrg.placeholder}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

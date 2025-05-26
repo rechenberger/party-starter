@@ -1,16 +1,17 @@
 import { useMemo } from 'react'
-import { t as deT } from './translations/translations.de'
-import { t as enT } from './translations/translations.en'
+import { zodErrorTranslationsDe } from './translations/zodTranslations.de'
+import { zodErrorTranslationsEn } from './translations/zodTranslations.en'
 import { useLocale } from './useLocale'
 
-export const useTranslations = () => {
+export const useZodTranslations = () => {
   const locale = useLocale()
+
   return useMemo(() => {
     switch (locale) {
       case 'en':
-        return enT
+        return zodErrorTranslationsEn
       case 'de':
-        return deT
+        return zodErrorTranslationsDe
       default:
         const exhaustiveCheck: never = locale
         throw new Error(`Unsupported locale: ${exhaustiveCheck}`)

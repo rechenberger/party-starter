@@ -40,6 +40,7 @@ import {
 } from './organizationRoles'
 
 import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
+import { useTranslations } from '@/i18n/useTranslations'
 type MembershipWithUser = Pick<
   OrganizationMembership,
   'userId' | 'role' | 'createdAt'
@@ -91,22 +92,27 @@ export const MemberList = ({
     return filtered
   }, [organization, searchQuery])
 
+  const t = useTranslations()
+
   return (
     <>
       <div className="space-y-8">
         <Card key={organization.id} className="w-full">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center">
+              <div className="flex flex-col gap-2">
                 <CardTitle>{organization.name}</CardTitle>
                 <CardDescription>
-                  Created{' '}
+                  {t.standardWords.created}{' '}
                   <DateFnsFormat date={organization.createdAt} format="PPP" />
                 </CardDescription>
               </div>
+              <div className="flex-1"></div>
               <Badge variant="outline" className="text-xs">
                 {filteredMemberships.length}{' '}
-                {filteredMemberships.length === 1 ? 'member' : 'members'}
+                {filteredMemberships.length === 1
+                  ? t.org.members.member
+                  : t.org.members.members}
               </Badge>
             </div>
 
@@ -115,7 +121,7 @@ export const MemberList = ({
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Search members by name or email..."
+                placeholder={t.org.members.searchPlaceholder}
                 className="px-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -135,10 +141,12 @@ export const MemberList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Member</TableHead>
-                  <TableHead>Joined</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t.org.members.member}</TableHead>
+                  <TableHead>{t.org.members.joined}</TableHead>
+                  <TableHead>{t.org.members.role}</TableHead>
+                  <TableHead className="text-right">
+                    {t.org.members.actions}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -186,7 +194,7 @@ export const MemberList = ({
                             <SelectContent>
                               {organizationRoleDefinitions.map((role) => (
                                 <SelectItem key={role.name} value={role.name}>
-                                  {role.label}
+                                  {t.roles[role.i18nKey]}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -194,7 +202,11 @@ export const MemberList = ({
                         )}
                         {!isAdmin && (
                           <Badge variant="outline" className="text-xs">
-                            {getOrganizationRole(membership.role).label}
+                            {
+                              t.roles[
+                                getOrganizationRole(membership.role).i18nKey
+                              ]
+                            }
                           </Badge>
                         )}
                       </TableCell>
@@ -209,9 +221,14 @@ export const MemberList = ({
                               hideIcon
                               askForConfirmation={{
                                 title: isMyMember
-                                  ? 'Leave Organization'
-                                  : 'Kick User',
-                                content: `Are you sure you want to ${isMyMember ? 'leave' : `kick ${membership.user.name} from`} ${organization.name}?`,
+                                  ? t.org.leave.confirmation.title
+                                  : t.org.kick.confirmation.title,
+                                content: isMyMember
+                                  ? t.org.leave.confirmation.content
+                                  : t.org.kick.confirmation.content(
+                                      membership.user.name ??
+                                        membership.user.email,
+                                    ),
                               }}
                               action={async () =>
                                 kickUserAction({
@@ -219,7 +236,9 @@ export const MemberList = ({
                                 })
                               }
                               title={
-                                isMyMember ? 'Leave Organization' : 'Kick User'
+                                isMyMember
+                                  ? t.org.leave.confirmation.title
+                                  : t.org.kick.confirmation.title
                               }
                             >
                               {isMyMember ? (
@@ -227,7 +246,11 @@ export const MemberList = ({
                               ) : (
                                 <Trash2 className="h-4 w-4 text-destructive" />
                               )}
-                              <span className="sr-only">Kick user</span>
+                              <span className="sr-only">
+                                {isMyMember
+                                  ? t.org.leave.confirmation.title
+                                  : t.org.kick.confirmation.title}
+                              </span>
                             </ActionButton>
                           </div>
                         </TableCell>

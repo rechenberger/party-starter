@@ -15,6 +15,7 @@ import { SidebarMenuButton } from '@/components/ui/sidebar'
 import { Check } from 'lucide-react'
 import { localeDefinitions } from './locale'
 import { useLocale, useSetLocale } from './useLocale'
+import { useTranslations } from './useTranslations'
 
 const LocaleIcon = ({ locale }: { locale: string }) => {
   return (
@@ -31,10 +32,10 @@ export function LocaleSwitcher({
 }) {
   const locale = useLocale()
   const setLocale = useSetLocale()
-
+  const t = useTranslations()
   const icon = <LocaleIcon locale={locale} />
 
-  const label = 'Change Language'
+  const label = t.standardWords.changeLanguage
 
   const dropdownMenuItems = (
     <>

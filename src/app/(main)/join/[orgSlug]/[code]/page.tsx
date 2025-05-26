@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { getTranslations } from '@/i18n/getTranslations'
 import { superCache } from '@/lib/superCache'
 import { getInviteCode } from '@/organization/inviteCodes/getInviteCode'
 import { superAction } from '@/super-action/action/createSuperAction'
@@ -48,6 +49,7 @@ export default async function JoinOrgPage({
   }
 
   const alreadyOrgMember = !!find(org.memberships, (m) => m.userId === user.id)
+  const t = await getTranslations()
 
   // Card if already joined the team
   if (alreadyOrgMember) {
@@ -56,9 +58,11 @@ export default async function JoinOrgPage({
         <CardHeader>
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle2 className="h-5 w-5 text-green-500" />
-            <CardTitle>Successfully Joined!</CardTitle>
+            <CardTitle>{t.org.join.successTitle}</CardTitle>
           </div>
-          <CardDescription>You are now a member of {org.name}.</CardDescription>
+          <CardDescription>
+            {t.org.join.successDescription(org.name)}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <JoinCardOrgInfo
@@ -67,13 +71,12 @@ export default async function JoinOrgPage({
             code={code}
           />
           <p className="text-center text-muted-foreground">
-            You now have access to all resources shared with {inviteCode.role}s
-            in this organization.
+            {t.org.join.accessDescription}
           </p>
         </CardContent>
         <CardFooter>
           <Link href={`/org/${org.slug}`} className="w-full">
-            <Button className="w-full">Go to Organization</Button>
+            <Button className="w-full">{t.org.join.goToOrganization}</Button>
           </Link>
         </CardFooter>
       </CardShell>
@@ -87,10 +90,10 @@ export default async function JoinOrgPage({
         <CardHeader>
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="h-5 w-5 text-destructive" />
-            <CardTitle>Invalid Invitation</CardTitle>
+            <CardTitle>{t.org.join.invalidInvitationTitle}</CardTitle>
           </div>
           <CardDescription>
-            This invitation link cannot be used.
+            {t.org.join.invalidInvitationDescription}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -98,8 +101,8 @@ export default async function JoinOrgPage({
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>
               {error === 'Expired'
-                ? 'This invitation has expired.'
-                : 'This invitation has reached its maximum number of uses.'}
+                ? t.org.join.expiredInvitationDescription
+                : t.org.join.maxUsesReachedDescription}
             </AlertTitle>
           </Alert>
 
@@ -111,7 +114,7 @@ export default async function JoinOrgPage({
         </CardContent>
         <CardFooter>
           <Link href={`/`} className="w-full">
-            <Button className="w-full">Return to Home</Button>
+            <Button className="w-full">{t.org.join.returnToHome}</Button>
           </Link>
         </CardFooter>
       </CardShell>
@@ -122,9 +125,9 @@ export default async function JoinOrgPage({
   return (
     <CardShell>
       <CardHeader>
-        <CardTitle>Join Organization</CardTitle>
+        <CardTitle>{t.org.join.joinOrganization}</CardTitle>
         <CardDescription>
-          You&apos;ve been invited to join an organization
+          {t.org.join.joinOrganizationDescription}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -174,7 +177,7 @@ export default async function JoinOrgPage({
             })
           }}
         >
-          Join Organization
+          {t.org.join.joinOrganization}
         </ActionButton>
         <ActionButton
           variant="outline"
@@ -184,14 +187,14 @@ export default async function JoinOrgPage({
             redirect(`/`)
           }}
         >
-          Cancel
+          {t.standardWords.cancel}
         </ActionButton>
       </CardFooter>
     </CardShell>
   )
 }
 
-const JoinCardOrgInfo = ({
+const JoinCardOrgInfo = async ({
   organization,
   inviteCode,
   code,
@@ -202,13 +205,18 @@ const JoinCardOrgInfo = ({
   >
   code: string
 }) => {
+  const t = await getTranslations()
   return (
     <div className="flex flex-col items-center justify-center py-6 gap-2">
       <SeededAvatar size={100} value={organization.slug} />
       <h2 className="text-xl font-bold">{organization.name}</h2>
-      <p className="text-sm text-muted-foreground">Invitation Code: {code}</p>
+      <p className="text-sm text-muted-foreground">
+        {t.org.join.invitationCode}: {code}
+      </p>
       <Badge variant={inviteCode.role === 'admin' ? 'default' : 'secondary'}>
-        {inviteCode.role === 'admin' ? 'Admin Role' : 'Member Role'}
+        {inviteCode.role === 'admin'
+          ? t.org.join.adminRole
+          : t.org.join.memberRole}
       </Badge>
     </div>
   )

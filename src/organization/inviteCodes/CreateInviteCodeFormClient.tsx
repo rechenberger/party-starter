@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/use-toast'
+import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
@@ -51,6 +52,7 @@ export const CreateInviteCodeFormClient = ({
     action,
     catchToast: true,
   })
+  const t = useTranslations()
 
   const showDialog = useShowDialog()
   const { toast } = useToast()
@@ -81,7 +83,7 @@ export const CreateInviteCodeFormClient = ({
               navigator.clipboard.writeText(url)
               showDialog(null)
               toast({
-                title: 'Invitation Code created and copied to clipboard',
+                title: t.inviteCodes.createForm.success,
               })
             }
           })}
@@ -92,7 +94,7 @@ export const CreateInviteCodeFormClient = ({
             name="role"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Role</FormLabel>
+                <FormLabel>{t.inviteCodes.createForm.role}</FormLabel>
                 <FormControl>
                   <Select
                     {...field}
@@ -103,12 +105,14 @@ export const CreateInviteCodeFormClient = ({
                     }}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select role" />
+                      <SelectValue
+                        placeholder={t.inviteCodes.createForm.selectRole}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {organizationRoleDefinitions.map((role) => (
                         <SelectItem key={role.name} value={role.name}>
-                          {role.label}
+                          {t.roles[role.i18nKey]}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -123,7 +127,7 @@ export const CreateInviteCodeFormClient = ({
             name="expiresAt"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Expires At</FormLabel>
+                <FormLabel>{t.inviteCodes.createForm.expiresAt}</FormLabel>
                 <FormControl>
                   <Select
                     {...field}
@@ -134,7 +138,9 @@ export const CreateInviteCodeFormClient = ({
                     }}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select expires at" />
+                      <SelectValue
+                        placeholder={t.inviteCodes.createForm.selectExpiresAt}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {expirationTimesDefinitions.map((expirationTime) => (
@@ -142,7 +148,7 @@ export const CreateInviteCodeFormClient = ({
                           key={expirationTime.value}
                           value={expirationTime.value}
                         >
-                          {expirationTime.label}
+                          {t.expirationTimes[expirationTime.i18nKey]}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -157,9 +163,13 @@ export const CreateInviteCodeFormClient = ({
             name="usesMax"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Max Uses</FormLabel>
+                <FormLabel>{t.inviteCodes.createForm.usesMax}</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} placeholder="Unlimited" />
+                  <Input
+                    type="number"
+                    {...field}
+                    placeholder={t.inviteCodes.createForm.usesMaxPlaceholder}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -170,12 +180,12 @@ export const CreateInviteCodeFormClient = ({
             name="comment"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Comment</FormLabel>
+                <FormLabel>{t.inviteCodes.createForm.comment}</FormLabel>
                 <FormControl>
                   <Input
                     type="text"
                     {...field}
-                    placeholder="Add an optional comment for yourself"
+                    placeholder={t.inviteCodes.createForm.commentPlaceholder}
                   />
                 </FormControl>
                 <FormMessage />
@@ -184,7 +194,7 @@ export const CreateInviteCodeFormClient = ({
           />
 
           <Button type="submit" className="mt-2" disabled={disabled}>
-            Create Invitation Code
+            {t.inviteCodes.createForm.create}
           </Button>
         </form>
       </Form>

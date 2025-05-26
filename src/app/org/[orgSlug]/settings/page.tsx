@@ -3,6 +3,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { getTranslations } from '@/i18n/getTranslations'
 import { ParamsWrapper } from '@/lib/paramsServerContext'
 import { superCache } from '@/lib/superCache'
 import {
@@ -21,26 +22,28 @@ export default ParamsWrapper(async () => {
   const { org } = await getMyMembershipOrNotFound({
     allowedRoles,
   })
+  const t = await getTranslations()
 
   return (
     <>
-      <TopHeader>Organization Settings for {org.name}</TopHeader>
+      <TopHeader>{t.org.settingsTopHeader(org.name)}</TopHeader>
 
       <div className="flex flex-row gap-4 justify-center">
         <div className="flex flex-col gap-4 max-w-2xl">
-          <h2 className="text-lg font-semibold">Danger Zone</h2>
+          <h2 className="text-lg font-semibold">
+            {t.org.deleteOrg.dangerZone}
+          </h2>
           <Card className="border-destructive">
             <CardHeader>
               <CardTitle className="text-destructive flex items-center gap-2">
                 <AlertTriangle className="size-5" />
-                Delete Organization
+                {t.org.deleteOrg.delete}
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <Alert variant="destructive">
                 <AlertDescription>
-                  This action cannot be undone. This will permanently delete the
-                  organization and remove all access for all team members.
+                  {t.org.deleteOrg.description}
                 </AlertDescription>
               </Alert>
               <div className="flex justify-end">
@@ -62,13 +65,12 @@ export default ParamsWrapper(async () => {
                     redirect('/')
                   }}
                   askForConfirmation={{
-                    title: 'Delete Organization',
-                    content: `Are you sure you want to delete ${org.name}? This action cannot be undone.`,
-                    confirm: 'Delete Organization',
-                    cancel: 'Cancel',
+                    title: t.org.deleteOrg.confirmation.title,
+                    content: t.org.deleteOrg.confirmation.content(org.name),
+                    confirm: t.org.deleteOrg.confirmation.confirm,
                   }}
                 >
-                  Delete Organization
+                  {t.org.deleteOrg.delete}
                 </ActionButton>
               </div>
             </CardContent>

@@ -1,4 +1,5 @@
 import { TopHeader } from '@/components/TopHeader'
+import { getTranslations } from '@/i18n/getTranslations'
 import { ParamsWrapper } from '@/lib/paramsServerContext'
 
 export default ParamsWrapper(
@@ -11,9 +12,10 @@ export default ParamsWrapper(
   }) => {
     const { orgSlug } = await params
     const { say } = await searchParams
+    const t = await getTranslations()
     return (
       <>
-        <TopHeader>OrgPage for {orgSlug}</TopHeader>
+        <TopHeader>{t.org.dashboardTopHeader(orgSlug)}</TopHeader>
         <div>{say}</div>
       </>
     )

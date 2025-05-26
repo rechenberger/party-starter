@@ -12,7 +12,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { TranslationsClient } from '@/i18n/translations/translations.en'
 import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
 import { cn } from '@/lib/utils'
@@ -22,40 +21,52 @@ import { ArrowLeft } from 'lucide-react'
 import { ReactNode } from 'react'
 import { z } from 'zod'
 
-const LoginData = ({ t }: { t: TranslationsClient }) => {
-  return z
-    .discriminatedUnion('type', [
-      z.object({
-        type: z.literal('login'),
-        email: z.string().email().min(1),
-        password: z.string().min(1),
+const LoginData = z
+  .discriminatedUnion('type', [
+    z.object({
+      type: z.literal('login'),
+      email: z.string().email().min(1),
+      password: z.string().min(1),
+    }),
+    z.object({
+      type: z.literal('register'),
+      email: z.string().email().min(1),
+      password: z.string().min(1),
+      confirmPassword: z.string().min(1),
+      acceptTerms: z.boolean().refine((v) => v, {
+        params: {
+          i18n: {
+            key: 'auth.acceptTerms',
+          },
+        },
       }),
-      z.object({
-        type: z.literal('register'),
-        email: z.string().email().min(1),
-        password: z.string().min(1),
-        confirmPassword: z.string().min(1),
-        acceptTerms: z.boolean().refine((v) => !!v, 'required'),
-      }),
-      z.object({
-        type: z.literal('forgotPassword'),
-        email: z.string().email().min(1),
-      }),
-    ])
-    .superRefine((data, ctx) => {
-      if (data.type === 'register') {
-        if (data.password !== data.confirmPassword) {
-          ctx.addIssue({
-            path: ['confirmPassword'],
-            code: 'custom',
-            message: t.auth.confirmPasswordMismatch,
-          })
-        }
+    }),
+    z.object({
+      type: z.literal('forgotPassword'),
+      email: z.string().email().min(1),
+    }),
+  ])
+  .superRefine((data, ctx) => {
+    if (data.type === 'register') {
+      if (data.password !== data.confirmPassword) {
+        ctx.addIssue({
+          path: ['confirmPassword'],
+          code: 'custom',
+          params: {
+            i18n: {
+              key: 'auth.confirmPasswordMismatch',
+              // values: {
+              //   password: 'lol',
+              // },
+            },
+          },
+          // message: t.auth.confirmPasswordMismatch,
+        })
       }
-    })
-}
+    }
+  })
 
-type LoginData = z.infer<ReturnType<typeof LoginData>>
+type LoginData = z.infer<typeof LoginData>
 type LoginType = LoginData['type']
 
 export const LoginFormClient = ({
@@ -69,7 +80,7 @@ export const LoginFormClient = ({
 }) => {
   const t = useTranslations()
 
-  const [useLoginForm] = createZodForm(LoginData({ t }))
+  const [useLoginForm] = createZodForm(LoginData)
   const { trigger, isLoading } = useSuperAction({
     action,
     catchToast: true,

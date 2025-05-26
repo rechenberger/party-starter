@@ -7,7 +7,7 @@ export const zodErrorTranslationsEn = {
     invalid_type_received_undefined: 'Required',
     invalid_type_received_null: 'Required',
     invalid_literal: (expected: string) =>
-      `Invalid literal value, expected ${expected}`,
+      `Invalid value, expected ${expected}`,
     unrecognized_keys: (keys: string) =>
       `Unrecognized key(s) in object: ${keys}`,
     invalid_union: 'Invalid input',
@@ -20,7 +20,8 @@ export const zodErrorTranslationsEn = {
     invalid_date: 'Invalid date',
     custom: 'Invalid input',
     invalid_intersection_types: 'Intersection results could not be merged',
-    not_multiple_of: 'Number must be a multiple of {{multipleOf}}',
+    not_multiple_of: (multipleOf: string) =>
+      `Number must be a multiple of ${multipleOf}`,
     not_finite: 'Number must be finite',
     invalid_string: {
       email: (validation: string) => `Invalid ${validation}`,
@@ -50,8 +51,12 @@ export const zodErrorTranslationsEn = {
       string: {
         exact: (minimum: string) =>
           `Must contain exactly ${minimum} character(s)`,
-        inclusive: (minimum: string) =>
-          `Must contain at least ${minimum} character(s)`,
+        inclusive: (minimum: string) => {
+          if (minimum === '1') {
+            return 'Cannot be empty.'
+          }
+          return `Must contain at least ${minimum} character(s)`
+        },
         not_inclusive: (minimum: string) =>
           `Must contain over ${minimum} character(s)`,
       },
@@ -77,19 +82,26 @@ export const zodErrorTranslationsEn = {
     },
     too_big: {
       array: {
-        exact: 'Array must contain exactly {{maximum}} element(s)',
-        inclusive: 'Array must contain at most {{maximum}} element(s)',
-        not_inclusive: 'Array must contain less than {{maximum}} element(s)',
+        exact: (maximum: string) =>
+          `Must contain exactly ${maximum} element(s)`,
+        inclusive: (maximum: string) =>
+          `Must contain at most ${maximum} element(s)`,
+        not_inclusive: (maximum: string) =>
+          `Must contain less than ${maximum} element(s)`,
       },
       string: {
-        exact: 'String must contain exactly {{maximum}} character(s)',
-        inclusive: 'String must contain at most {{maximum}} character(s)',
-        not_inclusive: 'String must contain under {{maximum}} character(s)',
+        exact: (maximum: string) =>
+          `Must contain exactly ${maximum} character(s)`,
+        inclusive: (maximum: string) =>
+          `Must contain at most ${maximum} character(s)`,
+        not_inclusive: (maximum: string) =>
+          `Must contain under ${maximum} character(s)`,
       },
       number: {
-        exact: 'Number must be exactly {{maximum}}',
-        inclusive: 'Number must be less than or equal to {{maximum}}',
-        not_inclusive: 'Number must be less than {{maximum}}',
+        exact: (maximum: string) => `Must be exactly ${maximum}`,
+        inclusive: (maximum: string) =>
+          `Must be less than or equal to ${maximum}`,
+        not_inclusive: (maximum: string) => `Must be less than ${maximum}`,
       },
       set: {
         exact: 'Invalid input',
@@ -97,10 +109,11 @@ export const zodErrorTranslationsEn = {
         not_inclusive: 'Invalid input',
       },
       date: {
-        exact: 'Date must be exactly {{- maximum, datetime}}',
-        inclusive:
-          'Date must be smaller than or equal to {{- maximum, datetime}}',
-        not_inclusive: 'Date must be smaller than {{- maximum, datetime}}',
+        exact: (maximum: string) => `Date must be exactly ${maximum}`,
+        inclusive: (maximum: string) =>
+          `Date must be smaller than or equal to ${maximum}`,
+        not_inclusive: (maximum: string) =>
+          `Date must be smaller than ${maximum}`,
       },
     },
   },
@@ -137,6 +150,12 @@ export const zodErrorTranslationsEn = {
     never: 'never',
     map: 'map',
     set: 'set',
+  },
+  custom: {
+    auth: {
+      confirmPasswordMismatch: `Passwords do not match`,
+      acceptTerms: `You must accept the terms and conditions`,
+    },
   },
 }
 

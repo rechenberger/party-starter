@@ -9,7 +9,7 @@ export const zodErrorTranslationsDe = {
     invalid_type_received_undefined: 'Darf nicht leer sein',
     invalid_type_received_null: 'Darf nicht leer sein',
     invalid_literal: (expected: string) =>
-      `Ungültiger Literalwert, ${expected} erwartet`,
+      `Ungültiger Wert, ${expected} erwartet`,
     unrecognized_keys: (keys: string) =>
       `Unbekannte Schlüssel im Objekt: ${keys}`,
     invalid_union: 'Ungültige Eingabe',
@@ -23,7 +23,8 @@ export const zodErrorTranslationsDe = {
     custom: 'Ungültige Eingabe',
     invalid_intersection_types:
       'Schnittmengenergebnisse konnten nicht zusammengeführt werden',
-    not_multiple_of: 'Zahl muss ein Vielfaches von {{multipleOf}} sein',
+    not_multiple_of: (multipleOf: string) =>
+      `Zahl muss ein Vielfaches von ${multipleOf} sein`,
     not_finite: 'Zahl muss endlich sein',
     invalid_string: {
       email: (validation: string) => `Ungültige ${validation}`,
@@ -52,8 +53,12 @@ export const zodErrorTranslationsDe = {
       },
       string: {
         exact: (minimum: string) => `Muss genau ${minimum} Zeichen enthalten`,
-        inclusive: (minimum: string) =>
-          `Muss mindestens ${minimum} Zeichen enthalten`,
+        inclusive: (minimum: string) => {
+          if (minimum === '1') {
+            return 'Darf nicht leer sein.'
+          }
+          return `Muss mindestens ${minimum} Zeichen enthalten`
+        },
         not_inclusive: (minimum: string) =>
           `Muss mehr als ${minimum} Zeichen enthalten`,
       },
@@ -79,20 +84,25 @@ export const zodErrorTranslationsDe = {
     },
     too_big: {
       array: {
-        exact: 'Array muss genau {{maximum}} Element(e) enthalten',
-        inclusive: 'Array darf höchstens {{maximum}} Element(e) enthalten',
-        not_inclusive:
-          'Array muss weniger als {{maximum}} Element(e) enthalten',
+        exact: (maximum: string) =>
+          `Muss genau ${maximum} Element(e) enthalten`,
+        inclusive: (maximum: string) =>
+          `Darf höchstens ${maximum} Element(e) enthalten`,
+        not_inclusive: (maximum: string) =>
+          `Muss weniger als ${maximum} Element(e) enthalten`,
       },
       string: {
-        exact: 'String muss genau {{maximum}} Zeichen enthalten',
-        inclusive: 'String darf höchstens {{maximum}} Zeichen enthalten',
-        not_inclusive: 'String muss weniger als {{maximum}} Zeichen enthalten',
+        exact: (maximum: string) => `Muss genau ${maximum} Zeichen enthalten`,
+        inclusive: (maximum: string) =>
+          `Darf höchstens ${maximum} Zeichen enthalten`,
+        not_inclusive: (maximum: string) =>
+          `Muss weniger als ${maximum} Zeichen enthalten`,
       },
       number: {
-        exact: 'Zahl muss genau {{maximum}} sein',
-        inclusive: 'Zahl muss kleiner oder gleich {{maximum}} sein',
-        not_inclusive: 'Zahl muss kleiner als {{maximum}} sein',
+        exact: (maximum: string) => `Muss genau ${maximum} sein`,
+        inclusive: (maximum: string) =>
+          `Muss kleiner oder gleich ${maximum} sein`,
+        not_inclusive: (maximum: string) => `Muss kleiner als ${maximum} sein`,
       },
       set: {
         exact: 'Ungültige Eingabe',
@@ -100,10 +110,10 @@ export const zodErrorTranslationsDe = {
         not_inclusive: 'Ungültige Eingabe',
       },
       date: {
-        exact: 'Datum muss genau {{- maximum, datetime}} sein',
-        inclusive:
-          'Datum muss kleiner oder gleich {{- maximum, datetime}} sein',
-        not_inclusive: 'Datum muss kleiner als {{- maximum, datetime}} sein',
+        exact: (maximum: string) => `Muss genau ${maximum} sein`,
+        inclusive: (maximum: string) =>
+          `Muss kleiner oder gleich ${maximum} sein`,
+        not_inclusive: (maximum: string) => `Muss kleiner als ${maximum} sein`,
       },
     },
   },
@@ -140,5 +150,11 @@ export const zodErrorTranslationsDe = {
     never: 'Never',
     map: 'Map',
     set: 'Set',
+  },
+  custom: {
+    auth: {
+      confirmPasswordMismatch: `Passwörter stimmen nicht überein`,
+      acceptTerms: `Sie müssen die Nutzungsbedingungen akzeptieren`,
+    },
   },
 } satisfies typeof zodErrorTranslationsEn

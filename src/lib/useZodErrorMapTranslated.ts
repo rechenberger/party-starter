@@ -204,6 +204,44 @@ function joinValues<T extends any[]>(array: T, separator = ' | '): string {
     .join(separator)
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+  if (typeof value !== 'object' || value === null) return false
+
+  for (const key in value) {
+    if (!Object.prototype.hasOwnProperty.call(value, key)) return false
+  }
+
+  return true
+}
+
+const getKeyAndValues = (
+  param: unknown,
+  defaultKey: string,
+): {
+  values: Record<string, unknown>
+  key: string
+} => {
+  if (typeof param === 'string') return { key: param, values: {} }
+
+  if (isRecord(param)) {
+    const key =
+      'key' in param && typeof param.key === 'string' ? param.key : defaultKey
+    const values =
+      'values' in param && isRecord(param.values) ? param.values : {}
+    return { key, values }
+  }
+
+  return { key: defaultKey, values: {} }
+}
+
+function getNestedValue(obj: any, keyString: string) {
+  const keys = keyString.split('.')
+  return keys.reduce(
+    (acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined),
+    obj,
+  )
+}
+
 export const useZodErrorMapTranslated = (t: ZodErrorTranslations) => {
   const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
     let message: string | Function = ctx.defaultError
@@ -273,9 +311,10 @@ export const useZodErrorMapTranslated = (t: ZodErrorTranslations) => {
           issue.type === 'date'
             ? new Date(issue.minimum as number).toString()
             : issue.minimum.toString()
-        const issueType = issue.type === 'bigint' ? 'number' : issue.type
+        const issueTypeTooSmall =
+          issue.type === 'bigint' ? 'number' : issue.type
         message =
-          t.errors.too_small[issueType][
+          t.errors.too_small[issueTypeTooSmall][
             issue.exact
               ? 'exact'
               : issue.inclusive
@@ -287,6 +326,62 @@ export const useZodErrorMapTranslated = (t: ZodErrorTranslations) => {
         }
 
         break
+      case ZodIssueCode.too_big:
+        const maximum =
+          issue.type === 'date'
+            ? new Date(issue.maximum as number).toString()
+            : issue.maximum.toString()
+        const issueTypeTooBig = issue.type === 'bigint' ? 'number' : issue.type
+        message =
+          t.errors.too_big[issueTypeTooBig][
+            issue.exact
+              ? 'exact'
+              : issue.inclusive
+                ? 'inclusive'
+                : 'not_inclusive'
+          ]
+
+        if (typeof message === 'function') {
+          message = message(maximum)
+        }
+        break
+      case ZodIssueCode.custom:
+        const { key, values } = getKeyAndValues(
+          issue.params?.i18n,
+          'errors.custom',
+        )
+        // console.log({ key, values })
+
+        if (issue.message && issue.params) {
+          console.warn(
+            'There is a message specified in the zod object and a custom issue param path. The message in the zod object will always win.',
+          )
+        }
+
+        message = getNestedValue(t.custom, key)
+        if (!message) {
+          console.error(
+            `No message found for key t.custom.${key}\nFallback to default error message...`,
+          )
+          message = t.errors.custom
+          break
+        }
+        if (typeof message === 'function') {
+          message = message(values)
+        }
+        // console.log({ message })
+
+        break
+      case ZodIssueCode.invalid_intersection_types:
+        message = t.errors.invalid_intersection_types
+        break
+      case ZodIssueCode.not_multiple_of:
+        message = t.errors.not_multiple_of(issue.multipleOf.toString())
+        break
+      case ZodIssueCode.not_finite:
+        message = t.errors.not_finite
+        break
+      default:
     }
 
     return { message: message as string }

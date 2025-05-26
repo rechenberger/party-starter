@@ -134,6 +134,10 @@ export const t = {
         content: 'Are you sure you want to leave this organization?',
         confirm: 'Leave Organization',
       },
+      cannotRemoveLastAdmin:
+        'You cannot remove the last admin from the organization.',
+      cannotRemoveLastAdminDescription:
+        'Please assign another admin beforehand. Otherwise you can delete the whole organization.',
     },
     kick: {
       title: 'Kick User',

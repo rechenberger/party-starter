@@ -143,6 +143,9 @@ export const t = {
           'Sind Sie sicher, dass Sie diese Organisation verlassen möchten?',
         confirm: 'Organisation verlassen',
       },
+      cannotRemoveLastAdmin: 'Sie können den letzten Admin nicht entfernen.',
+      cannotRemoveLastAdminDescription:
+        'Bitte weisen Sie einen anderen Admin vorher zu. Andernfalls können Sie die gesamte Organisation löschen.',
     },
     kick: {
       title: 'Benutzer entfernen',

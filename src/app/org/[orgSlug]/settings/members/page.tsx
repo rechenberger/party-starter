@@ -116,7 +116,7 @@ export default ParamsWrapper(
           data.role === 'member' &&
           data.userId === currentAdmins[0].userId
         ) {
-          throw new Error('Cannot remove last admin')
+          throw new Error(t.org.leave.cannotRemoveLastAdmin)
         }
 
         await db
@@ -168,7 +168,7 @@ export default ParamsWrapper(
           data.userId === currentAdmins[0].userId
         ) {
           throw new Error(
-            'Cannot remove last admin. Please assign another admin beforehand. Otherwise you can delete the whole organization.',
+            `${t.org.leave.cannotRemoveLastAdmin} ${t.org.leave.cannotRemoveLastAdminDescription}`,
           )
         }
 

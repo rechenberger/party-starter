@@ -99,14 +99,15 @@ export const MemberList = ({
       <div className="space-y-8">
         <Card key={organization.id} className="w-full">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center">
+              <div className="flex flex-col gap-2">
                 <CardTitle>{organization.name}</CardTitle>
                 <CardDescription>
                   {t.standardWords.created}{' '}
                   <DateFnsFormat date={organization.createdAt} format="PPP" />
                 </CardDescription>
               </div>
+              <div className="flex-1"></div>
               <Badge variant="outline" className="text-xs">
                 {filteredMemberships.length}{' '}
                 {filteredMemberships.length === 1

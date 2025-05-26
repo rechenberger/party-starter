@@ -3,7 +3,6 @@ import { Toaster } from '@/components/ui/toaster'
 import { BASE_URL } from '@/lib/config'
 import { BRAND } from '@/lib/starter.config'
 import { ActionCommandProvider } from '@/super-action/command/ActionCommandProvider'
-import { DialogProvider } from '@/super-action/dialog/DialogProvider'
 import type { Metadata } from 'next'
 import { SessionProvider } from 'next-auth/react'
 import { ThemeProvider } from 'next-themes'
@@ -37,7 +36,7 @@ export default async function Layout({
           <SessionProvider>{children}</SessionProvider>
           <ActionCommandProvider />
           <Toaster />
-          <DialogProvider />
+          {/* <DialogProvider /> This has to be inside deeper layouts in order to receive the current locale from ParamsWrapper */}
         </ThemeProvider>
       </body>
     </html>

@@ -16,6 +16,10 @@ export const t = {
     changePasswordAction: 'Change Password',
     changeUsernameTitle: 'Change Username',
     changeUsernameAction: 'Change Username',
+    createUser: {
+      title: 'Create User',
+      create: 'Create User',
+    },
   },
   standardWords: {
     users: 'Users',
@@ -26,6 +30,7 @@ export const t = {
     username: 'Username',
     or: 'or',
     email: 'Email',
+    cancel: 'Cancel',
   },
   auth: {
     checkMailTitle: 'Check your emails',
@@ -58,6 +63,33 @@ export const t = {
     create: 'Create Organization',
     members: 'Members',
     orgMembers: 'Organization Members',
+    join: {
+      successTitle: 'Successfully Joined!',
+      successDescription: (organizationName: string) =>
+        `You are now a member of ${organizationName}.`,
+      accessDescription: `You now have access to all resources shared with your Role in this organization.`,
+      goToOrganization: 'Go to Organization',
+      invalidInvitationTitle: 'Invalid Invitation',
+      invalidInvitationDescription: 'This invitation link cannot be used.',
+      expiredInvitationDescription: 'This invitation link has expired.',
+      maxUsesReachedDescription:
+        'This invitation link has reached its maximum number of uses.',
+      returnToHome: 'Return to Home',
+      joinOrganization: 'Join Organization',
+      joinOrganizationDescription:
+        'You have been invited to join an organization',
+      adminRole: 'Admin Role',
+      memberRole: 'Member Role',
+      invitationCode: 'Invitation Code',
+    },
+    createOrg: {
+      title: 'Create Organization',
+      description: 'Create a new organization',
+      name: 'Organization Name',
+      create: 'Create Organization',
+      placeholder: 'Enter organization name',
+    },
+    missingPermission: 'You are not allowed to create an organization',
   },
 }
 

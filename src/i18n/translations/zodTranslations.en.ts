@@ -156,6 +156,13 @@ export const zodErrorTranslationsEn = {
       confirmPasswordMismatch: `Passwords do not match`,
       acceptTerms: `You must accept the terms and conditions`,
     },
+    org: {
+      createOrg: {
+        name: {
+          refine: 'Name cannot be "create"',
+        },
+      },
+    },
   },
 }
 

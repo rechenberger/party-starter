@@ -156,5 +156,12 @@ export const zodErrorTranslationsDe = {
       confirmPasswordMismatch: `Passwörter stimmen nicht überein`,
       acceptTerms: `Sie müssen die Nutzungsbedingungen akzeptieren`,
     },
+    org: {
+      createOrg: {
+        name: {
+          refine: 'Name darf nicht "create" sein',
+        },
+      },
+    },
   },
 } satisfies typeof zodErrorTranslationsEn

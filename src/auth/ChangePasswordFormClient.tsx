@@ -28,7 +28,11 @@ const ChangePasswordSchema = z
       ctx.addIssue({
         path: ['confirmPassword'],
         code: 'custom',
-        message: 'Passwords do not match',
+        params: {
+          i18n: {
+            key: 'auth.confirmPasswordMismatch',
+          },
+        },
       })
     }
   })
@@ -78,7 +82,13 @@ export const ChangePasswordFormClient = ({
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input name="email" type="email" disabled value={email} />
+                <Input
+                  name="email"
+                  autoComplete="username"
+                  type="email"
+                  disabled
+                  value={email}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -91,7 +101,11 @@ export const ChangePasswordFormClient = ({
               <FormItem>
                 <FormLabel>{t.standardWords.password}</FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <Input
+                    type="password"
+                    autoComplete="new-password"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -105,7 +119,11 @@ export const ChangePasswordFormClient = ({
               <FormItem>
                 <FormLabel>{t.standardWords.confirmPassword}</FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <Input
+                    type="password"
+                    autoComplete="new-password"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

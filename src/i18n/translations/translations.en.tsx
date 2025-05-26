@@ -171,6 +171,19 @@ export const t = {
       create: 'Create Organization',
       placeholder: 'Enter organization name',
     },
+    deleteOrg: {
+      title: 'Delete Organization',
+      description:
+        'This action cannot be undone. This will permanently delete the organization and remove all access for all team members.',
+      confirmation: {
+        title: 'Really delete?',
+        content: (name: string) =>
+          `Are you sure you want to delete ${name}? This action cannot be undone.`,
+        confirm: 'Delete Organization',
+      },
+      delete: 'Delete Organization',
+      dangerZone: 'Danger Zone',
+    },
     missingPermission: 'You are not allowed to create an organization',
     membershipNotFound: 'Membership not found',
   },

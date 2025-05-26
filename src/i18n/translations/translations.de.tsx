@@ -181,6 +181,19 @@ export const t = {
       create: 'Organisation erstellen',
       placeholder: 'Geben Sie den Namen der Organisation ein',
     },
+    deleteOrg: {
+      title: 'Organisation löschen',
+      description:
+        'Diese Aktion kann nicht rückgängig gemacht werden. Dies wird die Organisation unwiderruflich löschen und alle Zugriffe für alle Teammitglieder entfernen.',
+      confirmation: {
+        title: 'Wirklich löschen?',
+        content: (name: string) =>
+          `Sind Sie sicher, dass Sie ${name} löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.`,
+        confirm: 'Organisation löschen',
+      },
+      delete: 'Organisation löschen',
+      dangerZone: 'Gefahrenzone',
+    },
     missingPermission:
       'Sie sind nicht berechtigt, eine Organisation zu erstellen',
     membershipNotFound: 'Mitgliedschaft nicht gefunden',

@@ -104,7 +104,10 @@ export const t = {
   },
   org: {
     organization: 'Organisation',
+    organizations: 'Organisationen',
     create: 'Organisation erstellen',
+    selectOrganization: 'Organisation auswählen',
+    settings: 'Einstellungen',
     members: {
       title: 'Mitglieder',
       description: 'Mitglieder der Organisation',

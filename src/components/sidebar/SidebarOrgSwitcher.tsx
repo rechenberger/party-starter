@@ -12,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { getTranslations } from '@/i18n/getTranslations'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { getMyMemberships } from '@/organization/getMyMemberships'
 import Link from 'next/link'
@@ -27,6 +28,8 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
   const selectedMembership = memberships.find(
     (membership) => membership.organization.slug === orgSlug,
   )
+
+  const t = await getTranslations()
 
   return (
     <SidebarMenu>
@@ -47,7 +50,7 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
                   {selectedMembership?.organization.name ??
-                    'Select an organization'}
+                    t.org.selectOrganization}
                 </span>
                 {/* <span className="truncate text-xs">{'activeTeam.plan'}</span> */}
               </div>
@@ -59,7 +62,7 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Organizations
+              {t.org.organizations}
             </DropdownMenuLabel>
             {memberships.map((membership) => (
               <DropdownMenuItem
@@ -88,7 +91,7 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
                       <Plus className="size-4" />
                     </div>
                     <div className="text-muted-foreground font-medium">
-                      Add organization
+                      {t.org.createOrg.title}
                     </div>
                   </Link>
                 </DropdownMenuItem>

@@ -98,8 +98,11 @@ export const t = {
   },
   org: {
     organization: 'Organization',
+    organizations: 'Organizations',
     create: 'Create Organization',
     orgMembers: 'Organization Members',
+    selectOrganization: 'Select an organization',
+    settings: 'Settings',
     members: {
       title: 'Members',
       description: 'Members of the organization',

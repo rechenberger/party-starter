@@ -152,6 +152,7 @@ export const MailInvitationCodesList = async (
                         action={async (data) => {
                           'use server'
                           return superAction(async () => {
+                            const t = await getTranslations()
                             await getMyMembershipOrThrow({
                               allowedRoles,
                               orgSlug: props.slug,

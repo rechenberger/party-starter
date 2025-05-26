@@ -146,7 +146,12 @@ export const LoginFormClient = ({
                   <FormItem>
                     <FormLabel>{t.standardWords.email}</FormLabel>
                     <FormControl>
-                      <Input type="email" {...field} />
+                      <Input
+                        type="text"
+                        autoComplete="username email"
+                        {...field}
+                        value={field.value ?? ''}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -178,7 +183,15 @@ export const LoginFormClient = ({
                         )}
                       </div>
                       <FormControl>
-                        <Input type="password" {...field} />
+                        <Input
+                          type="password"
+                          autoComplete={
+                            type === 'login'
+                              ? 'current-password'
+                              : 'new-password'
+                          }
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -196,6 +209,7 @@ export const LoginFormClient = ({
                         <FormControl>
                           <Input
                             type="password"
+                            autoComplete="new-password"
                             {...field}
                             value={field.value ?? ''}
                           />
@@ -207,18 +221,20 @@ export const LoginFormClient = ({
                   <FormField
                     control={form.control}
                     name="acceptTerms"
+                    defaultValue={false}
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center gap-2 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            required
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel className="flex-1 m-0">
-                          {t.auth.acceptTerms}
-                        </FormLabel>
+                      <FormItem className="flex flex-col gap-2">
+                        <div className="flex flex-row items-center gap-2 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="flex-1 m-0">
+                            {t.auth.acceptTerms}
+                          </FormLabel>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}

@@ -1,3 +1,5 @@
+import { getEmailTranslations } from '@/i18n/getEmailTranslations'
+import { EmailTranslations } from '@/i18n/translations/emailTranslations.en'
 import { BRAND } from '@/lib/starter.config'
 import { Button, Heading, Link, Section, Text } from '@react-email/components'
 import { DefaultTemplate } from './DefaultTemplate'
@@ -8,20 +10,24 @@ type OrgInviteProps = {
   orgName: string
   inviteLink: string
   role: 'admin' | 'member'
+  t?: EmailTranslations
 }
 
-export const OrgInvite = ({
+export const OrgInvite = async ({
   invitedByUsername,
   invitedByEmail,
   orgName,
   inviteLink,
   role,
+  t,
 }: OrgInviteProps) => {
-  const previewText = `Join ${invitedByUsername} on ${BRAND.name}`
+  t = t ?? (await getEmailTranslations('en'))
 
+  const previewText = `Join ${invitedByUsername} on ${BRAND.name}`
   return (
     <DefaultTemplate previewText={previewText}>
       <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
+        {t.welcome(orgName)}
         Join <strong>{orgName}</strong> on <BRAND.TextLogo />
       </Heading>
       <Text className="text-black text-[14px] leading-[24px]">Hello,</Text>

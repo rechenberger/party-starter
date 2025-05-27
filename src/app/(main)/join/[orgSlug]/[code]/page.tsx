@@ -65,11 +65,7 @@ export default async function JoinOrgPage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <JoinCardOrgInfo
-            organization={org}
-            inviteCode={inviteCode}
-            code={code}
-          />
+          <JoinCardOrgInfo org={org} inviteCode={inviteCode} code={code} />
           <p className="text-center text-muted-foreground">
             {t.org.join.accessDescription}
           </p>
@@ -106,11 +102,7 @@ export default async function JoinOrgPage({
             </AlertTitle>
           </Alert>
 
-          <JoinCardOrgInfo
-            organization={org}
-            inviteCode={inviteCode}
-            code={code}
-          />
+          <JoinCardOrgInfo org={org} inviteCode={inviteCode} code={code} />
         </CardContent>
         <CardFooter>
           <Link href={`/`} className="w-full">
@@ -131,11 +123,7 @@ export default async function JoinOrgPage({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <JoinCardOrgInfo
-          organization={org}
-          inviteCode={inviteCode}
-          code={code}
-        />
+        <JoinCardOrgInfo org={org} inviteCode={inviteCode} code={code} />
       </CardContent>
       <CardFooter className="flex flex-col gap-2">
         <ActionButton
@@ -195,11 +183,11 @@ export default async function JoinOrgPage({
 }
 
 const JoinCardOrgInfo = async ({
-  organization,
+  org,
   inviteCode,
   code,
 }: {
-  organization: NonNullable<Awaited<ReturnType<typeof getInviteCode>>['org']>
+  org: NonNullable<Awaited<ReturnType<typeof getInviteCode>>['org']>
   inviteCode: NonNullable<
     Awaited<ReturnType<typeof getInviteCode>>['inviteCode']
   >
@@ -208,8 +196,8 @@ const JoinCardOrgInfo = async ({
   const t = await getTranslations()
   return (
     <div className="flex flex-col items-center justify-center py-6 gap-2">
-      <SeededAvatar size={100} value={organization.slug} />
-      <h2 className="text-xl font-bold">{organization.name}</h2>
+      <SeededAvatar size={100} value={org.slug} />
+      <h2 className="text-xl font-bold">{org.name}</h2>
       <p className="text-sm text-muted-foreground">
         {t.org.join.invitationCode}: {code}
       </p>

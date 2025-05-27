@@ -49,12 +49,12 @@ type MembershipWithUser = Pick<
 }
 
 export const MemberList = ({
-  organization,
+  org,
   changeRoleAction,
   kickUserAction,
   isAdmin,
 }: {
-  organization: Organization & {
+  org: Organization & {
     memberships: MembershipWithUser[]
   }
   changeRoleAction: SuperActionWithInput<{
@@ -78,10 +78,10 @@ export const MemberList = ({
 
   const filteredMemberships = useMemo(() => {
     if (!searchQuery.trim()) {
-      return organization.memberships
+      return org.memberships
     }
 
-    const filtered = organization.memberships.filter((membership) => {
+    const filtered = org.memberships.filter((membership) => {
       const userName = membership.user.name?.toLowerCase() || ''
       const userEmail = membership.user.email?.toLowerCase() || ''
       const query = searchQuery.toLowerCase()
@@ -90,21 +90,21 @@ export const MemberList = ({
     })
 
     return filtered
-  }, [organization, searchQuery])
+  }, [org, searchQuery])
 
   const t = useTranslations()
 
   return (
     <>
       <div className="space-y-8">
-        <Card key={organization.id} className="w-full">
+        <Card key={org.id} className="w-full">
           <CardHeader>
             <div className="flex items-center">
               <div className="flex flex-col gap-2">
-                <CardTitle>{organization.name}</CardTitle>
+                <CardTitle>{org.name}</CardTitle>
                 <CardDescription>
                   {t.standardWords.created}{' '}
-                  <DateFnsFormat date={organization.createdAt} format="PPP" />
+                  <DateFnsFormat date={org.createdAt} format="PPP" />
                 </CardDescription>
               </div>
               <div className="flex-1"></div>
@@ -179,10 +179,10 @@ export const MemberList = ({
                         {isAdmin && (
                           <Select
                             defaultValue={membership.role}
-                            onValueChange={(value: 'admin' | 'member') =>
+                            onValueChange={(value: OrganizationRole) =>
                               trigger({
                                 userId: membership.userId,
-                                role: value as OrganizationRole,
+                                role: value,
                               })
                             }
                             disabled={isChangeRoleLoading}

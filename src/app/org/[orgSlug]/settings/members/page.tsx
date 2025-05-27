@@ -196,7 +196,7 @@ export default ParamsWrapper(
         {org && (
           <>
             <MemberList
-              organization={org}
+              org={org}
               changeRoleAction={changeRoleAction}
               kickUserAction={kickUserAction}
               isAdmin={isAdmin}

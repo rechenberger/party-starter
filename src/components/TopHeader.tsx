@@ -1,5 +1,5 @@
-import { SIDEBAR } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
+import { getIsSidebarActive } from './sidebar/getIsSidebarActive'
 import { Separator } from './ui/separator'
 import { SidebarTrigger } from './ui/sidebar'
 
@@ -13,7 +13,7 @@ export const TopHeader = async ({
   disableSeparator?: boolean
   hideIfSecondTopHeaderExists?: boolean
 }) => {
-  if (!(await SIDEBAR.activeInMain())) {
+  if (!(await getIsSidebarActive())) {
     return children
   }
 

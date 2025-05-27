@@ -86,6 +86,8 @@ export const t = {
     registerAction: 'Register',
     backToLogin: 'Back to Login',
     acceptTerms: 'Accept Terms',
+    emailAlreadyTaken:
+      'This email is already taken. Please use the forgot password link to reset your password.',
   },
   users: {
     title: 'Users',

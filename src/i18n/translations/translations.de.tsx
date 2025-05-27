@@ -91,6 +91,8 @@ export const t = {
     registerAction: 'Registrieren',
     backToLogin: 'Zurück zur Anmeldung',
     acceptTerms: 'Nutzungsbedingungen akzeptieren',
+    emailAlreadyTaken:
+      'Diese E-Mail Adresse ist bereits in Verwendung. Bitte verwenden Sie den Link zum Zurücksetzen des Passworts, um Ihr Passwort zurückzusetzen.',
   },
   users: {
     title: 'Benutzer',

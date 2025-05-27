@@ -22,19 +22,6 @@ export const BRAND = {
     active: true,
     url: 'https://github.com/rechenberger/party-starter',
   },
-  emails: {
-    footer: {
-      Signature: () => (
-        <>
-          Best regards
-          <br />
-          The Party Starter Team
-          <br />
-          🎉
-        </>
-      ),
-    },
-  },
   colors: {
     primary: '#79a913',
     primaryForeground: '#fafaf9',

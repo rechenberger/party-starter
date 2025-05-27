@@ -1,13 +1,22 @@
-import { MainTop } from '@/components/layout/MainTop'
+import { MainTopLayout } from '@/components/layout/MainTopLayout'
+import { getIsSidebarActive } from '@/components/sidebar/getIsSidebarActive'
+import { SidebarLayout } from '@/components/sidebar/SidebarLayout'
+import { ParamsWrapper } from '@/lib/paramsServerContext'
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <MainTop />
-      <hr />
-      <div className="container flex flex-col gap-8 py-8 flex-1">
-        {children}
-      </div>
-    </>
-  )
-}
+export default ParamsWrapper(
+  async ({ children }: { children: React.ReactNode }) => {
+    const activeInMain = await getIsSidebarActive()
+    if (activeInMain) {
+      return (
+        <>
+          <SidebarLayout>{children}</SidebarLayout>
+        </>
+      )
+    }
+    return (
+      <>
+        <MainTopLayout>{children}</MainTopLayout>
+      </>
+    )
+  },
+)

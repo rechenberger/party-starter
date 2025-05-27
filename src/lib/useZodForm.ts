@@ -1,15 +1,21 @@
+import { useZodTranslations } from '@/i18n/useZodTranslations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useFormContext, type UseFormProps } from 'react-hook-form'
 import { type ZodType } from 'zod'
+import { useZodErrorMapTranslated } from './useZodErrorMapTranslated'
 
 export const useZodForm = <TSchema extends ZodType>(
   props: Omit<UseFormProps<TSchema['_input']>, 'resolver'> & {
     schema: TSchema
   },
 ) => {
+  const t = useZodTranslations()
+  const errorMap = useZodErrorMapTranslated(t)
   const form = useForm<TSchema['_input']>({
     ...props,
-    resolver: zodResolver(props.schema),
+    resolver: zodResolver(props.schema, {
+      errorMap: errorMap,
+    }),
   })
 
   return form

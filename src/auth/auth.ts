@@ -1,4 +1,5 @@
 import { db } from '@/db/db'
+import { superCache } from '@/lib/superCache'
 import Nodemailer from '@auth/core/providers/nodemailer'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
 import NextAuth from 'next-auth'
@@ -12,6 +13,10 @@ const hasEmailEnvVars = !!process.env.EMAIL_FROM && !!process.env.SMTP_URL
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db),
+  pages: {
+    signIn: `/auth/login`,
+    verifyRequest: `/auth/check-mail`,
+  },
   providers: [
     Discord,
     ...((hasEmailEnvVars
@@ -30,7 +35,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
               await sendVerificationRequestEmail({
                 ...params,
-                theme: { brandColor: '#79a913' },
                 url,
               })
             },
@@ -49,6 +53,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.sub as string
       }
       return session
+    },
+  },
+  events: {
+    createUser: ({ user }) => {
+      if (user.id) {
+        superCache.user({ id: user.id }).revalidate()
+      } else {
+        superCache.users().revalidate()
+      }
+    },
+    linkAccount: ({ user }) => {
+      if (user.id) {
+        superCache.user({ id: user.id }).revalidate()
+      } else {
+        superCache.users().revalidate()
+      }
+    },
+    updateUser: ({ user }) => {
+      if (user.id) {
+        superCache.user({ id: user.id }).revalidate()
+      } else {
+        superCache.users().revalidate()
+      }
     },
   },
 })

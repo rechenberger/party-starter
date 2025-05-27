@@ -1,4 +1,4 @@
-import { getEmailTranslations } from '@/i18n/getEmailTranslations'
+import { getMyLocale } from '@/i18n/getMyLocale'
 import { getMailTransporter } from '@/lib/getMailTransporter'
 import { BRAND } from '@/lib/starter.config'
 import { OrgInvite } from '@emails/OrgInvite'
@@ -22,7 +22,7 @@ export const sendOrgInviteMail = async (params: {
   } = params
   try {
     const transporter = getMailTransporter()
-    const t = await getEmailTranslations()
+    const locale = await getMyLocale()
 
     const emailComponent = (
       <OrgInvite
@@ -31,7 +31,7 @@ export const sendOrgInviteMail = async (params: {
         orgName={orgName}
         inviteLink={inviteLink}
         role={role}
-        t={t}
+        locale={locale}
       />
     )
 
@@ -41,29 +41,6 @@ export const sendOrgInviteMail = async (params: {
         plainText: true,
       }),
     ])
-
-    // const emailHtml = await render(
-    //   <OrgInvite
-    //     invitedByEmail={invitedByEmail}
-    //     invitedByUsername={invitedByUsername}
-    //     orgName={orgName}
-    //     inviteLink={inviteLink}
-    //     role={role}
-    //     t={t}
-    //   />,
-    // )
-    // const emailPlainText = await render(
-    //   <OrgInvite
-    //     invitedByEmail={invitedByEmail}
-    //     invitedByUsername={invitedByUsername}
-    //     orgName={orgName}
-    //     inviteLink={inviteLink}
-    //     role={role}
-    //   />,
-    //   {
-    //     plainText: true,
-    //   },
-    // )
 
     const mailOptions = {
       to: receiverEmail,

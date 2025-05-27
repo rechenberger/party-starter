@@ -21,7 +21,7 @@ import { redirect } from 'next/navigation'
 const allowedRolesView: OrganizationRole[] = ['admin', 'member']
 const allowedRolesEdit: OrganizationRole[] = ['admin']
 
-const getOrg = async ({ orgSlug }: { orgSlug: string }) => {
+const getOrgWithInviteCodes = async ({ orgSlug }: { orgSlug: string }) => {
   'use cache'
 
   const org = await db.query.organizations.findFirst({
@@ -75,16 +75,19 @@ const getOrg = async ({ orgSlug }: { orgSlug: string }) => {
 
 export default ParamsWrapper(
   async ({ params }: { params: Promise<{ orgSlug: string }> }) => {
+    const { orgSlug } = await params
     const t = await getTranslations()
 
-    const { orgSlug } = await params
-    const { membership: myMembership } = await getMyMembershipOrNotFound({
+    const { membership: myMembership, org } = await getMyMembershipOrNotFound({
       allowedRoles: allowedRolesView,
+      orgSlug,
     })
 
     const isAdmin = myMembership.role === 'admin'
 
-    const org = await getOrg({ orgSlug })
+    const orgWithInviteCodes = await getOrgWithInviteCodes({
+      orgSlug: org.slug,
+    })
 
     const changeRoleAction = async (data: {
       userId: string
@@ -97,7 +100,7 @@ export default ParamsWrapper(
           orgSlug,
         })
 
-        if (!org) {
+        if (!orgWithInviteCodes) {
           throw new Error('Organization not found')
         }
 
@@ -149,7 +152,7 @@ export default ParamsWrapper(
           })
         }
 
-        if (!org) {
+        if (!orgWithInviteCodes) {
           throw new Error('Organization not found')
         }
 
@@ -193,10 +196,10 @@ export default ParamsWrapper(
     return (
       <>
         <TopHeader>{t.org.orgMembers}</TopHeader>
-        {org && (
+        {orgWithInviteCodes && (
           <>
             <MemberList
-              org={org}
+              org={orgWithInviteCodes}
               changeRoleAction={changeRoleAction}
               kickUserAction={kickUserAction}
               isAdmin={isAdmin}
@@ -204,7 +207,7 @@ export default ParamsWrapper(
             {isAdmin && (
               <InvitationCodesList
                 {...org}
-                inviteCodes={map(org.inviteCodes, (inviteCode) =>
+                inviteCodes={map(orgWithInviteCodes.inviteCodes, (inviteCode) =>
                   getEnhancedInviteCode(inviteCode),
                 )}
               />

@@ -95,7 +95,18 @@ export default async function Page({
                 <CardHeader>
                   <CardTitle className="flex gap-2 items-center">
                     <SimpleUserAvatar user={user} />
-                    {user.name ?? user.email}
+                    <div className="flex flex-col">
+                      <div className="font-medium">{user.name}</div>
+                      <div
+                        className={cn(
+                          !!user.name
+                            ? 'text-muted-foreground text-xs'
+                            : 'font-medium',
+                        )}
+                      >
+                        {user.email}
+                      </div>
+                    </div>
                   </CardTitle>
                   <CardDescription>{user.id}</CardDescription>
                   {tags.length && (

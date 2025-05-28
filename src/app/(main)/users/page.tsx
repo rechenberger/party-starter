@@ -21,14 +21,13 @@ import {
   streamToast,
   superAction,
 } from '@/super-action/action/createSuperAction'
-import { streamRevalidatePath } from '@/super-action/action/streamRevalidatePath'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { ActionWrapper } from '@/super-action/button/ActionWrapper'
 import { asc, eq } from 'drizzle-orm'
-import { Check } from 'lucide-react'
 import { Metadata } from 'next'
 import { Fragment } from 'react'
 import { CreateUserButton } from './CreateUserButton'
+import { ImpersonateButton } from './ImpersonateButton'
 
 export const metadata: Metadata = {
   title: 'Users',
@@ -79,7 +78,7 @@ export default async function Page({
         </div>
       </TopHeader>
 
-      <div className="grid lg:grid-cols-3 gap-4">
+      <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-4">
         {users.map((user) => {
           const isAdmin = !!user.isAdmin
           const tags: string[] = []
@@ -202,24 +201,16 @@ export default async function Page({
                     >
                       {t.userManagement.deleteUser.delete}
                     </ActionButton>
-                    <ActionButton
-                      size="sm"
-                      variant={'outline'}
-                      disabled={isCurrentUser}
-                      icon={isCurrentUser ? <Check /> : undefined}
+                    <ImpersonateButton
+                      userId={user.id}
                       action={async () => {
                         'use server'
                         return superAction(async () => {
-                          await throwIfNotAdmin({ allowDev: true })
                           await impersonate({ userId: user.id })
-                          streamRevalidatePath('/', 'layout') // force refresh
+                          //
                         })
                       }}
-                    >
-                      {isCurrentUser
-                        ? t.userManagement.currentUser
-                        : t.userManagement.loginAs}
-                    </ActionButton>
+                    />
                   </div>
                 </CardContent>
               </Card>

@@ -1,5 +1,5 @@
 import { getMyUserOrLogin } from '@/auth/getMyUser'
-import SeededAvatar from '@/components/SeededAvatar'
+import { SimpleOrgAvatar } from '@/components/simple/SimpleOrgAvatar'
 import { Alert, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -196,7 +196,7 @@ const JoinCardOrgInfo = async ({
   const t = await getTranslations()
   return (
     <div className="flex flex-col items-center justify-center py-6 gap-2">
-      <SeededAvatar size={100} value={org.slug} />
+      <SimpleOrgAvatar org={org} size={100} />
       <h2 className="text-xl font-bold">{org.name}</h2>
       <p className="text-sm text-muted-foreground">
         {t.org.join.invitationCode}: {code}

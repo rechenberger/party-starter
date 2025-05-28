@@ -1,13 +1,17 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import Avvvatars from 'avvvatars-react'
+import Avatar from 'boring-avatars'
 export default function SeededAvatar(
-  props: React.ComponentProps<typeof Avvvatars> & { className?: string },
+  props: React.ComponentProps<typeof Avatar> & {
+    value: string
+    variant?: string
+    className?: string
+  },
 ) {
   return (
     <div className={cn('dark:invert dark:hue-rotate-180', props.className)}>
-      <Avvvatars {...props} style={props.style ?? 'shape'} />
+      <Avatar name={props.value} {...props} />
     </div>
   )
 }

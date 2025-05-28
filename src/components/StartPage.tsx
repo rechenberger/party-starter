@@ -19,7 +19,7 @@ export const StartPage = async () => {
             target="_blank"
           >
             <Button variant={'outline'}>
-              Use this template
+              {t.landing.useThisTemplate}
               <ExternalLink className="w-4 h-4 ml-1" />
             </Button>
           </Link>

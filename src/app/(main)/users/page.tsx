@@ -4,6 +4,7 @@ import { impersonate } from '@/auth/impersonate'
 import { TopHeader } from '@/components/TopHeader'
 import { DateFnsFormat } from '@/components/date-fns-client/DateFnsFormat'
 import { SimpleParamSelect } from '@/components/simple/SimpleParamSelect'
+import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
 import {
   Card,
   CardContent,
@@ -92,7 +93,10 @@ export default async function Page({
             <Fragment key={user.id}>
               <Card className={cn(isCurrentUser && 'border-primary')}>
                 <CardHeader>
-                  <CardTitle>{user.name ?? user.email}</CardTitle>
+                  <CardTitle className="flex gap-2 items-center">
+                    <SimpleUserAvatar user={user} />
+                    {user.name ?? user.email}
+                  </CardTitle>
                   <CardDescription>{user.id}</CardDescription>
                   {tags.length && (
                     <div className="flex flex-row gap-2">

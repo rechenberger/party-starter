@@ -18,7 +18,7 @@ export const SimpleUserAvatar = ({
           alt={user.name || 'Member'}
         />
         <AvatarFallback asChild>
-          <SeededAvatar value={user.email} />
+          <SeededAvatar value={user.email} variant="beam" />
         </AvatarFallback>
       </Avatar>
     </>

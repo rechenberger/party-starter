@@ -60,6 +60,7 @@ const upsertInviteCodeAndSendMail = async ({
       }
   )) => {
   'use server'
+  const t = await getTranslations()
   const existingCode = await db
     .select()
     .from(schema.inviteCodes)
@@ -77,7 +78,7 @@ const upsertInviteCodeAndSendMail = async ({
     .then((res) => res[0])
 
   if (existingCodeId && !existingCode) {
-    throw new Error('No existing code found')
+    throw new Error(t.inviteCodes.errors.noExistingCodeFound)
   }
 
   const newCodeRes = await db

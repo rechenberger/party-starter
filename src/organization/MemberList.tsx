@@ -130,7 +130,7 @@ export const MemberList = ({
                 <button
                   onClick={() => setSearchQuery('')}
                   className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
-                  aria-label="Clear search"
+                  aria-label={t.org.members.clearSearch}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -189,7 +189,9 @@ export const MemberList = ({
                             value={membership.role}
                           >
                             <SelectTrigger className="w-[110px]">
-                              <SelectValue placeholder="Select role" />
+                              <SelectValue
+                                placeholder={t.org.members.selectRolePlaceholder}
+                              />
                             </SelectTrigger>
                             <SelectContent>
                               {organizationRoleDefinitions.map((role) => (

@@ -8,6 +8,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { UserMenuDropDownContent } from '@/components/UserMenuDropDownContent'
 import { ActionButton } from '@/super-action/button/ActionButton'
+import { getTranslations } from '@/i18n/getTranslations'
 import { ChevronDown, ChevronsUpDown, LogInIcon } from 'lucide-react'
 import { Suspense } from 'react'
 import { getMyUser } from './getMyUser'
@@ -23,6 +24,7 @@ export const UserButtonSuspense = ({ large }: { large?: boolean }) => {
 
 export const UserButton = async ({ large }: { large?: boolean }) => {
   const user = await getMyUser()
+  const t = await getTranslations()
   const showName = false
 
   if (!!user) {
@@ -33,7 +35,7 @@ export const UserButton = async ({ large }: { large?: boolean }) => {
             <Button size="vanilla" variant="vanilla">
               {showName ? (
                 <>
-                  <span>{user.name ?? user.email ?? 'You'}</span>
+                  <span>{user.name ?? user.email ?? t.standardWords.you}</span>
                   <ChevronDown className="size-4" />
                 </>
               ) : (
@@ -70,7 +72,7 @@ export const UserButton = async ({ large }: { large?: boolean }) => {
         hideIcon
         action={loginWithRedirect}
       >
-        <span className="hidden md:block">Login</span>
+        <span className="hidden md:block">{t.auth.loginAction}</span>
         <LogInIcon className="size-4" />
       </ActionButton>
     </>

@@ -7,6 +7,7 @@ export const t = {
         Willkommen im Party <b className="text-primary">Starter</b>
       </>
     ),
+    useThisTemplate: '[NEEDS TRANSLATION] Use this template',
   },
   app: {
     welcome: 'Willkommen in der App',
@@ -62,6 +63,10 @@ export const t = {
       dark: 'Dunkel',
       system: 'System',
     },
+    error: '[NEEDS TRANSLATION] Error',
+    anErrorOccurred: '[NEEDS TRANSLATION] An error occurred.',
+    logo: '[NEEDS TRANSLATION] logo',
+    you: '[NEEDS TRANSLATION] You',
   },
   auth: {
     checkMailTitle: 'Überprüfen Sie Ihre E-Mails',
@@ -93,6 +98,8 @@ export const t = {
     acceptTerms: 'Nutzungsbedingungen akzeptieren',
     emailAlreadyTaken:
       'Diese E-Mail Adresse ist bereits in Verwendung. Bitte verwenden Sie den Link zum Zurücksetzen des Passworts, um Ihr Passwort zurückzusetzen.',
+    invalidCredentials: '[NEEDS TRANSLATION] Invalid credentials',
+    loginAction: '[NEEDS TRANSLATION] Login',
   },
   users: {
     title: 'Benutzer',
@@ -132,6 +139,8 @@ export const t = {
       role: 'Rolle',
       joined: 'Beigetreten',
       actions: 'Aktionen',
+      clearSearch: '[NEEDS TRANSLATION] Clear search',
+      selectRolePlaceholder: '[NEEDS TRANSLATION] Select role',
     },
     orgMembers: 'Organisationsmitglieder',
     leave: {
@@ -225,6 +234,9 @@ export const t = {
       },
       noEmailFound: 'Keine E-Mail Adresse gefunden',
     },
+    errors: {
+      noExistingCodeFound: '[NEEDS TRANSLATION] No existing code found',
+    },
     createForm: {
       success: 'Einladungscode erstellt und in die Zwischenablage kopiert',
       role: 'Rolle',
@@ -241,6 +253,7 @@ export const t = {
       sending: 'Senden...',
       sendInvitation: 'Einladung senden',
     },
+    usesUnlimited: '[NEEDS TRANSLATION] ∞',
     table: {
       code: 'Code',
       role: 'Rolle',
@@ -287,5 +300,10 @@ export const t = {
     home: 'Home',
     users: 'Benutzer',
     dashboard: 'Dashboard',
+  },
+  form: {
+    placeholder: {
+      emailExample: '[NEEDS TRANSLATION] john@example.com',
+    },
   },
 } satisfies TranslationsClient

@@ -185,7 +185,9 @@ export const NormalInviteCodesTable = async (
                                 {code.usesMax - (code.usesCurrent ?? 0)}
                               </span>
                             ) : (
-                              <span className="text-muted-foreground">∞</span>
+                              <span className="text-muted-foreground">
+                                {t.inviteCodes.usesUnlimited}
+                              </span>
                             )}
                           </div>
                         </div>

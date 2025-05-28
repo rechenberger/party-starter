@@ -3,7 +3,6 @@ import { TopHeader } from '@/components/TopHeader'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { getTranslations } from '@/i18n/getTranslations'
-import { ParamsWrapper } from '@/lib/paramsServerContext'
 import { superCache } from '@/lib/superCache'
 import {
   getMyMembershipOrNotFound,
@@ -73,148 +72,150 @@ const getOrgWithInviteCodes = async ({ orgSlug }: { orgSlug: string }) => {
   return org
 }
 
-export default ParamsWrapper(
-  async ({ params }: { params: Promise<{ orgSlug: string }> }) => {
-    const { orgSlug } = await params
-    const t = await getTranslations()
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ orgSlug: string }>
+}) {
+  const { orgSlug } = await params
+  const t = await getTranslations()
 
-    const { membership: myMembership, org } = await getMyMembershipOrNotFound({
-      allowedRoles: allowedRolesView,
-      orgSlug,
+  const { membership: myMembership, org } = await getMyMembershipOrNotFound({
+    allowedRoles: allowedRolesView,
+    orgSlug,
+  })
+
+  const isAdmin = myMembership.role === 'admin'
+
+  const orgWithInviteCodes = await getOrgWithInviteCodes({
+    orgSlug: org.slug,
+  })
+
+  const changeRoleAction = async (data: {
+    userId: string
+    role: OrganizationRole
+  }) => {
+    'use server'
+    return superAction(async () => {
+      const { membership } = await getMyMembershipOrThrow({
+        allowedRoles: allowedRolesEdit,
+        orgSlug,
+      })
+
+      if (!orgWithInviteCodes) {
+        throw new Error('Organization not found')
+      }
+
+      const currentAdmins = await db
+        .select()
+        .from(schema.organizationMemberships)
+        .where(
+          and(
+            eq(schema.organizationMemberships.role, 'admin'),
+            eq(schema.organizationMemberships.organizationId, org.id),
+          ),
+        )
+
+      if (
+        currentAdmins.length === 1 &&
+        data.role === 'member' &&
+        data.userId === currentAdmins[0].userId
+      ) {
+        throw new Error(t.org.leave.cannotRemoveLastAdmin)
+      }
+
+      await db
+        .update(schema.organizationMemberships)
+        .set({
+          role: data.role,
+          updatedById: membership.userId,
+        })
+        .where(
+          and(
+            eq(schema.organizationMemberships.userId, data.userId),
+            eq(schema.organizationMemberships.organizationId, org.id),
+          ),
+        )
+
+      superCache.orgMembers({ orgId: org.id }).revalidate()
+      superCache.userOrgMemberships({ userId: data.userId }).revalidate()
     })
+  }
+  const kickUserAction = async (data: { userId: string }) => {
+    'use server'
 
-    const isAdmin = myMembership.role === 'admin'
+    return superAction(async () => {
+      const myUserId = await getMyUserId()
 
-    const orgWithInviteCodes = await getOrgWithInviteCodes({
-      orgSlug: org.slug,
-    })
-
-    const changeRoleAction = async (data: {
-      userId: string
-      role: OrganizationRole
-    }) => {
-      'use server'
-      return superAction(async () => {
-        const { membership } = await getMyMembershipOrThrow({
+      if (myUserId !== data.userId) {
+        await getMyMembershipOrThrow({
           allowedRoles: allowedRolesEdit,
           orgSlug,
         })
+      }
 
-        if (!orgWithInviteCodes) {
-          throw new Error('Organization not found')
-        }
+      if (!orgWithInviteCodes) {
+        throw new Error('Organization not found')
+      }
 
-        const currentAdmins = await db
-          .select()
-          .from(schema.organizationMemberships)
-          .where(
-            and(
-              eq(schema.organizationMemberships.role, 'admin'),
-              eq(schema.organizationMemberships.organizationId, org.id),
-            ),
-          )
+      const currentAdmins = await db
+        .select()
+        .from(schema.organizationMemberships)
+        .where(
+          and(
+            eq(schema.organizationMemberships.role, 'admin'),
+            eq(schema.organizationMemberships.organizationId, org.id),
+          ),
+        )
 
-        if (
-          currentAdmins.length === 1 &&
-          data.role === 'member' &&
-          data.userId === currentAdmins[0].userId
-        ) {
-          throw new Error(t.org.leave.cannotRemoveLastAdmin)
-        }
+      if (
+        currentAdmins.length === 1 &&
+        data.userId === currentAdmins[0].userId
+      ) {
+        throw new Error(
+          `${t.org.leave.cannotRemoveLastAdmin} ${t.org.leave.cannotRemoveLastAdminDescription}`,
+        )
+      }
 
-        await db
-          .update(schema.organizationMemberships)
-          .set({
-            role: data.role,
-            updatedById: membership.userId,
-          })
-          .where(
-            and(
-              eq(schema.organizationMemberships.userId, data.userId),
-              eq(schema.organizationMemberships.organizationId, org.id),
-            ),
-          )
+      await db
+        .delete(schema.organizationMemberships)
+        .where(
+          and(
+            eq(schema.organizationMemberships.userId, data.userId),
+            eq(schema.organizationMemberships.organizationId, org.id),
+          ),
+        )
 
-        superCache.orgMembers({ orgId: org.id }).revalidate()
-        superCache.userOrgMemberships({ userId: data.userId }).revalidate()
-      })
-    }
-    const kickUserAction = async (data: { userId: string }) => {
-      'use server'
+      superCache.orgMembers({ orgId: org.id }).revalidate()
+      superCache.userOrgMemberships({ userId: data.userId }).revalidate()
 
-      return superAction(async () => {
-        const myUserId = await getMyUserId()
+      if (myUserId === data.userId) {
+        redirect(`/`)
+      }
+    })
+  }
 
-        if (myUserId !== data.userId) {
-          await getMyMembershipOrThrow({
-            allowedRoles: allowedRolesEdit,
-            orgSlug,
-          })
-        }
-
-        if (!orgWithInviteCodes) {
-          throw new Error('Organization not found')
-        }
-
-        const currentAdmins = await db
-          .select()
-          .from(schema.organizationMemberships)
-          .where(
-            and(
-              eq(schema.organizationMemberships.role, 'admin'),
-              eq(schema.organizationMemberships.organizationId, org.id),
-            ),
-          )
-
-        if (
-          currentAdmins.length === 1 &&
-          data.userId === currentAdmins[0].userId
-        ) {
-          throw new Error(
-            `${t.org.leave.cannotRemoveLastAdmin} ${t.org.leave.cannotRemoveLastAdminDescription}`,
-          )
-        }
-
-        await db
-          .delete(schema.organizationMemberships)
-          .where(
-            and(
-              eq(schema.organizationMemberships.userId, data.userId),
-              eq(schema.organizationMemberships.organizationId, org.id),
-            ),
-          )
-
-        superCache.orgMembers({ orgId: org.id }).revalidate()
-        superCache.userOrgMemberships({ userId: data.userId }).revalidate()
-
-        if (myUserId === data.userId) {
-          redirect(`/`)
-        }
-      })
-    }
-
-    return (
-      <>
-        <TopHeader>{t.org.orgMembers}</TopHeader>
-        {orgWithInviteCodes && (
-          <>
-            <MemberList
-              org={orgWithInviteCodes}
-              changeRoleAction={changeRoleAction}
-              kickUserAction={kickUserAction}
-              isAdmin={isAdmin}
+  return (
+    <>
+      <TopHeader>{t.org.orgMembers}</TopHeader>
+      {orgWithInviteCodes && (
+        <>
+          <MemberList
+            org={orgWithInviteCodes}
+            changeRoleAction={changeRoleAction}
+            kickUserAction={kickUserAction}
+            isAdmin={isAdmin}
+          />
+          {isAdmin && (
+            <InvitationCodesList
+              {...org}
+              inviteCodes={map(orgWithInviteCodes.inviteCodes, (inviteCode) =>
+                getEnhancedInviteCode(inviteCode),
+              )}
             />
-            {isAdmin && (
-              <InvitationCodesList
-                {...org}
-                inviteCodes={map(orgWithInviteCodes.inviteCodes, (inviteCode) =>
-                  getEnhancedInviteCode(inviteCode),
-                )}
-              />
-            )}
-          </>
-        )}
-      </>
-    )
-  },
-)
+          )}
+        </>
+      )}
+    </>
+  )
+}

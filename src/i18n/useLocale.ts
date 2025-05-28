@@ -11,6 +11,7 @@ const setCookie = (name: string, value: string) => {
 
 export const useLocale = () => {
   const locale = useContext(LocaleContext)
+  console.log({ localeFromContext: locale })
   return locale
 }
 
@@ -27,6 +28,7 @@ export const useSetLocale = () => {
       )
       if (isLocalePath) {
         router.push(pathname.replace(/^\/[^/]+/, `/${locale}`))
+        router.refresh()
       } else {
         router.refresh()
       }

@@ -11,9 +11,8 @@ export const getMyLocale = async () => {
   }
 
   const locale =
-    (await getFromParams()) ??
-    (await getFromCookies()) ??
-    (await getFromHeaders())
+    // (await getFromParams()) ??
+    (await getFromCookies()) ?? (await getFromHeaders())
 
   const parsed = Locale.safeParse(locale)
   if (parsed.success) {
@@ -51,5 +50,7 @@ const getFromHeaders = async () => {
   }).languages()
 
   const locale = match(languages, LOCALES, DEFAULT_LOCALE)
+  console.log({ localeFromHeaders: locale })
+
   return locale
 }

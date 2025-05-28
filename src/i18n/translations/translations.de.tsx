@@ -7,7 +7,7 @@ export const t = {
         Willkommen im Party <b className="text-primary">Starter</b>
       </>
     ),
-    useThisTemplate: '[NEEDS TRANSLATION] Use this template',
+    useThisTemplate: 'Diese Vorlage verwenden',
   },
   app: {
     welcome: 'Willkommen in der App',
@@ -63,10 +63,10 @@ export const t = {
       dark: 'Dunkel',
       system: 'System',
     },
-    error: '[NEEDS TRANSLATION] Error',
-    anErrorOccurred: '[NEEDS TRANSLATION] An error occurred.',
-    logo: '[NEEDS TRANSLATION] logo',
-    you: '[NEEDS TRANSLATION] You',
+    error: 'Fehler',
+    anErrorOccurred: 'Ein Fehler ist aufgetreten.',
+    logo: 'Logo',
+    you: 'Sie',
   },
   auth: {
     checkMailTitle: 'Überprüfen Sie Ihre E-Mails',
@@ -98,8 +98,8 @@ export const t = {
     acceptTerms: 'Nutzungsbedingungen akzeptieren',
     emailAlreadyTaken:
       'Diese E-Mail Adresse ist bereits in Verwendung. Bitte verwenden Sie den Link zum Zurücksetzen des Passworts, um Ihr Passwort zurückzusetzen.',
-    invalidCredentials: '[NEEDS TRANSLATION] Invalid credentials',
-    loginAction: '[NEEDS TRANSLATION] Login',
+    invalidCredentials: 'Ungültige Anmeldeinformationen',
+    loginAction: 'Anmelden',
   },
   users: {
     title: 'Benutzer',
@@ -139,8 +139,8 @@ export const t = {
       role: 'Rolle',
       joined: 'Beigetreten',
       actions: 'Aktionen',
-      clearSearch: '[NEEDS TRANSLATION] Clear search',
-      selectRolePlaceholder: '[NEEDS TRANSLATION] Select role',
+      clearSearch: 'Suche löschen',
+      selectRolePlaceholder: 'Rolle auswählen',
     },
     orgMembers: 'Organisationsmitglieder',
     leave: {
@@ -235,7 +235,7 @@ export const t = {
       noEmailFound: 'Keine E-Mail Adresse gefunden',
     },
     errors: {
-      noExistingCodeFound: '[NEEDS TRANSLATION] No existing code found',
+      noExistingCodeFound: 'Kein bestehender Code gefunden',
     },
     createForm: {
       success: 'Einladungscode erstellt und in die Zwischenablage kopiert',
@@ -253,7 +253,7 @@ export const t = {
       sending: 'Senden...',
       sendInvitation: 'Einladung senden',
     },
-    usesUnlimited: '[NEEDS TRANSLATION] ∞',
+    usesUnlimited: 'Unbegrenzt',
     table: {
       code: 'Code',
       role: 'Rolle',
@@ -303,7 +303,7 @@ export const t = {
   },
   form: {
     placeholder: {
-      emailExample: '[NEEDS TRANSLATION] john@example.com',
+      emailExample: 'max@beispiel.com',
     },
   },
 } satisfies TranslationsClient

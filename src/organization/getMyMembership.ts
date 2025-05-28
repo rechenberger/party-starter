@@ -6,7 +6,6 @@ import { neverNullish, throwError } from '@/lib/neverNullish'
 import { superCache } from '@/lib/superCache'
 import { and, eq, inArray } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
-import { getCurrentOrgSlug } from './getCurrentOrgSlug'
 import { OrganizationRole } from './organizationRoles'
 
 export const getMembership = async ({
@@ -52,15 +51,12 @@ export const getMembership = async ({
 
 export const getMyMembership = async ({
   allowedRoles,
-  orgSlug: inputOrgSlug,
+  orgSlug,
 }: {
   allowedRoles?: OrganizationRole[]
-  orgSlug?: string
-} = {}) => {
-  const [orgSlug, userId] = await Promise.all([
-    inputOrgSlug ?? getCurrentOrgSlug(),
-    getMyUserId(),
-  ])
+  orgSlug: string
+}) => {
+  const userId = await getMyUserId()
 
   if (!userId || !orgSlug) {
     return null

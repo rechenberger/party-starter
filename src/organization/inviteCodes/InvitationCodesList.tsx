@@ -24,6 +24,7 @@ export type InvitationCodesListProps = {
 export const InvitationCodesList = async (props: InvitationCodesListProps) => {
   await getMyMembershipOrNotFound({
     allowedRoles,
+    orgSlug: props.slug,
   })
 
   const { inviteCodes } = props

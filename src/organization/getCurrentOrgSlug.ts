@@ -1,6 +1,7 @@
 import { paramsContext } from '@/lib/paramsServerContext'
 import { z } from 'zod'
 
+// this function is not reliable, use with caution 😅
 export const getCurrentOrgSlug = async () => {
   const paramsFromContext = paramsContext.get()
   if (!paramsFromContext) {

@@ -4,6 +4,9 @@ import { createServerContext } from '@sodefa/next-server-context'
 import { ReactNode } from 'react'
 import { z } from 'zod'
 
+/**
+ * @deprecated
+ */
 export const paramsContext = createServerContext<
   Promise<{
     orgSlug?: string
@@ -11,6 +14,9 @@ export const paramsContext = createServerContext<
   }>
 >()
 
+/**
+ * @deprecated
+ */
 export const ParamsWrapper = <ComponentProps,>(
   Component: (props: ComponentProps) => ReactNode,
 ) => {

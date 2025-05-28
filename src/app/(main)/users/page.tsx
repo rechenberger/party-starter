@@ -123,7 +123,6 @@ export default async function Page({
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
                   <div>
-                    <div>{user.email}</div>
                     <div className="text-muted-foreground">
                       {user.emailVerified ? (
                         <>

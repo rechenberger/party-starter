@@ -5,7 +5,7 @@ import { useTranslations } from '@/i18n/useTranslations'
 import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { SuperLoadingIcon } from '@/super-action/button/SuperLoadingIcon'
-import { Check } from 'lucide-react'
+import { Check, VenetianMask } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 
 export const ImpersonateButton = ({
@@ -27,6 +27,7 @@ export const ImpersonateButton = ({
       <Button
         size="sm"
         variant={'outline'}
+        className="flex-1"
         disabled={isCurrentUser}
         onClick={async () => {
           if (isCurrentUser) return
@@ -38,7 +39,10 @@ export const ImpersonateButton = ({
         {isCurrentUser
           ? t.userManagement.currentUser
           : t.userManagement.loginAs}
-        <SuperLoadingIcon icon={<Check />} isLoading={isLoading} />
+        <SuperLoadingIcon
+          icon={isCurrentUser ? <Check /> : <VenetianMask />}
+          isLoading={isLoading}
+        />
       </Button>
     </>
   )

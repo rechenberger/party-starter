@@ -24,6 +24,7 @@ import {
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { ActionWrapper } from '@/super-action/button/ActionWrapper'
 import { asc, eq } from 'drizzle-orm'
+import { Trash2 } from 'lucide-react'
 import { Metadata } from 'next'
 import { Fragment } from 'react'
 import { CreateUserButton } from './CreateUserButton'
@@ -160,7 +161,7 @@ export default async function Page({
                       <Switch checked={isAdmin} />
                     </ActionWrapper>
                   </label>
-                  <div className="flex flex-row gap-2 items-center justify-end">
+                  <div className="flex flex-row gap-2 items-center flex-1">
                     <ActionButton
                       size="sm"
                       variant={'outline'}
@@ -173,6 +174,7 @@ export default async function Page({
                         confirm:
                           t.userManagement.deleteUser.confirmation.confirm,
                       }}
+                      icon={<Trash2 />}
                       action={async () => {
                         'use server'
                         return superAction(async () => {

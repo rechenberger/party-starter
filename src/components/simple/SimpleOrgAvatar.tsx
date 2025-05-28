@@ -17,6 +17,7 @@ export const SimpleOrgAvatar = ({
         variant="bauhaus"
         value={org.slug}
         className={className}
+        colors={['#1c1917', '#78716c', '#e7e5e4']}
       />
     </>
   )

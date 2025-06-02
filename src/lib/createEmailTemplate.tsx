@@ -25,30 +25,35 @@ export const createEmailTemplate = <Schema extends ZodType>(template: {
     locale?: Locale
     props: z.infer<Schema>
   }) => {
-    const locale = params.locale ?? (await getMyLocale())
-    const t = await getTranslations(locale)
+    try {
+      const locale = params.locale ?? (await getMyLocale())
+      const t = await getTranslations(locale)
 
-    const props = typedParse(template.schema, params.props)
-    const renderProps = { props, t, locale }
+      const props = typedParse(template.schema, params.props)
+      const renderProps = { props, t, locale }
 
-    const emailComponent = <template.Email {...renderProps} />
+      const emailComponent = <template.Email {...renderProps} />
 
-    const [html, text] = await Promise.all([
-      render(emailComponent),
-      render(emailComponent, {
-        plainText: true,
-      }),
-    ])
+      const [html, text] = await Promise.all([
+        render(emailComponent),
+        render(emailComponent, {
+          plainText: true,
+        }),
+      ])
 
-    const subject = await template.subject(renderProps)
+      const subject = await template.subject(renderProps)
 
-    const transporter = getMailTransporter()
-    await transporter.sendMail({
-      to: params.to,
-      subject,
-      html,
-      text,
-    })
+      const transporter = getMailTransporter()
+      await transporter.sendMail({
+        to: params.to,
+        subject,
+        html,
+        text,
+      })
+    } catch (error) {
+      console.error('Error sending email', error)
+      throw error
+    }
   }
 
   const preview = () => {

@@ -1,4 +1,4 @@
-import { type Locale as DateFnsLocale, de, enUS } from 'date-fns/locale'
+import { de, enUS, type Locale as DateFnsLocale } from 'date-fns/locale'
 import { z } from 'zod'
 
 export const LOCALES = ['en', 'de'] as const
@@ -10,7 +10,6 @@ export const COOKIE_NAME = 'locale'
 export const localeDefinitions: {
   locale: Locale
   nativeName: string
-  flagEmoji: string
   abbreviationLabel: string
   actionLabel: string
   dateFnsLocale: DateFnsLocale
@@ -18,7 +17,6 @@ export const localeDefinitions: {
   {
     locale: 'en',
     nativeName: 'English',
-    flagEmoji: '🇺🇸',
     abbreviationLabel: 'EN',
     actionLabel: 'Change language to English',
     dateFnsLocale: enUS,
@@ -26,7 +24,6 @@ export const localeDefinitions: {
   {
     locale: 'de',
     nativeName: 'Deutsch',
-    flagEmoji: '🇩🇪',
     abbreviationLabel: 'DE',
     actionLabel: 'Sprache zu Deutsch wechseln',
     dateFnsLocale: de,

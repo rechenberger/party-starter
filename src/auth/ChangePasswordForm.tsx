@@ -1,3 +1,5 @@
+import { getTranslations } from '@/i18n/getTranslations'
+import { superCache } from '@/lib/superCache'
 import {
   streamToast,
   superAction,
@@ -19,6 +21,7 @@ export const ChangePasswordForm = async ({
         action={async (data) => {
           'use server'
           return superAction(async () => {
+            const t = await getTranslations()
             const userId = await getMyUserIdOrThrow()
             await changePassword({
               password: data.password,
@@ -26,11 +29,13 @@ export const ChangePasswordForm = async ({
             })
 
             const description = redirectUrl
-              ? 'Redirecting...'
-              : 'Your password has been changed'
+              ? t.standardWords.redirecting
+              : undefined
+
+            superCache.user({ id: userId }).revalidate()
 
             streamToast({
-              title: 'Password Changed!',
+              title: t.userManagement.passwordChanged,
               description,
             })
 

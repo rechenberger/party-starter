@@ -1,3 +1,4 @@
+import { getTranslations } from '@/i18n/getTranslations'
 import {
   streamDialog,
   superAction,
@@ -9,36 +10,26 @@ import { LoginFormClient } from './LoginFormClient'
 import { signIn } from './auth'
 import { registerUser } from './registerUser'
 
-export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
+export const LoginForm = async ({ redirectUrl }: { redirectUrl?: string }) => {
+  const t = await getTranslations()
   return (
     <>
       <LoginFormClient
         action={async (data) => {
           'use server'
           return superAction(async () => {
+            const t = await getTranslations()
             if (data.type === 'login') {
               // LOGIN
               try {
                 await signIn('credentials', data)
               } catch (error) {
                 if (error instanceof CredentialsSignin) {
-                  throw new Error('Invalid credentials')
+                  throw new Error(t.auth.invalidCredentials)
                 } else if (error instanceof EmailNotVerifiedAuthorizeError) {
-                  // throw new Error('Email not verified')
                   streamDialog({
-                    title: 'Email not verified',
-                    content: (
-                      <>
-                        <p>
-                          We sent you another verification email to
-                          {data.email}.
-                        </p>
-                        <p>
-                          Please open the email and click sign in to verify your
-                          email.
-                        </p>
-                      </>
-                    ),
+                    title: t.auth.emailNotVerifiedTitle,
+                    content: t.auth.resendVerifyMailDescription(data.email),
                   })
                   await signIn('nodemailer', {
                     email: data.email,
@@ -77,17 +68,8 @@ export const LoginForm = ({ redirectUrl }: { redirectUrl?: string }) => {
                 await signIn('discord')
               }}
             >
-              Continue with Discord
+              {t.auth.continueWithDiscord}
             </ActionButton>
-            {/* <ActionButton
-              variant={'outline'}
-              action={async () => {
-                'use server'
-                await signIn()
-              }}
-            >
-              Sign in Page
-            </ActionButton> */}
           </>
         }
       />

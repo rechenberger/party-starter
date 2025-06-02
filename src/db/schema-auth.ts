@@ -1,14 +1,26 @@
 import type { AdapterAccount } from '@auth/core/adapters'
 import { relations } from 'drizzle-orm'
-import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import {
+  boolean,
+  integer,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core'
+import { createdUpdatedAtColumns, idColumn } from './commonColumns'
 
-export const users = sqliteTable('user', {
-  id: text('id').notNull().primaryKey(),
+export type SelectUser = typeof users.$inferSelect
+
+export const users = pgTable('user', {
+  id: idColumn(),
+  ...createdUpdatedAtColumns(),
+
   name: text('name'),
   email: text('email').notNull(),
-  emailVerified: integer('emailVerified', { mode: 'timestamp_ms' }),
+  emailVerified: timestamp('emailVerified', { mode: 'date' }),
   image: text('image'),
-  isAdmin: integer('isAdmin', { mode: 'boolean' }),
+  isAdmin: boolean('isAdmin').notNull().default(false),
   passwordHash: text('passwordHash'),
 })
 
@@ -16,7 +28,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
 }))
 
-export const accounts = sqliteTable(
+export const accounts = pgTable(
   'account',
   {
     userId: text('userId')
@@ -33,11 +45,11 @@ export const accounts = sqliteTable(
     id_token: text('id_token'),
     session_state: text('session_state'),
   },
-  (account) => ({
-    compoundKey: primaryKey({
+  (account) => [
+    primaryKey({
       columns: [account.provider, account.providerAccountId],
     }),
-  }),
+  ],
 )
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -47,22 +59,20 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
   }),
 }))
 
-export const sessions = sqliteTable('session', {
+export const sessions = pgTable('session', {
   sessionToken: text('sessionToken').notNull().primaryKey(),
   userId: text('userId')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
+  expires: timestamp('expires', { mode: 'date' }).notNull(),
 })
 
-export const verificationTokens = sqliteTable(
+export const verificationTokens = pgTable(
   'verificationToken',
   {
     identifier: text('identifier').notNull(),
     token: text('token').notNull(),
-    expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
+    expires: timestamp('expires', { mode: 'date' }).notNull(),
   },
-  (vt) => ({
-    compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
-  }),
+  (vt) => [primaryKey({ columns: [vt.identifier, vt.token] })],
 )

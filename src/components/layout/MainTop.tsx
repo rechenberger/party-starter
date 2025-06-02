@@ -1,66 +1,64 @@
-import { UserButton } from '@/auth/UserButton'
-import { getIsAdmin } from '@/auth/getIsAdmin'
-import { getIsLoggedIn } from '@/auth/getMyUser'
-import { DarkModeToggle } from '@/components/layout/DarkModeToggle'
 import { Button } from '@/components/ui/button'
-import { Github } from 'lucide-react'
+import { BRAND } from '@/lib/starter.config'
+import { cn } from '@/lib/utils'
+import { Github, MenuIcon } from 'lucide-react'
 import Link from 'next/link'
+import { Suspense } from 'react'
+import { Sidebar } from '../sidebar/Sidebar'
+import { SidebarProvider, SidebarTrigger } from '../ui/sidebar'
 import { DevBadges } from './DevBadges'
-import { MainTopNav } from './MainTopNav'
+import { MainDashboardButton } from './MainDashboardButton'
+import { MainTopContent } from './MainTopContent'
+import { MainTopUserSettings } from './MainTopUserSettings'
 
 export const MainTop = async () => {
-  const isAdminOrDev = await getIsAdmin({ allowDev: true })
-  const isLoggedIn = await getIsLoggedIn()
-
-  const entries = [
-    {
-      name: 'Home',
-      href: '/',
-    },
-    {
-      name: 'Me',
-      href: '/auth/me',
-      hidden: !isLoggedIn,
-    },
-    {
-      name: 'Users',
-      href: '/users',
-      hidden: !isAdminOrDev,
-    },
-  ].filter((entry) => !entry.hidden)
-
   return (
-    <>
-      <div className="container flex flex-row items-center justify-between gap-6 py-6">
-        <Link href="/" className="flex flex-row items-center gap-3">
-          <div className="text-xl">
-            <strong>
-              Party <span className="text-primary">Starter</span>
-            </strong>
-          </div>
-        </Link>
-        <div className="hidden flex-1 xl:flex items-center gap-2">
-          <MainTopNav entries={entries} />
-          <DevBadges />
-          <UserButton />
-        </div>
-        <div className="flex flex-row">
-          <Button variant={'ghost'} size="icon" asChild>
-            <Link
-              href="https://github.com/rechenberger/party-starter"
-              target="_blank"
+    <header className="sticky top-0 z-50 w-full border-b-2 bg-background/95 backdrop-blur-sm">
+      <SidebarProvider className="min-h-auto">
+        <div className="container flex items-center gap-2 md:gap-6 py-6">
+          <SidebarTrigger
+            className="md:hidden"
+            icon={<MenuIcon className="size-4" />}
+          />
+          <Link
+            href="/"
+            prefetch={false}
+            className="flex flex-row items-center gap-3"
+          >
+            <div className="text-xl">
+              <BRAND.TextLogo />
+            </div>
+          </Link>
+          <Suspense fallback={<div className="flex-1" />}>
+            <nav
+              className={cn(
+                'hidden md:flex flex-1 flex-wrap items-center gap-4 lg:gap-6',
+              )}
             >
-              <Github />
-            </Link>
-          </Button>
-          <DarkModeToggle />
+              <MainTopContent />
+            </nav>
+          </Suspense>
+          <div className="flex-1 md:hidden" />
+          <div className="flex items-center gap-4">
+            <DevBadges className="max-md:hidden" />
+            <div className="hidden items-center gap-2 text-sm font-medium md:flex">
+              {BRAND.github.active && (
+                <Button variant={'ghost'} size="icon" asChild>
+                  <Link href={BRAND.github.url} target="_blank">
+                    <Github />
+                  </Link>
+                </Button>
+              )}
+
+              <MainTopUserSettings />
+            </div>
+            <MainDashboardButton />
+          </div>
         </div>
-      </div>
-      <div className="container flex pb-6 xl:hidden items-center gap-2 flex-wrap">
-        <MainTopNav entries={entries} />
-        <DevBadges />
-        <UserButton />
-      </div>
-    </>
+        <div className="md:hidden">
+          <Sidebar collapsible="icon" isLanding={true} />
+        </div>
+      </SidebarProvider>
+    </header>
   )
 }

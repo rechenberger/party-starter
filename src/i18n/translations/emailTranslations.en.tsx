@@ -15,8 +15,13 @@ export const t = {
     },
   },
   orgInvite: {
-    subjectText: (orgName: string, platformName: string) =>
-      `Join ${orgName} on ${platformName}`,
+    subjectText: ({
+      orgName,
+      platformName,
+    }: {
+      orgName: string
+      platformName: string
+    }) => `Join ${orgName} on ${platformName}`,
     greeting: 'Hello',
     welcome: (orgName: string) => (
       <>
@@ -46,7 +51,8 @@ export const t = {
     fallback: 'or copy and paste this URL into your browser',
   },
   verifyEmail: {
-    subjectText: (platformName: string) => `Login to ${platformName}`,
+    subjectText: ({ platformName }: { platformName: string }) =>
+      `Login to ${platformName}`,
     previewText: 'Verify your email address',
     title: 'Verify your email address',
     greeting: 'Hello',

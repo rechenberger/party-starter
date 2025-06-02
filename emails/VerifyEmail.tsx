@@ -5,7 +5,7 @@ import { DefaultTemplate } from './DefaultTemplate'
 
 type VerifyEmailProps = {
   verifyUrl: string
-  locale: Locale
+  locale?: Locale
 }
 
 export const VerifyEmail = async ({ verifyUrl, locale }: VerifyEmailProps) => {

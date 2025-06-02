@@ -1,5 +1,7 @@
 import { db } from '@/db/db'
+import { BRAND } from '@/lib/starter.config'
 import { superCache } from '@/lib/superCache'
+import { sendMail } from '@/organization/sendMail'
 import Nodemailer from '@auth/core/providers/nodemailer'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
 import NextAuth from 'next-auth'
@@ -7,7 +9,6 @@ import Discord from 'next-auth/providers/discord'
 import { headers } from 'next/headers'
 import { CredentialsProvider } from './CredentialsProvider'
 import { ImpersonateProvider } from './ImpersonateProvider'
-import { sendVerificationRequestEmail } from './sendVerificationRequestEmail'
 
 const hasEmailEnvVars = !!process.env.EMAIL_FROM && !!process.env.SMTP_URL
 
@@ -33,9 +34,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 params.url,
               )}`
 
-              await sendVerificationRequestEmail({
-                ...params,
-                url,
+              await sendMail({
+                template: 'verifyEmail',
+                props: { verifyUrl: url },
+                receiverEmail: params.identifier,
+                subjectProps: {
+                  platformName: BRAND.name,
+                },
               })
             },
           }),

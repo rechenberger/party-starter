@@ -16,8 +16,14 @@ export const t = {
     },
   },
   orgInvite: {
-    subjectText: (orgName: string, platformName: string) =>
-      `Tritt ${orgName} auf ${platformName} bei`,
+    subjectText: ({
+      orgName,
+      platformName,
+    }: {
+      orgName: string
+      platformName: string
+    }) => `Tritt ${orgName} auf ${platformName} bei`,
+
     greeting: 'Hallo',
     welcome: (orgName: string) => (
       <>
@@ -48,7 +54,8 @@ export const t = {
     fallback: 'oder kopiere und füge diese URL in deinen Browser ein',
   },
   verifyEmail: {
-    subjectText: (platformName: string) => `Login zu ${platformName}`,
+    subjectText: ({ platformName }: { platformName: string }) =>
+      `Login zu ${platformName}`,
     previewText: 'Bestätige deine E-Mail-Adresse',
     title: 'Bestätige deine E-Mail-Adresse',
     greeting: 'Hallo',

@@ -15,7 +15,7 @@ import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { User } from '@/db/schema-zod'
 import { getTranslations } from '@/i18n/getTranslations'
-import { ORGS } from '@/lib/starter.config'
+import { BRAND, ORGS } from '@/lib/starter.config'
 import { superCache } from '@/lib/superCache'
 import { cn } from '@/lib/utils'
 import {
@@ -31,7 +31,7 @@ import {
   getMyMembershipOrThrow,
 } from '../getMyMembership'
 import { OrganizationRole, getOrganizationRole } from '../organizationRoles'
-import { sendOrgInviteMail } from '../sendOrgInviteMail'
+import { sendMail } from '../sendMail'
 import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
 import { InvitationCodesListProps } from './InvitationCodesList'
 import { getInviteCodeUrl } from './getInviteCodeUrl'
@@ -107,16 +107,20 @@ const upsertInviteCodeAndSendMail = async ({
   superCache.orgMembers({ orgId }).revalidate()
   const newCode = newCodeRes[0]
 
-  await sendOrgInviteMail({
+  await sendMail({
     receiverEmail,
-    invitedByEmail: user.email,
-    invitedByUsername: user.name,
-    orgName: orgName,
-    inviteLink: getInviteCodeUrl({
-      organizationSlug: orgSlug,
-      code: newCode.id,
-    }),
-    role: newCode.role,
+    template: 'orgInvite',
+    props: {
+      invitedByEmail: user.email,
+      invitedByUsername: user.name,
+      orgName: orgName,
+      inviteLink: getInviteCodeUrl({
+        organizationSlug: orgSlug,
+        code: newCode.id,
+      }),
+      role: newCode.role,
+    },
+    subjectProps: { orgName, platformName: BRAND.name },
   })
 }
 

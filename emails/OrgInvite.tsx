@@ -10,7 +10,7 @@ type OrgInviteProps = {
   orgName: string
   inviteLink: string
   role: 'admin' | 'member'
-  locale: Locale
+  locale?: Locale
 }
 
 export const OrgInvite = async ({
@@ -22,8 +22,10 @@ export const OrgInvite = async ({
   locale,
 }: OrgInviteProps) => {
   const t = await getTranslations(locale)
-
-  const previewText = `Join ${invitedByUsername} on ${BRAND.name}`
+  const previewText = t.email.orgInvite.subjectText({
+    orgName,
+    platformName: BRAND.name,
+  })
   return (
     <DefaultTemplate previewText={previewText} locale={locale}>
       <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">

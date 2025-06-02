@@ -1,7 +1,7 @@
 import { notFoundIfNotAdmin, throwIfNotAdmin } from '@/auth/getIsAdmin'
 import { getMyUserId } from '@/auth/getMyUser'
-import { impersonate } from '@/auth/impersonate'
 import { TopHeader } from '@/components/TopHeader'
+import { UserAvatar } from '@/components/UserAvatar'
 import { DateFnsFormat } from '@/components/date-fns-client/DateFnsFormat'
 import { SimpleParamSelect } from '@/components/simple/SimpleParamSelect'
 import {
@@ -21,17 +21,20 @@ import {
   streamToast,
   superAction,
 } from '@/super-action/action/createSuperAction'
-import { streamRevalidatePath } from '@/super-action/action/streamRevalidatePath'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { ActionWrapper } from '@/super-action/button/ActionWrapper'
 import { asc, eq } from 'drizzle-orm'
-import { Check } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { Metadata } from 'next'
 import { Fragment } from 'react'
 import { CreateUserButton } from './CreateUserButton'
+import { ImpersonateButton } from './ImpersonateButton'
 
-export const metadata: Metadata = {
-  title: 'Users',
+export const generateMetadata = async () => {
+  const t = await getTranslations()
+  return {
+    title: t.users.title,
+  } satisfies Metadata
 }
 
 const getUsers = async ({ filter }: { filter?: 'admins' }) => {
@@ -79,7 +82,7 @@ export default async function Page({
         </div>
       </TopHeader>
 
-      <div className="grid lg:grid-cols-3 gap-4">
+      <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-4">
         {users.map((user) => {
           const isAdmin = !!user.isAdmin
           const tags: string[] = []
@@ -92,7 +95,21 @@ export default async function Page({
             <Fragment key={user.id}>
               <Card className={cn(isCurrentUser && 'border-primary')}>
                 <CardHeader>
-                  <CardTitle>{user.name ?? user.email}</CardTitle>
+                  <CardTitle className="flex gap-2 items-center">
+                    <UserAvatar user={user} />
+                    <div className="flex flex-col">
+                      <div className="font-medium">{user.name}</div>
+                      <div
+                        className={cn(
+                          !!user.name
+                            ? 'text-muted-foreground text-xs'
+                            : 'font-medium',
+                        )}
+                      >
+                        {user.email}
+                      </div>
+                    </div>
+                  </CardTitle>
                   <CardDescription>{user.id}</CardDescription>
                   {tags.length && (
                     <div className="flex flex-row gap-2">
@@ -108,8 +125,7 @@ export default async function Page({
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
                   <div>
-                    <div>{user.email}</div>
-                    <div className="text-muted-foreground">
+                    <div className="text-muted-foreground text-sm">
                       {user.emailVerified ? (
                         <>
                           {t.users.emailVerified}{' '}
@@ -124,7 +140,7 @@ export default async function Page({
                     </div>
                   </div>
                   <label className="">
-                    <div className="flex-1">{t.users.admin}</div>
+                    <div className="flex-1 text-sm">{t.users.admin}</div>
                     <ActionWrapper
                       askForConfirmation={{
                         title: isAdmin
@@ -161,7 +177,7 @@ export default async function Page({
                       <Switch checked={isAdmin} />
                     </ActionWrapper>
                   </label>
-                  <div className="flex flex-row gap-2 items-center justify-end">
+                  <div className="flex flex-row gap-2 items-center flex-1">
                     <ActionButton
                       size="sm"
                       variant={'outline'}
@@ -174,6 +190,7 @@ export default async function Page({
                         confirm:
                           t.userManagement.deleteUser.confirmation.confirm,
                       }}
+                      icon={<Trash2 />}
                       action={async () => {
                         'use server'
                         return superAction(async () => {
@@ -202,24 +219,7 @@ export default async function Page({
                     >
                       {t.userManagement.deleteUser.delete}
                     </ActionButton>
-                    <ActionButton
-                      size="sm"
-                      variant={'outline'}
-                      disabled={isCurrentUser}
-                      icon={isCurrentUser ? <Check /> : undefined}
-                      action={async () => {
-                        'use server'
-                        return superAction(async () => {
-                          await throwIfNotAdmin({ allowDev: true })
-                          await impersonate({ userId: user.id })
-                          streamRevalidatePath('/', 'layout') // force refresh
-                        })
-                      }}
-                    >
-                      {isCurrentUser
-                        ? t.userManagement.currentUser
-                        : t.userManagement.loginAs}
-                    </ActionButton>
+                    <ImpersonateButton userId={user.id} />
                   </div>
                 </CardContent>
               </Card>

@@ -1,1 +1,1 @@
-export { LoadingScreen as default } from '@/components/LoadingScreen'
+export { LoadingScreen as default } from '@/components/layout/LoadingScreen'

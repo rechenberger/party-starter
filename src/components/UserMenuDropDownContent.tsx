@@ -20,8 +20,8 @@ import { cn } from '@/lib/utils'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { UserAvatar } from './UserAvatar'
 import { ThemeSwitcher } from './layout/ThemeSwitcher'
-import { SimpleUserAvatar } from './simple/SimpleUserAvatar'
 
 export const UserMenuDropDownContent = async ({
   user,
@@ -37,7 +37,7 @@ export const UserMenuDropDownContent = async ({
     <>
       <DropdownMenuLabel className="p-0 font-normal">
         <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-          <SimpleUserAvatar user={user} />
+          <UserAvatar user={user} />
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-medium">{user.name}</span>
             <span

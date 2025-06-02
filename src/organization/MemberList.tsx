@@ -1,7 +1,12 @@
 'use client'
 
+import {
+  changeRoleAction,
+  kickUserAction,
+} from '@/app/org/[orgSlug]/settings/members/actions'
+import { UserAvatar } from '@/components/UserAvatar'
 import { DateFnsFormat } from '@/components/date-fns-client/DateFnsFormat'
-import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
+import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -27,7 +32,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Organization, OrganizationMembership, User } from '@/db/schema-zod'
-import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
+import { useTranslations } from '@/i18n/useTranslations'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
@@ -39,8 +44,6 @@ import {
   organizationRoleDefinitions,
 } from './organizationRoles'
 
-import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
-import { useTranslations } from '@/i18n/useTranslations'
 type MembershipWithUser = Pick<
   OrganizationMembership,
   'userId' | 'role' | 'createdAt'
@@ -50,20 +53,11 @@ type MembershipWithUser = Pick<
 
 export const MemberList = ({
   org,
-  changeRoleAction,
-  kickUserAction,
   isAdmin,
 }: {
   org: Organization & {
     memberships: MembershipWithUser[]
   }
-  changeRoleAction: SuperActionWithInput<{
-    userId: string
-    role: OrganizationRole
-  }>
-  kickUserAction: SuperActionWithInput<{
-    userId: string
-  }>
   isAdmin: boolean
 }) => {
   const { data: session } = useSession()
@@ -156,7 +150,7 @@ export const MemberList = ({
                     <TableRow key={membership.userId}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <SimpleUserAvatar user={membership.user} />
+                          <UserAvatar user={membership.user} />
                           <div>
                             <p className="font-medium">
                               {membership.user.name}
@@ -183,6 +177,7 @@ export const MemberList = ({
                               trigger({
                                 userId: membership.userId,
                                 role: value,
+                                orgSlug: org.slug,
                               })
                             }
                             disabled={isChangeRoleLoading}
@@ -235,6 +230,7 @@ export const MemberList = ({
                               action={async () =>
                                 kickUserAction({
                                   userId: membership.userId,
+                                  orgSlug: org.slug,
                                 })
                               }
                               title={

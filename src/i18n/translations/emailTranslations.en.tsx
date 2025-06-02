@@ -7,7 +7,7 @@ export const t = {
         <>
           Best regards
           <br />
-          The Party Starter Team
+          The {BRAND.name} Team
           <br />
           🎉
         </>
@@ -15,8 +15,8 @@ export const t = {
     },
   },
   orgInvite: {
-    subjectText: (orgName: string, platformName: string) =>
-      `Join ${orgName} on ${platformName}`,
+    subjectText: ({ orgName }: { orgName: string }) =>
+      `Join ${orgName} on ${BRAND.name}`,
     greeting: 'Hello',
     welcome: (orgName: string) => (
       <>
@@ -28,25 +28,23 @@ export const t = {
       invitedByEmail,
       orgName,
       role,
-      platformName,
     }: {
       invitedByUsername: string | null
       invitedByEmail: string
       orgName: string
       role: string
-      platformName: string
     }) => (
       <>
         <strong>{invitedByUsername ?? invitedByEmail}</strong>
         {invitedByUsername && ` (${invitedByEmail})`} has invited you to the{' '}
-        <strong>{orgName}</strong> organization as {role} on {platformName}.
+        <strong>{orgName}</strong> organization as {role} on {BRAND.name}.
       </>
     ),
     joinButton: (orgName: string) => `Join ${orgName}`,
     fallback: 'or copy and paste this URL into your browser',
   },
   verifyEmail: {
-    subjectText: (platformName: string) => `Login to ${platformName}`,
+    subjectText: `Login to ${BRAND.name}`,
     previewText: 'Verify your email address',
     title: 'Verify your email address',
     greeting: 'Hello',

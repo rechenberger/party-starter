@@ -1,6 +1,6 @@
 import { CopyToClipboardButton } from '@/components/CopyToClipboardButton'
+import { UserAvatar } from '@/components/UserAvatar'
 import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
-import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -195,7 +195,7 @@ export const NormalInviteCodesTable = async (
                       <TableCell>
                         {code.updatedBy && (
                           <div className="flex items-center gap-3">
-                            <SimpleUserAvatar user={code.updatedBy} />
+                            <UserAvatar user={code.updatedBy} />
                             <div>
                               <p className="font-medium">
                                 {code.updatedBy.name}

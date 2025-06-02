@@ -1,5 +1,3 @@
-import 'server-only'
-
 import { getMyLocale } from './getMyLocale'
 import { Locale } from './locale'
 

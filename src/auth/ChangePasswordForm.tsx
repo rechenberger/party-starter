@@ -15,13 +15,13 @@ export const ChangePasswordForm = async ({
   redirectUrl?: string
 }) => {
   const user = await getMyUser()
-  const t = await getTranslations()
   return (
     <>
       <ChangePasswordFormClient
         action={async (data) => {
           'use server'
           return superAction(async () => {
+            const t = await getTranslations()
             const userId = await getMyUserIdOrThrow()
             await changePassword({
               password: data.password,

@@ -123,7 +123,7 @@ export default async function Page({
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
                   <div>
-                    <div className="text-muted-foreground">
+                    <div className="text-muted-foreground text-sm">
                       {user.emailVerified ? (
                         <>
                           {t.users.emailVerified}{' '}
@@ -138,7 +138,7 @@ export default async function Page({
                     </div>
                   </div>
                   <label className="">
-                    <div className="flex-1">{t.users.admin}</div>
+                    <div className="flex-1 text-sm">{t.users.admin}</div>
                     <ActionWrapper
                       askForConfirmation={{
                         title: isAdmin

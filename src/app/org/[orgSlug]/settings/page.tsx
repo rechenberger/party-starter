@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { getTranslations } from '@/i18n/getTranslations'
-import { ParamsWrapper } from '@/lib/paramsServerContext'
 import { superCache } from '@/lib/superCache'
 import {
   getMyMembershipOrNotFound,
@@ -18,7 +17,7 @@ import { redirect } from 'next/navigation'
 
 const allowedRoles: OrganizationRole[] = ['admin']
 
-export default ParamsWrapper(async () => {
+export default async function Page() {
   const { org } = await getMyMembershipOrNotFound({
     allowedRoles,
   })
@@ -79,4 +78,4 @@ export default ParamsWrapper(async () => {
       </div>
     </>
   )
-})
+}

@@ -5,7 +5,6 @@ export const t = {
         Welcome to Party <b className="text-primary">Starter</b>
       </>
     ),
-    useThisTemplate: 'Use this template',
   },
   app: {
     welcome: 'Welcome to the app',
@@ -243,7 +242,6 @@ export const t = {
       sending: 'Sending...',
       sendInvitation: 'Send Invitation',
     },
-    usesUnlimited: '∞',
     table: {
       code: 'Code',
       role: 'Role',
@@ -290,11 +288,6 @@ export const t = {
     home: 'Home',
     users: 'Users',
     dashboard: 'Dashboard',
-  },
-  form: {
-    placeholder: {
-      emailExample: 'john@example.com',
-    },
   },
 }
 

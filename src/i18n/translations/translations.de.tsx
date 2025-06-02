@@ -7,7 +7,6 @@ export const t = {
         Willkommen im Party <b className="text-primary">Starter</b>
       </>
     ),
-    useThisTemplate: 'Diese Vorlage verwenden',
   },
   app: {
     welcome: 'Willkommen in der App',
@@ -66,7 +65,7 @@ export const t = {
     error: 'Fehler',
     anErrorOccurred: 'Ein Fehler ist aufgetreten.',
     logo: 'Logo',
-    you: 'Sie',
+    you: 'Du',
   },
   auth: {
     checkMailTitle: 'Überprüfen Sie Ihre E-Mails',
@@ -253,7 +252,6 @@ export const t = {
       sending: 'Senden...',
       sendInvitation: 'Einladung senden',
     },
-    usesUnlimited: 'Unbegrenzt',
     table: {
       code: 'Code',
       role: 'Rolle',
@@ -300,10 +298,5 @@ export const t = {
     home: 'Home',
     users: 'Benutzer',
     dashboard: 'Dashboard',
-  },
-  form: {
-    placeholder: {
-      emailExample: 'max@beispiel.com',
-    },
   },
 } satisfies TranslationsClient

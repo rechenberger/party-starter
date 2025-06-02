@@ -1,9 +1,8 @@
 import { db } from '@/db/db'
-import { BRAND } from '@/lib/starter.config'
 import { superCache } from '@/lib/superCache'
-import { sendMail } from '@/organization/sendMail'
 import Nodemailer from '@auth/core/providers/nodemailer'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
+import { VerifyEmail } from '@emails/VerifyEmail'
 import NextAuth from 'next-auth'
 import Discord from 'next-auth/providers/discord'
 import { headers } from 'next/headers'
@@ -34,13 +33,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 params.url,
               )}`
 
-              await sendMail({
-                template: 'verifyEmail',
+              await VerifyEmail.send({
                 props: { verifyUrl: url },
-                receiverEmail: params.identifier,
-                subjectProps: {
-                  platformName: BRAND.name,
-                },
+                to: params.identifier,
               })
             },
           }),

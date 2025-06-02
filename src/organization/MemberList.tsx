@@ -1,7 +1,12 @@
 'use client'
 
+import {
+  changeRoleAction,
+  kickUserAction,
+} from '@/app/org/[orgSlug]/settings/members/actions'
+import { UserAvatar } from '@/components/UserAvatar'
 import { DateFnsFormat } from '@/components/date-fns-client/DateFnsFormat'
-import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
+import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -27,6 +32,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Organization, OrganizationMembership, User } from '@/db/schema-zod'
+import { useTranslations } from '@/i18n/useTranslations'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
@@ -38,12 +44,6 @@ import {
   organizationRoleDefinitions,
 } from './organizationRoles'
 
-import {
-  changeRoleAction,
-  kickUserAction,
-} from '@/app/org/[orgSlug]/settings/members/actions'
-import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
-import { useTranslations } from '@/i18n/useTranslations'
 type MembershipWithUser = Pick<
   OrganizationMembership,
   'userId' | 'role' | 'createdAt'
@@ -150,7 +150,7 @@ export const MemberList = ({
                     <TableRow key={membership.userId}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <SimpleUserAvatar user={membership.user} />
+                          <UserAvatar user={membership.user} />
                           <div>
                             <p className="font-medium">
                               {membership.user.name}

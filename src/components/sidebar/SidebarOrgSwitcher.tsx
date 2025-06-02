@@ -16,8 +16,8 @@ import { getTranslations } from '@/i18n/getTranslations'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { getMyMemberships } from '@/organization/getMyMemberships'
 import Link from 'next/link'
+import { OrgAvatar } from '../OrgAvatar'
 import { ResponsiveDropdownMenuContent } from '../ResponsiveDropdownMenuContent'
-import SeededAvatar from '../SeededAvatar'
 
 export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
   const [memberships, userCanCreateOrg] = await Promise.all([
@@ -40,13 +40,11 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-                <SeededAvatar
-                  size={32}
-                  style="shape"
-                  value={selectedMembership?.organization.slug ?? ''}
-                />
-              </div>
+              {selectedMembership?.organization && (
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <OrgAvatar org={selectedMembership.organization} size={28} />
+                </div>
+              )}
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
                   {selectedMembership?.organization.name ??
@@ -67,17 +65,11 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
             {memberships.map((membership) => (
               <DropdownMenuItem
                 key={membership.organization.id}
-                className="gap-2 p-2"
+                className="gap-2 py-2"
                 asChild
               >
                 <Link href={`/org/${membership.organization.slug}`}>
-                  <div className="flex size-6 items-center justify-center rounded-md border">
-                    <SeededAvatar
-                      size={20}
-                      style="shape"
-                      value={membership.organization.slug}
-                    />
-                  </div>
+                  <OrgAvatar org={membership.organization} size={32} />
                   {membership.organization.name}
                 </Link>
               </DropdownMenuItem>

@@ -10,13 +10,14 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { z } from 'zod'
 
 const CreateOrgSchema = z.object({
-  name: z.string().min(1, 'Organization name is required'),
+  name: z.string().min(1),
 })
 
 type CreateOrgData = z.infer<typeof CreateOrgSchema>
@@ -32,7 +33,7 @@ export const CreateOrgFormClient = ({
     action,
     catchToast: true,
   })
-
+  const t = useTranslations()
   const disabled = isLoading
 
   const form = useCreateOrgForm({
@@ -56,7 +57,7 @@ export const CreateOrgFormClient = ({
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Organization Name</FormLabel>
+                <FormLabel>{t.org.createOrg.title}</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -65,7 +66,7 @@ export const CreateOrgFormClient = ({
             )}
           />
           <Button type="submit" className="mt-2" disabled={disabled}>
-            Create Organization
+            {t.org.createOrg.create}
           </Button>
         </form>
       </Form>

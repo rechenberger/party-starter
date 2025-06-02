@@ -1,8 +1,12 @@
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
-import { superAction } from '@/super-action/action/createSuperAction'
+import { getTranslations } from '@/i18n/getTranslations'
+import { superCache } from '@/lib/superCache'
+import {
+  streamToast,
+  superAction,
+} from '@/super-action/action/createSuperAction'
 import { eq } from 'drizzle-orm'
-import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { ChangeUsernameFormClient } from './ChangeUsernameFormClient'
 import { getMyUser, getMyUserIdOrThrow } from './getMyUser'
@@ -27,13 +31,22 @@ export const ChangeUsernameForm = async ({
               })
               .where(eq(schema.users.id, userId))
 
-            revalidatePath('/', 'layout')
+            superCache.user({ id: userId }).revalidate()
+
+            const t = await getTranslations()
+            const description = redirectUrl
+              ? t.standardWords.redirecting
+              : undefined
+
+            streamToast({
+              title: t.userManagement.userNameChanged,
+              description,
+            })
 
             redirect(redirectUrl || '/')
           })
         }}
         username={user?.name ?? undefined}
-        redirectUrl={redirectUrl}
       />
     </>
   )

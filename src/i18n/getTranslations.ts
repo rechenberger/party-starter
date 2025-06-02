@@ -1,9 +1,8 @@
-import 'server-only'
-
 import { getMyLocale } from './getMyLocale'
+import { Locale } from './locale'
 
-export const getTranslations = async () => {
-  const locale = await getMyLocale()
+export const getTranslations = async (locale?: Locale) => {
+  locale = locale ?? (await getMyLocale())
   switch (locale) {
     case 'de':
       return import('./translations/translations.server.de').then((m) => m.t)

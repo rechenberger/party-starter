@@ -1,13 +1,14 @@
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { superCache } from '@/lib/superCache'
 import Nodemailer from '@auth/core/providers/nodemailer'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
+import { verifyEmailEmail } from '@emails/VerifyEmail'
 import { and, eq, lt } from 'drizzle-orm'
 import NextAuth from 'next-auth'
 import Discord from 'next-auth/providers/discord'
 import { CredentialsProvider } from './CredentialsProvider'
 import { ImpersonateProvider } from './ImpersonateProvider'
-import { sendVerificationRequestEmail } from './sendVerificationRequestEmail'
 
 const hasEmailEnvVars = !!process.env.EMAIL_FROM && !!process.env.SMTP_URL
 
@@ -46,7 +47,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
 
   pages: {
-    signIn: '/auth/login',
+    signIn: `/auth/login`,
+    verifyRequest: `/auth/check-mail`,
   },
   providers: [
     Discord,
@@ -57,8 +59,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             server: process.env.SMTP_URL,
 
             sendVerificationRequest: async (params) => {
-              await sendVerificationRequestEmail({
-                ...params,
+              await verifyEmailEmail.send({
+                props: { verifyUrl: params.url },
+                to: params.identifier,
               })
             },
           }),
@@ -76,6 +79,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.sub as string
       }
       return session
+    },
+  },
+  events: {
+    createUser: ({ user }) => {
+      if (user.id) {
+        superCache.user({ id: user.id }).revalidate()
+      } else {
+        superCache.users().revalidate()
+      }
+    },
+    linkAccount: ({ user }) => {
+      if (user.id) {
+        superCache.user({ id: user.id }).revalidate()
+      } else {
+        superCache.users().revalidate()
+      }
+    },
+    updateUser: ({ user }) => {
+      if (user.id) {
+        superCache.user({ id: user.id }).revalidate()
+      } else {
+        superCache.users().revalidate()
+      }
     },
   },
 })

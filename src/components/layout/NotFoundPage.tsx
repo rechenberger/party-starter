@@ -7,12 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { getMyLocale } from '@/i18n/getMyLocale'
 import { House, Squirrel } from 'lucide-react'
 import Link from 'next/link'
 
 export const NotFoundPage = async () => {
-  const locale = await getMyLocale()
+  // const locale = await getMyLocale()
 
   return (
     <MainTopLayout>
@@ -27,7 +26,7 @@ export const NotFoundPage = async () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-row gap-4 flex-1 justify-center">
-            <Link href={`/${locale}`}>
+            <Link href={`/`} prefetch={false}>
               <Button variant="default" className="w-full">
                 <House className="size-4" /> Home
               </Button>
@@ -38,5 +37,3 @@ export const NotFoundPage = async () => {
     </MainTopLayout>
   )
 }
-
-export default NotFoundPage

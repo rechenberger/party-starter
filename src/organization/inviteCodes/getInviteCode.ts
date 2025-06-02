@@ -1,7 +1,7 @@
-import { getMyUserOrLogin } from '@/auth/getMyUser'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { InviteCode } from '@/db/schema-zod'
+import { superCache } from '@/lib/superCache'
 import { isPast } from 'date-fns'
 import { and, eq, isNull } from 'drizzle-orm'
 
@@ -12,50 +12,49 @@ export const getInviteCode = async ({
   orgSlug: string
   code: string
 }) => {
-  const user = await getMyUserOrLogin({
-    forceRedirectUrl: `/join/${orgSlug}/${code}`,
-  })
+  'use cache'
 
-  const organization = await db.query.organizations.findFirst({
+  const org = await db.query.organizations.findFirst({
     where: eq(schema.organizations.slug, orgSlug),
     with: {
       memberships: true,
     },
   })
 
-  if (!organization) {
+  if (!org) {
+    superCache.orgs().tag()
     return { error: 'Organization not found' as const }
   }
+  superCache.org({ id: org.id }).tag()
+  superCache.orgMembers({ orgId: org.id }).tag()
 
   const inviteCodeRaw = await db.query.inviteCodes.findFirst({
     where: and(
       eq(schema.inviteCodes.id, code),
-      eq(schema.inviteCodes.organizationId, organization.id),
+      eq(schema.inviteCodes.organizationId, org.id),
       isNull(schema.inviteCodes.deletedAt),
     ),
   })
 
   if (!inviteCodeRaw) {
-    return { error: 'Invite code not found' as const, organization }
+    return { error: 'Invite code not found' as const, org }
   }
 
   const inviteCode = getEnhancedInviteCode(inviteCodeRaw)
 
   if (inviteCode.isExpired) {
-    return { error: 'Expired' as const, organization, inviteCode, user }
+    return { error: 'Expired' as const, org, inviteCode }
   } else if (inviteCode.isCompletelyUsed) {
     return {
       error: 'Max uses reached' as const,
-      organization,
+      org,
       inviteCode,
-      user,
     }
   }
 
   return {
     inviteCode,
-    organization,
-    user,
+    org,
   }
 }
 

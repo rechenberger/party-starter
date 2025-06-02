@@ -1,6 +1,12 @@
 'use client'
 
-import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
+import {
+  changeRoleAction,
+  kickUserAction,
+} from '@/app/org/[orgSlug]/settings/members/actions'
+import { UserAvatar } from '@/components/UserAvatar'
+import { DateFnsFormat } from '@/components/date-fns-client/DateFnsFormat'
+import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -26,16 +32,15 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Organization, OrganizationMembership, User } from '@/db/schema-zod'
-import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
+import { useTranslations } from '@/i18n/useTranslations'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { formatDistanceToNow } from 'date-fns'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useMemo, useState } from 'react'
 import {
-  getOrganizationRole,
   OrganizationRole,
+  getOrganizationRole,
   organizationRoleDefinitions,
 } from './organizationRoles'
 
@@ -47,21 +52,12 @@ type MembershipWithUser = Pick<
 }
 
 export const MemberList = ({
-  organization,
-  changeRoleAction,
-  kickUserAction,
+  org,
   isAdmin,
 }: {
-  organization: Organization & {
+  org: Organization & {
     memberships: MembershipWithUser[]
   }
-  changeRoleAction: SuperActionWithInput<{
-    userId: string
-    role: OrganizationRole
-  }>
-  kickUserAction: SuperActionWithInput<{
-    userId: string
-  }>
   isAdmin: boolean
 }) => {
   const { data: session } = useSession()
@@ -76,10 +72,10 @@ export const MemberList = ({
 
   const filteredMemberships = useMemo(() => {
     if (!searchQuery.trim()) {
-      return organization.memberships
+      return org.memberships
     }
 
-    const filtered = organization.memberships.filter((membership) => {
+    const filtered = org.memberships.filter((membership) => {
       const userName = membership.user.name?.toLowerCase() || ''
       const userEmail = membership.user.email?.toLowerCase() || ''
       const query = searchQuery.toLowerCase()
@@ -88,26 +84,29 @@ export const MemberList = ({
     })
 
     return filtered
-  }, [organization, searchQuery])
+  }, [org, searchQuery])
+
+  const t = useTranslations()
 
   return (
     <>
       <div className="space-y-8">
-        <Card key={organization.id} className="w-full">
+        <Card key={org.id} className="w-full">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>{organization.name}</CardTitle>
+            <div className="flex items-center">
+              <div className="flex flex-col gap-2">
+                <CardTitle>{org.name}</CardTitle>
                 <CardDescription>
-                  Created{' '}
-                  {formatDistanceToNow(new Date(organization.createdAt), {
-                    addSuffix: true,
-                  })}
+                  {t.standardWords.created}{' '}
+                  <DateFnsFormat date={org.createdAt} format="PPP" />
                 </CardDescription>
               </div>
+              <div className="flex-1"></div>
               <Badge variant="outline" className="text-xs">
                 {filteredMemberships.length}{' '}
-                {filteredMemberships.length === 1 ? 'member' : 'members'}
+                {filteredMemberships.length === 1
+                  ? t.org.members.member
+                  : t.org.members.members}
               </Badge>
             </div>
 
@@ -116,7 +115,7 @@ export const MemberList = ({
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Search members by name or email..."
+                placeholder={t.org.members.searchPlaceholder}
                 className="px-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -136,10 +135,12 @@ export const MemberList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Member</TableHead>
-                  <TableHead>Joined</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t.org.members.member}</TableHead>
+                  <TableHead>{t.org.members.joined}</TableHead>
+                  <TableHead>{t.org.members.role}</TableHead>
+                  <TableHead className="text-right">
+                    {t.org.members.actions}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -149,7 +150,7 @@ export const MemberList = ({
                     <TableRow key={membership.userId}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <SimpleUserAvatar user={membership.user} />
+                          <UserAvatar user={membership.user} />
                           <div>
                             <p className="font-medium">
                               {membership.user.name}
@@ -161,18 +162,22 @@ export const MemberList = ({
                         </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {formatDistanceToNow(new Date(membership.createdAt), {
-                          addSuffix: true,
-                        })}
+                        <DateFnsFormatDistanceToNow
+                          date={membership.createdAt}
+                          options={{
+                            addSuffix: true,
+                          }}
+                        />
                       </TableCell>
                       <TableCell>
                         {isAdmin && (
                           <Select
                             defaultValue={membership.role}
-                            onValueChange={(value: 'admin' | 'member') =>
+                            onValueChange={(value: OrganizationRole) =>
                               trigger({
                                 userId: membership.userId,
-                                role: value as OrganizationRole,
+                                role: value,
+                                orgSlug: org.slug,
                               })
                             }
                             disabled={isChangeRoleLoading}
@@ -184,7 +189,7 @@ export const MemberList = ({
                             <SelectContent>
                               {organizationRoleDefinitions.map((role) => (
                                 <SelectItem key={role.name} value={role.name}>
-                                  {role.label}
+                                  {t.roles[role.i18nKey]}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -192,7 +197,11 @@ export const MemberList = ({
                         )}
                         {!isAdmin && (
                           <Badge variant="outline" className="text-xs">
-                            {getOrganizationRole(membership.role).label}
+                            {
+                              t.roles[
+                                getOrganizationRole(membership.role).i18nKey
+                              ]
+                            }
                           </Badge>
                         )}
                       </TableCell>
@@ -207,17 +216,25 @@ export const MemberList = ({
                               hideIcon
                               askForConfirmation={{
                                 title: isMyMember
-                                  ? 'Leave Organization'
-                                  : 'Kick User',
-                                content: `Are you sure you want to ${isMyMember ? 'leave' : `kick ${membership.user.name} from`} ${organization.name}?`,
+                                  ? t.org.leave.confirmation.title
+                                  : t.org.kick.confirmation.title,
+                                content: isMyMember
+                                  ? t.org.leave.confirmation.content
+                                  : t.org.kick.confirmation.content(
+                                      membership.user.name ??
+                                        membership.user.email,
+                                    ),
                               }}
                               action={async () =>
                                 kickUserAction({
                                   userId: membership.userId,
+                                  orgSlug: org.slug,
                                 })
                               }
                               title={
-                                isMyMember ? 'Leave Organization' : 'Kick User'
+                                isMyMember
+                                  ? t.org.leave.confirmation.title
+                                  : t.org.kick.confirmation.title
                               }
                             >
                               {isMyMember ? (
@@ -225,7 +242,11 @@ export const MemberList = ({
                               ) : (
                                 <Trash2 className="h-4 w-4 text-destructive" />
                               )}
-                              <span className="sr-only">Kick user</span>
+                              <span className="sr-only">
+                                {isMyMember
+                                  ? t.org.leave.confirmation.title
+                                  : t.org.kick.confirmation.title}
+                              </span>
                             </ActionButton>
                           </div>
                         </TableCell>

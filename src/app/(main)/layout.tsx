@@ -1,10 +1,20 @@
 import { MainTopLayout } from '@/components/layout/MainTopLayout'
+import { RootLayout } from '@/components/layout/RootLayout'
+import { getIsSidebarActive } from '@/components/sidebar/getIsSidebarActive'
 import { SidebarLayout } from '@/components/sidebar/SidebarLayout'
-import { SIDEBAR } from '@/lib/starter.config'
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  if (SIDEBAR.activeInMain) {
-    return <SidebarLayout>{children}</SidebarLayout>
-  }
-  return <MainTopLayout>{children}</MainTopLayout>
+export { metadata } from '@/components/layout/RootLayout'
+
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const activeInMain = await getIsSidebarActive()
+  const content = activeInMain ? (
+    <SidebarLayout>{children}</SidebarLayout>
+  ) : (
+    <MainTopLayout>{children}</MainTopLayout>
+  )
+  return <RootLayout>{content}</RootLayout>
 }

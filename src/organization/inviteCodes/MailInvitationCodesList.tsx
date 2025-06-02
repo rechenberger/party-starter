@@ -1,5 +1,6 @@
 import { getMyUserOrThrow } from '@/auth/getMyUser'
-import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
+import { UserAvatar } from '@/components/UserAvatar'
+import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -13,7 +14,9 @@ import {
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { User } from '@/db/schema-zod'
+import { getTranslations } from '@/i18n/getTranslations'
 import { ORGS } from '@/lib/starter.config'
+import { superCache } from '@/lib/superCache'
 import { cn } from '@/lib/utils'
 import {
   streamDialog,
@@ -21,16 +24,14 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { format, formatDistanceToNow } from 'date-fns'
+import { orgInviteEmail } from '@emails/OrgInvite'
 import { and, desc, eq, or } from 'drizzle-orm'
 import { Mail, Trash2 } from 'lucide-react'
-import { revalidatePath } from 'next/cache'
 import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
 } from '../getMyMembership'
 import { OrganizationRole, getOrganizationRole } from '../organizationRoles'
-import { sendOrgInviteMail } from '../sendOrgInviteMail'
 import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
 import { InvitationCodesListProps } from './InvitationCodesList'
 import { getInviteCodeUrl } from './getInviteCodeUrl'
@@ -41,9 +42,9 @@ const upsertInviteCodeAndSendMail = async ({
   role,
   user,
   existingCodeId,
-  id: organizationId,
-  slug: organizationSlug,
-  name: organizationName,
+  id: orgId,
+  slug: orgSlug,
+  name: orgName,
 }: {
   receiverEmail: string
   user: Pick<User, 'id' | 'email' | 'name'>
@@ -67,7 +68,7 @@ const upsertInviteCodeAndSendMail = async ({
         existingCodeId ? eq(schema.inviteCodes.id, existingCodeId) : undefined,
         and(
           eq(schema.inviteCodes.sentToEmail, receiverEmail),
-          eq(schema.inviteCodes.organizationId, organizationId),
+          eq(schema.inviteCodes.organizationId, orgId),
         ),
       ),
     )
@@ -83,7 +84,7 @@ const upsertInviteCodeAndSendMail = async ({
     .insert(schema.inviteCodes)
     .values({
       id: existingCode?.id,
-      organizationId: organizationId,
+      organizationId: orgId,
       role: role ?? existingCode.role,
       expiresAt: resolveExpiresAt(ORGS.defaultExpirationEmailInvitation),
       usesMax: 1,
@@ -103,18 +104,21 @@ const upsertInviteCodeAndSendMail = async ({
     })
     .returning({ id: schema.inviteCodes.id, role: schema.inviteCodes.role })
 
+  superCache.orgMembers({ orgId }).revalidate()
   const newCode = newCodeRes[0]
 
-  await sendOrgInviteMail({
-    receiverEmail,
-    invitedByEmail: user.email,
-    invitedByUsername: user.name,
-    orgName: organizationName,
-    inviteLink: getInviteCodeUrl({
-      organizationSlug: organizationSlug,
-      code: newCode.id,
-    }),
-    role: newCode.role,
+  await orgInviteEmail.send({
+    to: receiverEmail,
+    props: {
+      invitedByEmail: user.email,
+      invitedByUsername: user.name,
+      orgName: orgName,
+      inviteLink: getInviteCodeUrl({
+        organizationSlug: orgSlug,
+        code: newCode.id,
+      }),
+      role: newCode.role,
+    },
   })
 }
 
@@ -128,12 +132,13 @@ export const MailInvitationCodesList = async (
   await getMyMembershipOrNotFound({
     allowedRoles,
   })
+  const t = await getTranslations()
 
   return (
     <>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Mail Invitations</CardTitle>
+          <CardTitle>{t.inviteCodes.mailInvitations.title}</CardTitle>
           <div className="flex gap-2">
             <ActionButton
               size="sm"
@@ -141,13 +146,15 @@ export const MailInvitationCodesList = async (
               action={async () => {
                 'use server'
                 return superAction(async () => {
+                  const t = await getTranslations()
                   return streamDialog({
-                    title: 'Send Invitation Mail',
+                    title: t.inviteCodes.mailInvitations.create,
                     content: (
                       <CreateInviteCodeEmailFormClient
                         action={async (data) => {
                           'use server'
                           return superAction(async () => {
+                            const t = await getTranslations()
                             await getMyMembershipOrThrow({
                               allowedRoles,
                               orgSlug: props.slug,
@@ -164,12 +171,11 @@ export const MailInvitationCodesList = async (
                               }),
                             )
 
-                            revalidatePath(`/org/${orgId}/settings/members`)
-
                             streamToast({
-                              title: `Invitation sent to ${data.receiverEmail.join(
-                                ', ',
-                              )}`,
+                              title:
+                                t.inviteCodes.mailInvitations.createSuccess(
+                                  data.receiverEmail.join(', '),
+                                ),
                             })
                             streamDialog(null)
                           })
@@ -180,7 +186,7 @@ export const MailInvitationCodesList = async (
                 })
               }}
             >
-              Mail Invitation
+              {t.inviteCodes.mailInvitations.create}
             </ActionButton>
           </div>
         </CardHeader>
@@ -188,12 +194,14 @@ export const MailInvitationCodesList = async (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Receiver</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Sent at</TableHead>
-                <TableHead>Sent by</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t.inviteCodes.table.receiver}</TableHead>
+                <TableHead>{t.inviteCodes.table.status}</TableHead>
+                <TableHead>{t.inviteCodes.table.role}</TableHead>
+                <TableHead>{t.inviteCodes.table.sentAt}</TableHead>
+                <TableHead>{t.inviteCodes.table.sentBy}</TableHead>
+                <TableHead className="text-right">
+                  {t.inviteCodes.table.actions}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -203,25 +211,25 @@ export const MailInvitationCodesList = async (
                     colSpan={42} //just a high number to make sure the cell takes the full width
                     className="text-center py-6 text-muted-foreground"
                   >
-                    No invitation codes sent yet.
+                    {t.inviteCodes.table.noMailInvitations}
                   </TableCell>
                 </TableRow>
               ) : (
                 inviteCodes.map((code) => {
                   const status = code.isCompletelyUsed
-                    ? 'Accepted'
+                    ? t.inviteCodes.status.accepted
                     : code.isExpired
-                      ? 'Expired'
-                      : 'Pending'
+                      ? t.inviteCodes.status.expired
+                      : t.inviteCodes.status.pending
                   return (
                     <TableRow key={code.id}>
                       <TableCell className={cn()}>{code.sentToEmail}</TableCell>
                       <TableCell>
                         <Badge
                           variant={
-                            status === 'Accepted'
+                            code.isCompletelyUsed
                               ? 'default'
-                              : status === 'Expired'
+                              : code.isExpired
                                 ? 'destructive'
                                 : 'secondary'
                           }
@@ -235,24 +243,21 @@ export const MailInvitationCodesList = async (
                             code.role === 'admin' ? 'default' : 'secondary'
                           }
                         >
-                          {getOrganizationRole(code.role).label}
+                          {t.roles[getOrganizationRole(code.role).i18nKey]}
                         </Badge>
                       </TableCell>
-                      <TableCell
-                        title={
-                          code.updatedAt
-                            ? format(code.updatedAt, 'MMM d, yyyy HH:mm')
-                            : 'Never'
-                        }
-                      >
-                        {formatDistanceToNow(new Date(code.updatedAt), {
-                          addSuffix: true,
-                        })}
+                      <TableCell>
+                        <DateFnsFormatDistanceToNow
+                          date={code.updatedAt}
+                          options={{
+                            addSuffix: true,
+                          }}
+                        />
                       </TableCell>
                       <TableCell>
                         {code.updatedBy && (
                           <div className="flex items-center gap-3">
-                            <SimpleUserAvatar user={code.updatedBy} />
+                            <UserAvatar user={code.updatedBy} />
                             <div>
                               <p className="font-medium">
                                 {code.updatedBy.name}
@@ -264,7 +269,9 @@ export const MailInvitationCodesList = async (
                           </div>
                         )}
                         {code.updatedBy === null && (
-                          <span className="text-muted-foreground">Unknown</span>
+                          <span className="text-muted-foreground">
+                            {t.standardWords.unknown}
+                          </span>
                         )}
                       </TableCell>
                       <TableCell className="text-right">
@@ -272,22 +279,29 @@ export const MailInvitationCodesList = async (
                           <ActionButton
                             variant="ghost"
                             size="icon"
-                            // disabled={isDeleting}
                             catchToast
                             hideIcon
                             askForConfirmation={{
-                              title: 'Resend invitation',
-                              content: `Are you sure you want to resend the invitation to ${code.sentToEmail}?`,
+                              title:
+                                t.inviteCodes.mailInvitations.resendConfirmation
+                                  .title,
+                              content:
+                                t.inviteCodes.mailInvitations.resendConfirmation.content(
+                                  code.sentToEmail ?? '',
+                                ),
                             }}
                             action={async () => {
                               'use server'
                               return superAction(async () => {
+                                const t = await getTranslations()
                                 await getMyMembershipOrThrow({
                                   allowedRoles,
                                   orgSlug,
                                 })
                                 if (!code.sentToEmail) {
-                                  throw new Error('No email found')
+                                  throw new Error(
+                                    t.inviteCodes.mailInvitations.noEmailFound,
+                                  )
                                 }
                                 const me = await getMyUserOrThrow()
                                 await upsertInviteCodeAndSendMail({
@@ -297,15 +311,25 @@ export const MailInvitationCodesList = async (
                                   ...props,
                                 })
                                 streamToast({
-                                  title: `Invitation sent to ${code.sentToEmail}`,
+                                  title:
+                                    t.inviteCodes.mailInvitations.createSuccess(
+                                      code.sentToEmail,
+                                    ),
                                 })
-                                revalidatePath(`/org/${orgId}/settings/members`)
                               })
                             }}
-                            title="Resend invitation"
+                            title={
+                              t.inviteCodes.mailInvitations.resendConfirmation
+                                .title
+                            }
                           >
                             <Mail className="h-4 w-4" />
-                            <span className="sr-only">Resend invitation</span>
+                            <span className="sr-only">
+                              {
+                                t.inviteCodes.mailInvitations.resendConfirmation
+                                  .title
+                              }
+                            </span>
                           </ActionButton>
                           <ActionButton
                             variant="ghost"
@@ -313,10 +337,13 @@ export const MailInvitationCodesList = async (
                             // disabled={isDeleting}
                             catchToast
                             hideIcon
-                            askForConfirmation
+                            askForConfirmation={
+                              t.inviteCodes.delete.confirmation
+                            }
                             action={async () => {
                               'use server'
                               return superAction(async () => {
+                                const t = await getTranslations()
                                 const { membership } =
                                   await getMyMembershipOrThrow({
                                     allowedRoles,
@@ -329,15 +356,15 @@ export const MailInvitationCodesList = async (
                                     deletedAt: new Date(),
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))
-                                revalidatePath(
-                                  `/org/${orgSlug}/settings/members`,
-                                )
+                                superCache.orgMembers({ orgId }).revalidate()
                               })
                             }}
-                            title="Delete code"
+                            title={t.inviteCodes.delete.action}
                           >
                             <Trash2 className="h-4 w-4 text-destructive" />
-                            <span className="sr-only">Delete code</span>
+                            <span className="sr-only">
+                              {t.inviteCodes.delete.action}
+                            </span>
                           </ActionButton>
                         </div>
                       </TableCell>

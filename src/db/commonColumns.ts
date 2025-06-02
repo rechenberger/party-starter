@@ -7,12 +7,12 @@ export const idColumn = () =>
   text('id').notNull().primaryKey().$default(createId)
 
 export const createdAtColumn = () =>
-  timestamp('createdAt')
+  timestamp('createdAt', { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull()
 
 export const updatedAtColumn = () =>
-  timestamp('updatedAt')
+  timestamp('updatedAt', { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull()
     .$onUpdate(() => new Date())

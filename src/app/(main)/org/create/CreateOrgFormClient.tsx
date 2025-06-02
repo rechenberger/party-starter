@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
@@ -30,6 +31,7 @@ export const CreateOrgFormClient = ({
 }: {
   action: SuperActionWithInput<CreateOrgSchema>
 }) => {
+  const t = useTranslations()
   const { trigger, isLoading } = useSuperAction({
     action,
     catchToast: true,
@@ -38,6 +40,9 @@ export const CreateOrgFormClient = ({
   const disabled = isLoading
 
   const form = useCreateOrgForm({
+    defaultValues: {
+      name: '',
+    },
     disabled,
   })
 
@@ -46,7 +51,7 @@ export const CreateOrgFormClient = ({
       <div className="flex-1"></div>
       <Card className="self-center w-full max-w-md flex flex-col gap-4">
         <CardHeader>
-          <CardTitle>Create Organization</CardTitle>
+          <CardTitle>{t.org.create}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <Form {...form}>
@@ -61,9 +66,12 @@ export const CreateOrgFormClient = ({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Organization Name</FormLabel>
+                    <FormLabel>{t.org.createOrg.name}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter organization name" />
+                      <Input
+                        {...field}
+                        placeholder={t.org.createOrg.placeholder}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -71,7 +79,7 @@ export const CreateOrgFormClient = ({
               />
               <div className="flex flex-row gap-2 justify-end">
                 <Button type="submit" disabled={disabled}>
-                  Create Organization
+                  {t.org.create}
                 </Button>
               </div>
             </form>

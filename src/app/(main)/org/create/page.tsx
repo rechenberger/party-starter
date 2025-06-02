@@ -1,11 +1,12 @@
 import { getMyUserIdOrThrow } from '@/auth/getMyUser'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { getTranslations } from '@/i18n/getTranslations'
 import { slugify } from '@/lib/slugify'
 import { ORGS } from '@/lib/starter.config'
+import { superCache } from '@/lib/superCache'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { superAction } from '@/super-action/action/createSuperAction'
-import { revalidatePath } from 'next/cache'
 import { notFound, redirect } from 'next/navigation'
 import { CreateOrgFormClient } from './CreateOrgFormClient'
 import { NameSchema } from './NameSchema'
@@ -21,6 +22,8 @@ export default async function CreateOrg() {
     notFound()
   }
 
+  const t = await getTranslations()
+
   return (
     <>
       <CreateOrgFormClient
@@ -35,7 +38,7 @@ export default async function CreateOrg() {
 
             const userCanCreateOrg = await canUserCreateOrg()
             if (!userCanCreateOrg) {
-              throw new Error('User cannot create an organization')
+              throw new Error(t.org.missingPermission)
             }
 
             const userId = await getMyUserIdOrThrow()
@@ -54,7 +57,10 @@ export default async function CreateOrg() {
               role: 'admin',
             })
 
-            revalidatePath('/', 'layout')
+            superCache.org({ id: org.id }).revalidate()
+            superCache.orgMembers({ orgId: org.id }).revalidate()
+            superCache.userOrgMemberships({ userId }).revalidate()
+
             redirect(`/org/${org.slug}`)
           })
         }}

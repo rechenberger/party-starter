@@ -1,4 +1,5 @@
-import SeededAvatar from '@/components/SeededAvatar'
+import { getMyUserOrLogin } from '@/auth/getMyUser'
+import { OrgAvatar } from '@/components/OrgAvatar'
 import { Alert, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -12,13 +13,14 @@ import {
 } from '@/components/ui/card'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { getTranslations } from '@/i18n/getTranslations'
+import { superCache } from '@/lib/superCache'
 import { getInviteCode } from '@/organization/inviteCodes/getInviteCode'
 import { superAction } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { eq } from 'drizzle-orm'
 import { find } from 'lodash-es'
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
-import { revalidatePath } from 'next/cache'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 
@@ -29,7 +31,11 @@ export default async function JoinOrgPage({
 }) {
   const { orgSlug, code } = await params
 
-  const { error, organization, inviteCode, user } = await getInviteCode({
+  const user = await getMyUserOrLogin({
+    forceRedirectUrl: `/join/${orgSlug}/${code}`,
+  })
+
+  const { error, org, inviteCode } = await getInviteCode({
     orgSlug,
     code,
   })
@@ -42,10 +48,8 @@ export default async function JoinOrgPage({
     return notFound()
   }
 
-  const alreadyOrgMember = !!find(
-    organization.memberships,
-    (m) => m.userId === user.id,
-  )
+  const alreadyOrgMember = !!find(org.memberships, (m) => m.userId === user.id)
+  const t = await getTranslations()
 
   // Card if already joined the team
   if (alreadyOrgMember) {
@@ -54,26 +58,21 @@ export default async function JoinOrgPage({
         <CardHeader>
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle2 className="h-5 w-5 text-green-500" />
-            <CardTitle>Successfully Joined!</CardTitle>
+            <CardTitle>{t.org.join.successTitle}</CardTitle>
           </div>
           <CardDescription>
-            You are now a member of {organization.name}.
+            {t.org.join.successDescription(org.name)}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <JoinCardOrgInfo
-            organization={organization}
-            inviteCode={inviteCode}
-            code={code}
-          />
+          <JoinCardOrgInfo org={org} inviteCode={inviteCode} code={code} />
           <p className="text-center text-muted-foreground">
-            You now have access to all resources shared with {inviteCode.role}s
-            in this organization.
+            {t.org.join.accessDescription}
           </p>
         </CardContent>
         <CardFooter>
-          <Link href={`/org/${organization.slug}`} className="w-full">
-            <Button className="w-full">Go to Organization</Button>
+          <Link href={`/org/${org.slug}`} className="w-full">
+            <Button className="w-full">{t.org.join.goToOrganization}</Button>
           </Link>
         </CardFooter>
       </CardShell>
@@ -87,10 +86,10 @@ export default async function JoinOrgPage({
         <CardHeader>
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="h-5 w-5 text-destructive" />
-            <CardTitle>Invalid Invitation</CardTitle>
+            <CardTitle>{t.org.join.invalidInvitationTitle}</CardTitle>
           </div>
           <CardDescription>
-            This invitation link cannot be used.
+            {t.org.join.invalidInvitationDescription}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -98,20 +97,16 @@ export default async function JoinOrgPage({
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>
               {error === 'Expired'
-                ? 'This invitation has expired.'
-                : 'This invitation has reached its maximum number of uses.'}
+                ? t.org.join.expiredInvitationDescription
+                : t.org.join.maxUsesReachedDescription}
             </AlertTitle>
           </Alert>
 
-          <JoinCardOrgInfo
-            organization={organization}
-            inviteCode={inviteCode}
-            code={code}
-          />
+          <JoinCardOrgInfo org={org} inviteCode={inviteCode} code={code} />
         </CardContent>
         <CardFooter>
           <Link href={`/`} className="w-full">
-            <Button className="w-full">Return to Home</Button>
+            <Button className="w-full">{t.org.join.returnToHome}</Button>
           </Link>
         </CardFooter>
       </CardShell>
@@ -122,17 +117,13 @@ export default async function JoinOrgPage({
   return (
     <CardShell>
       <CardHeader>
-        <CardTitle>Join Organization</CardTitle>
+        <CardTitle>{t.org.join.joinOrganization}</CardTitle>
         <CardDescription>
-          You&apos;ve been invited to join an organization
+          {t.org.join.joinOrganizationDescription}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <JoinCardOrgInfo
-          organization={organization}
-          inviteCode={inviteCode}
-          code={code}
-        />
+        <JoinCardOrgInfo org={org} inviteCode={inviteCode} code={code} />
       </CardContent>
       <CardFooter className="flex flex-col gap-2">
         <ActionButton
@@ -141,8 +132,14 @@ export default async function JoinOrgPage({
           action={async () => {
             'use server'
             return superAction(async () => {
-              const { error, organization, inviteCode, user } =
-                await getInviteCode({ orgSlug, code })
+              const user = await getMyUserOrLogin({
+                forceRedirectUrl: `/join/${orgSlug}/${code}`,
+              })
+
+              const { error, org, inviteCode } = await getInviteCode({
+                orgSlug,
+                code,
+              })
 
               if (error) {
                 throw new Error(error)
@@ -156,17 +153,19 @@ export default async function JoinOrgPage({
                   })
                   .where(eq(schema.inviteCodes.id, inviteCode.id)),
                 db.insert(schema.organizationMemberships).values({
-                  organizationId: organization.id,
+                  organizationId: org.id,
                   userId: user.id,
                   role: inviteCode.role,
                   invitationCodeId: inviteCode.id,
                 }),
               ])
-              revalidatePath(`/join/${organization.slug}/${code}`)
+
+              superCache.userOrgMemberships({ userId: user.id }).revalidate()
+              superCache.orgMembers({ orgId: org.id }).revalidate()
             })
           }}
         >
-          Join Organization
+          {t.org.join.joinOrganization}
         </ActionButton>
         <ActionButton
           variant="outline"
@@ -176,33 +175,36 @@ export default async function JoinOrgPage({
             redirect(`/`)
           }}
         >
-          Cancel
+          {t.standardWords.cancel}
         </ActionButton>
       </CardFooter>
     </CardShell>
   )
 }
 
-const JoinCardOrgInfo = ({
-  organization,
+const JoinCardOrgInfo = async ({
+  org,
   inviteCode,
   code,
 }: {
-  organization: NonNullable<
-    Awaited<ReturnType<typeof getInviteCode>>['organization']
-  >
+  org: NonNullable<Awaited<ReturnType<typeof getInviteCode>>['org']>
   inviteCode: NonNullable<
     Awaited<ReturnType<typeof getInviteCode>>['inviteCode']
   >
   code: string
 }) => {
+  const t = await getTranslations()
   return (
     <div className="flex flex-col items-center justify-center py-6 gap-2">
-      <SeededAvatar size={100} value={organization.slug} />
-      <h2 className="text-xl font-bold">{organization.name}</h2>
-      <p className="text-sm text-muted-foreground">Invitation Code: {code}</p>
+      <OrgAvatar org={org} size={100} />
+      <h2 className="text-xl font-bold">{org.name}</h2>
+      <p className="text-sm text-muted-foreground">
+        {t.org.join.invitationCode}: {code}
+      </p>
       <Badge variant={inviteCode.role === 'admin' ? 'default' : 'secondary'}>
-        {inviteCode.role === 'admin' ? 'Admin Role' : 'Member Role'}
+        {inviteCode.role === 'admin'
+          ? t.org.join.adminRole
+          : t.org.join.memberRole}
       </Badge>
     </div>
   )

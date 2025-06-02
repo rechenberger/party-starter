@@ -1,5 +1,6 @@
 import { CopyToClipboardButton } from '@/components/CopyToClipboardButton'
-import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
+import { UserAvatar } from '@/components/UserAvatar'
+import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -17,16 +18,16 @@ import {
 } from '@/components/ui/table'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { getTranslations } from '@/i18n/getTranslations'
+import { superCache } from '@/lib/superCache'
 import { cn } from '@/lib/utils'
 import {
   streamDialog,
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { format, formatDistanceToNow } from 'date-fns'
 import { eq } from 'drizzle-orm'
 import { Info, PlusCircle, Trash2 } from 'lucide-react'
-import { revalidatePath } from 'next/cache'
 import {
   getMyMembershipOrNotFound,
   getMyMembershipOrThrow,
@@ -47,12 +48,13 @@ export const NormalInviteCodesTable = async (
   await getMyMembershipOrNotFound({
     allowedRoles,
   })
+  const t = await getTranslations()
 
   return (
     <>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Invitation Codes</CardTitle>
+          <CardTitle>{t.inviteCodes.normalCodes.title}</CardTitle>
           <div className="flex gap-2">
             <ActionButton
               size="sm"
@@ -61,9 +63,8 @@ export const NormalInviteCodesTable = async (
                 'use server'
                 return superAction(async () => {
                   return streamDialog({
-                    title: 'New Invitation Code',
-                    description:
-                      'Create and share the code with others to invite them to this organization.',
+                    title: t.inviteCodes.normalCodes.create,
+                    description: t.inviteCodes.normalCodes.createDescription,
                     content: (
                       <CreateInviteCodeFormClient
                         organizationSlug={orgSlug}
@@ -94,7 +95,8 @@ export const NormalInviteCodesTable = async (
                                 id: schema.inviteCodes.id,
                               })
 
-                            revalidatePath(`/org/${orgId}/settings/members`)
+                            superCache.orgMembers({ orgId }).revalidate()
+
                             return {
                               id: code.id,
                             }
@@ -106,7 +108,7 @@ export const NormalInviteCodesTable = async (
                 })
               }}
             >
-              Add Invitation Code
+              {t.inviteCodes.normalCodes.create}
             </ActionButton>
           </div>
         </CardHeader>
@@ -114,13 +116,15 @@ export const NormalInviteCodesTable = async (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Code</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Expires</TableHead>
-                <TableHead>Uses left</TableHead>
-                <TableHead>Updated By</TableHead>
-                <TableHead>Comment</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t.inviteCodes.table.code}</TableHead>
+                <TableHead>{t.inviteCodes.table.role}</TableHead>
+                <TableHead>{t.inviteCodes.table.expires}</TableHead>
+                <TableHead>{t.inviteCodes.table.usesLeft}</TableHead>
+                <TableHead>{t.inviteCodes.table.updatedBy}</TableHead>
+                <TableHead>{t.inviteCodes.table.comment}</TableHead>
+                <TableHead className="text-right">
+                  {t.inviteCodes.table.actions}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -130,7 +134,7 @@ export const NormalInviteCodesTable = async (
                     className="text-center py-6 text-muted-foreground"
                     colSpan={42} //just a high number to make sure the cell takes the full width
                   >
-                    No invitation codes found. Create one to get started.
+                    {t.inviteCodes.table.noInvitationCodes}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -158,20 +162,17 @@ export const NormalInviteCodesTable = async (
                             code.role === 'admin' ? 'default' : 'secondary'
                           }
                         >
-                          {getOrganizationRole(code.role).label}
+                          {t.roles[getOrganizationRole(code.role).i18nKey]}
                         </Badge>
                       </TableCell>
-                      <TableCell
-                        title={
-                          code.expiresAt
-                            ? format(code.expiresAt, 'MMM d, yyyy HH:mm')
-                            : 'Never'
-                        }
-                      >
+                      <TableCell>
                         {code.expiresAt ? (
-                          formatDistanceToNow(new Date(code.expiresAt), {
-                            addSuffix: true,
-                          })
+                          <DateFnsFormatDistanceToNow
+                            date={code.expiresAt}
+                            options={{
+                              addSuffix: true,
+                            }}
+                          />
                         ) : (
                           <span className="text-muted-foreground">Never</span>
                         )}
@@ -192,7 +193,7 @@ export const NormalInviteCodesTable = async (
                       <TableCell>
                         {code.updatedBy && (
                           <div className="flex items-center gap-3">
-                            <SimpleUserAvatar user={code.updatedBy} />
+                            <UserAvatar user={code.updatedBy} />
                             <div>
                               <p className="font-medium">
                                 {code.updatedBy.name}
@@ -204,7 +205,9 @@ export const NormalInviteCodesTable = async (
                           </div>
                         )}
                         {code.updatedBy === null && (
-                          <span className="text-muted-foreground">Unknown</span>
+                          <span className="text-muted-foreground">
+                            {t.standardWords.unknown}
+                          </span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -234,7 +237,9 @@ export const NormalInviteCodesTable = async (
                             // disabled={isDeleting}
                             catchToast
                             hideIcon
-                            askForConfirmation
+                            askForConfirmation={
+                              t.inviteCodes.delete.confirmation
+                            }
                             action={async () => {
                               'use server'
                               return superAction(async () => {
@@ -251,15 +256,16 @@ export const NormalInviteCodesTable = async (
                                     updatedById: membership.userId,
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))
-                                revalidatePath(
-                                  `/org/${orgSlug}/settings/members`,
-                                )
+
+                                superCache.orgMembers({ orgId }).revalidate()
                               })
                             }}
-                            title="Delete code"
+                            title={t.inviteCodes.delete.action}
                           >
                             <Trash2 className="h-4 w-4 text-destructive" />
-                            <span className="sr-only">Delete code</span>
+                            <span className="sr-only">
+                              {t.inviteCodes.delete.action}
+                            </span>
                           </ActionButton>
                         </div>
                       </TableCell>

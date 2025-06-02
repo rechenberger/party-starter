@@ -1,24 +1,9 @@
-import {
-  ChevronsUpDown,
-  KeyRound,
-  LogIn,
-  LogOut,
-  UserRound,
-} from 'lucide-react'
+import { ChevronsUpDown, LogIn } from 'lucide-react'
 
-import { signOut } from '@/auth/auth'
 import { getMyUser } from '@/auth/getMyUser'
-import {
-  changePasswordWithRedirect,
-  changeUsernameWithRedirect,
-  loginWithRedirect,
-} from '@/auth/loginWithRedirect'
+import { loginWithRedirect } from '@/auth/loginWithRedirect'
 import {
   DropdownMenu,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
@@ -27,9 +12,9 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { redirect } from 'next/navigation'
 import { ResponsiveDropdownMenuContent } from '../ResponsiveDropdownMenuContent'
-import { SimpleUserAvatar } from '../simple/SimpleUserAvatar'
+import { UserAvatar } from '../UserAvatar'
+import { UserMenuDropDownContent } from '../UserMenuDropDownContent'
 
 export const SidebarUserSection = async () => {
   const user = await getMyUser()
@@ -59,7 +44,7 @@ export const SidebarUserSection = async () => {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <SimpleUserAvatar user={user} />
+              <UserAvatar user={user} />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
                 <span className="truncate text-xs">{user.email}</span>
@@ -71,65 +56,7 @@ export const SidebarUserSection = async () => {
             align="end"
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
           >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <SimpleUserAvatar user={user} />
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <ActionButton
-                  variant={'ghost'}
-                  hideIcon
-                  className="w-full text-left flex justify-start"
-                  size={'sm'}
-                  action={changeUsernameWithRedirect}
-                >
-                  <UserRound className="size-4" />
-                  Change Username
-                </ActionButton>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <ActionButton
-                  variant={'ghost'}
-                  hideIcon
-                  className="w-full text-left flex justify-start"
-                  size={'sm'}
-                  action={changePasswordWithRedirect}
-                >
-                  <KeyRound className="size-4" />
-                  Change Password
-                </ActionButton>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <ActionButton
-                variant={'ghost'}
-                hideIcon
-                className="w-full text-left flex justify-start"
-                size={'sm'}
-                action={async () => {
-                  'use server'
-                  const signOutResponse = await signOut({ redirect: false })
-                  const url = signOutResponse.redirect
-                  const response = await fetch(url)
-                  if (response.ok) {
-                    redirect(url)
-                  } else {
-                    redirect('/')
-                  }
-                }}
-              >
-                <LogOut className="size-4" />
-                Logout
-              </ActionButton>
-            </DropdownMenuItem>
+            <UserMenuDropDownContent user={user} />
           </ResponsiveDropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

@@ -11,7 +11,7 @@ export const StartPage = async () => {
   return (
     <>
       <div className="flex-1 flex flex-col items-center justify-center gap-12 py-8">
-        <h1 className="text-2xl lg:text-6xl">🎉 {t.welcome.title} 🥳</h1>
+        <h1 className="text-2xl lg:text-6xl">🎉 {t.landing.title} 🥳</h1>
         <div className="flex flex-col gap-2">
           <PartyButton />
           <Link

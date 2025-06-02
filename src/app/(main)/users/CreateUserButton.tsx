@@ -1,13 +1,14 @@
 import { LoginFormClient } from '@/auth/LoginFormClient'
 import { registerUser } from '@/auth/registerUser'
+import { getTranslations } from '@/i18n/getTranslations'
 import {
   streamDialog,
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { revalidatePath } from 'next/cache'
 
-export const CreateUserButton = () => {
+export const CreateUserButton = async () => {
+  const t = await getTranslations()
   return (
     <>
       <ActionButton
@@ -16,7 +17,7 @@ export const CreateUserButton = () => {
           'use server'
           return superAction(async () => {
             streamDialog({
-              title: 'Create User',
+              title: t.userManagement.createUser.title,
               content: (
                 <>
                   <LoginFormClient
@@ -28,7 +29,6 @@ export const CreateUserButton = () => {
                         }
                         await registerUser(credentials)
                         streamDialog(null)
-                        revalidatePath('/users')
                       })
                     }}
                   />
@@ -38,7 +38,7 @@ export const CreateUserButton = () => {
           })
         }}
       >
-        Create User
+        {t.userManagement.createUser.create}
       </ActionButton>
     </>
   )

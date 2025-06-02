@@ -6,6 +6,7 @@ import { render } from '@react-email/components'
 import { ReactNode } from 'react'
 import { ZodType, z } from 'zod'
 import { getMailTransporter } from './getMailTransporter'
+import { typedParse } from './typedParse'
 
 type EmailRenderProps<Schema extends ZodType> = {
   props: z.infer<Schema>
@@ -27,7 +28,8 @@ export const createEmailTemplate = <Schema extends ZodType>(template: {
     const locale = params.locale ?? (await getMyLocale())
     const t = await getTranslations(locale)
 
-    const renderProps = { props: params.props, t, locale }
+    const props = typedParse(template.schema, params.props)
+    const renderProps = { props, t, locale }
 
     const emailComponent = <template.Email {...renderProps} />
 

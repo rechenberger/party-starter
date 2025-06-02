@@ -14,6 +14,7 @@ import {
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { User } from '@/db/schema-zod'
+import { orgInviteEmail } from '@/emails/OrgInvite'
 import { getTranslations } from '@/i18n/getTranslations'
 import { ORGS } from '@/lib/starter.config'
 import { superCache } from '@/lib/superCache'
@@ -24,7 +25,6 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { orgInviteEmail } from '@emails/OrgInvite'
 import { and, desc, eq, or } from 'drizzle-orm'
 import { Mail, Trash2 } from 'lucide-react'
 import {

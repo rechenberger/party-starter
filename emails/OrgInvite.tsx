@@ -65,7 +65,7 @@ OrgInvite.PreviewProps = {
   orgName: 'Enigma',
   inviteLink: 'https://vercel.com',
   role: 'admin',
-  locale: 'de',
+  locale: DEFAULT_LOCALE,
 } satisfies OrgInviteProps
 
 export default OrgInvite

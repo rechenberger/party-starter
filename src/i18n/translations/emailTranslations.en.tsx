@@ -7,7 +7,7 @@ export const t = {
         <>
           Best regards
           <br />
-          The Party Starter Team
+          The {BRAND.name} Team
           <br />
           🎉
         </>

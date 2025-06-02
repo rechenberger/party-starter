@@ -8,7 +8,7 @@ export const t = {
         <>
           Beste Grüße
           <br />
-          Dein Party Starter Team
+          Dein {BRAND.name} Team
           <br />
           🎉
         </>

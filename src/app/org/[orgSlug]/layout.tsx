@@ -3,6 +3,8 @@ import { SidebarLayout } from '@/components/sidebar/SidebarLayout'
 import { ORGS } from '@/lib/starter.config'
 import { redirect } from 'next/navigation'
 
+export { metadata } from '@/components/layout/RootLayout'
+
 export default async function Layout({
   children,
   params,

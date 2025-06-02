@@ -3,6 +3,8 @@ import { RootLayout } from '@/components/layout/RootLayout'
 import { getIsSidebarActive } from '@/components/sidebar/getIsSidebarActive'
 import { SidebarLayout } from '@/components/sidebar/SidebarLayout'
 
+export { metadata } from '@/components/layout/RootLayout'
+
 export default async function Layout({
   children,
 }: {

@@ -22,13 +22,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
 }
 
-export async function RootLayout({
-  children,
-  // locale,
-}: {
-  children: React.ReactNode
-  // locale?: Locale
-}) {
+export async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getMyLocale()
   return (
     <html suppressHydrationWarning lang={locale}>

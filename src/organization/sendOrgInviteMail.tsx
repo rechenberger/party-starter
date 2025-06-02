@@ -37,7 +37,7 @@ export const sendOrgInviteMail = async (params: {
       />
     )
 
-    const [emailHtml, emailPlainText] = await Promise.all([
+    const [html, text] = await Promise.all([
       render(emailComponent),
       render(emailComponent, {
         plainText: true,
@@ -47,8 +47,8 @@ export const sendOrgInviteMail = async (params: {
     const mailOptions = {
       to: receiverEmail,
       subject: t.email.orgInvite.subjectText(orgName, BRAND.name),
-      html: emailHtml,
-      text: emailPlainText,
+      html,
+      text,
     }
 
     await transporter.sendMail(mailOptions)

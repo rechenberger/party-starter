@@ -15,16 +15,19 @@ export const sendVerificationRequestEmail = async (
     const locale = await getMyLocale()
     const t = await getTranslations(locale)
     const emailComponent = <VerifyEmail verifyUrl={url} locale={locale} />
-    const emailHtml = await render(emailComponent)
-    const emailPlainText = await render(emailComponent, {
-      plainText: true,
-    })
+
+    const [html, text] = await Promise.all([
+      render(emailComponent),
+      render(emailComponent, {
+        plainText: true,
+      }),
+    ])
 
     const mailOptions = {
       to: email,
       subject: t.email.verifyEmail.subjectText(BRAND.name),
-      html: emailHtml,
-      text: emailPlainText,
+      html,
+      text,
     }
 
     await transporter.sendMail(mailOptions)

@@ -2,7 +2,6 @@ import { TopHeader } from '@/components/TopHeader'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { getTranslations } from '@/i18n/getTranslations'
-import { ParamsWrapper } from '@/lib/paramsServerContext'
 import { superCache } from '@/lib/superCache'
 import { getMyMembershipOrNotFound } from '@/organization/getMyMembership'
 import { getEnhancedInviteCode } from '@/organization/inviteCodes/getInviteCode'
@@ -66,41 +65,43 @@ const getOrgWithInviteCodes = async ({ orgSlug }: { orgSlug: string }) => {
   return org
 }
 
-export default ParamsWrapper(
-  async ({ params }: { params: Promise<{ orgSlug: string }> }) => {
-    const { orgSlug } = await params
-    const t = await getTranslations()
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ orgSlug: string }>
+}) {
+  const { orgSlug } = await params
+  const t = await getTranslations()
 
-    const { membership: myMembership, org } = await getMyMembershipOrNotFound({
-      allowedRoles: allowedRolesView,
-      orgSlug,
-    })
+  const { membership: myMembership, org } = await getMyMembershipOrNotFound({
+    allowedRoles: allowedRolesView,
+    orgSlug,
+  })
 
-    const isAdmin = myMembership.role === 'admin'
+  const isAdmin = myMembership.role === 'admin'
 
-    const orgWithInviteCodes = await getOrgWithInviteCodes({
-      orgSlug: org.slug,
-    })
+  const orgWithInviteCodes = await getOrgWithInviteCodes({
+    orgSlug: org.slug,
+  })
 
-    const orgWithMemberships = omit(orgWithInviteCodes, ['inviteCodes'])
+  const orgWithMemberships = omit(orgWithInviteCodes, ['inviteCodes'])
 
-    return (
-      <>
-        <TopHeader>{t.org.orgMembers}</TopHeader>
-        {orgWithInviteCodes && (
-          <>
-            <MemberList org={orgWithMemberships} isAdmin={isAdmin} />
-            {isAdmin && (
-              <InvitationCodesList
-                {...org}
-                inviteCodes={map(orgWithInviteCodes.inviteCodes, (inviteCode) =>
-                  getEnhancedInviteCode(inviteCode),
-                )}
-              />
-            )}
-          </>
-        )}
-      </>
-    )
-  },
-)
+  return (
+    <>
+      <TopHeader>{t.org.orgMembers}</TopHeader>
+      {orgWithInviteCodes && (
+        <>
+          <MemberList org={orgWithMemberships} isAdmin={isAdmin} />
+          {isAdmin && (
+            <InvitationCodesList
+              {...org}
+              inviteCodes={map(orgWithInviteCodes.inviteCodes, (inviteCode) =>
+                getEnhancedInviteCode(inviteCode),
+              )}
+            />
+          )}
+        </>
+      )}
+    </>
+  )
+}

@@ -1,3 +1,4 @@
+import { metadata } from '@/components/layout/RootLayout'
 import { Locale, localeDefinitions } from '@/i18n/locale'
 import { keyBy, mapValues, replace } from 'lodash-es'
 import { type Metadata, type ResolvingMetadata } from 'next'
@@ -9,6 +10,7 @@ export const generateMetadataLocalizedLayout = () => {
   return async ({ params }: { params: Promise<{ locale: string }> }) => {
     const localeFromParams = (await params).locale
     return {
+      ...metadata,
       alternates: {
         canonical: `./`,
         languages: mapValues(

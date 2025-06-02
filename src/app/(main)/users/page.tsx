@@ -30,8 +30,11 @@ import { Fragment } from 'react'
 import { CreateUserButton } from './CreateUserButton'
 import { ImpersonateButton } from './ImpersonateButton'
 
-export const metadata: Metadata = {
-  title: 'Users',
+export const generateMetadata = async () => {
+  const t = await getTranslations()
+  return {
+    title: t.users.title,
+  } satisfies Metadata
 }
 
 const getUsers = async ({ filter }: { filter?: 'admins' }) => {

@@ -17,6 +17,37 @@ import { redirect } from 'next/navigation'
 
 const allowedRolesEdit: OrganizationRole[] = ['admin']
 
+const isLastAdmin = async ({
+  userId,
+  orgId,
+}: {
+  userId: string
+  orgId: string
+}) => {
+  const currentAdmins = await db
+    .select()
+    .from(schema.organizationMemberships)
+    .where(
+      and(
+        eq(schema.organizationMemberships.role, 'admin'),
+        eq(schema.organizationMemberships.organizationId, orgId),
+      ),
+    )
+    .limit(2)
+
+  if (currentAdmins.length > 1) {
+    // more than one admin, so not the last admin
+    return false
+  }
+
+  if (userId !== currentAdmins[0].userId) {
+    // user is not the last admin
+    return false
+  }
+
+  return true
+}
+
 export const changeRoleAction = async (data: {
   userId: string
   role: OrganizationRole
@@ -31,20 +62,11 @@ export const changeRoleAction = async (data: {
 
     const t = await getTranslations()
 
-    const currentAdmins = await db
-      .select()
-      .from(schema.organizationMemberships)
-      .where(
-        and(
-          eq(schema.organizationMemberships.role, 'admin'),
-          eq(schema.organizationMemberships.organizationId, org.id),
-        ),
-      )
-
     if (
-      currentAdmins.length === 1 &&
-      data.role === 'member' &&
-      data.userId === currentAdmins[0].userId
+      await isLastAdmin({
+        userId: data.userId,
+        orgId: org.id,
+      })
     ) {
       throw new Error(t.org.leave.cannotRemoveLastAdmin)
     }
@@ -95,17 +117,12 @@ export const kickUserAction = async (data: {
       throw new Error(t.org.missingPermission)
     }
 
-    const currentAdmins = await db
-      .select()
-      .from(schema.organizationMemberships)
-      .where(
-        and(
-          eq(schema.organizationMemberships.role, 'admin'),
-          eq(schema.organizationMemberships.organizationId, org.id),
-        ),
-      )
-
-    if (currentAdmins.length === 1 && data.userId === currentAdmins[0].userId) {
+    if (
+      await isLastAdmin({
+        userId: data.userId,
+        orgId: org.id,
+      })
+    ) {
       throw new Error(
         `${t.org.leave.cannotRemoveLastAdmin} ${t.org.leave.cannotRemoveLastAdminDescription}`,
       )

@@ -62,7 +62,6 @@ export const MemberList = ({
 }) => {
   const { data: session } = useSession()
   const myUserId = session?.user?.id
-  console.log({ myUserId })
 
   const { trigger, isLoading: isChangeRoleLoading } = useSuperAction({
     action: changeRoleAction,

@@ -24,6 +24,7 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
+import { orgInviteEmail } from '@emails/OrgInvite'
 import { and, desc, eq, or } from 'drizzle-orm'
 import { Mail, Trash2 } from 'lucide-react'
 import {
@@ -31,7 +32,6 @@ import {
   getMyMembershipOrThrow,
 } from '../getMyMembership'
 import { OrganizationRole, getOrganizationRole } from '../organizationRoles'
-import { sendOrgInviteMail } from '../sendOrgInviteMail'
 import { CreateInviteCodeEmailFormClient } from './CreateInviteCodeEmailFormClient'
 import { InvitationCodesListProps } from './InvitationCodesList'
 import { getInviteCodeUrl } from './getInviteCodeUrl'
@@ -107,16 +107,18 @@ const upsertInviteCodeAndSendMail = async ({
   superCache.orgMembers({ orgId }).revalidate()
   const newCode = newCodeRes[0]
 
-  await sendOrgInviteMail({
-    receiverEmail,
-    invitedByEmail: user.email,
-    invitedByUsername: user.name,
-    orgName: orgName,
-    inviteLink: getInviteCodeUrl({
-      organizationSlug: orgSlug,
-      code: newCode.id,
-    }),
-    role: newCode.role,
+  await orgInviteEmail.send({
+    to: receiverEmail,
+    props: {
+      invitedByEmail: user.email,
+      invitedByUsername: user.name,
+      orgName: orgName,
+      inviteLink: getInviteCodeUrl({
+        organizationSlug: orgSlug,
+        code: newCode.id,
+      }),
+      role: newCode.role,
+    },
   })
 }
 

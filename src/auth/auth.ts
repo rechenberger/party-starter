@@ -2,12 +2,12 @@ import { db } from '@/db/db'
 import { superCache } from '@/lib/superCache'
 import Nodemailer from '@auth/core/providers/nodemailer'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
+import { verifyEmailEmail } from '@emails/VerifyEmail'
 import NextAuth from 'next-auth'
 import Discord from 'next-auth/providers/discord'
 import { headers } from 'next/headers'
 import { CredentialsProvider } from './CredentialsProvider'
 import { ImpersonateProvider } from './ImpersonateProvider'
-import { sendVerificationRequestEmail } from './sendVerificationRequestEmail'
 
 const hasEmailEnvVars = !!process.env.EMAIL_FROM && !!process.env.SMTP_URL
 
@@ -33,9 +33,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 params.url,
               )}`
 
-              await sendVerificationRequestEmail({
-                ...params,
-                url,
+              await verifyEmailEmail.send({
+                props: { verifyUrl: url },
+                to: params.identifier,
               })
             },
           }),

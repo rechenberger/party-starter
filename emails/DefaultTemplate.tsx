@@ -20,7 +20,7 @@ export const DefaultTemplate = async ({
   children,
 }: {
   previewText: string
-  locale: Locale
+  locale?: Locale
   children: React.ReactNode
 }) => {
   const t = await getTranslations(locale)

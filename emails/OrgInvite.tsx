@@ -10,7 +10,7 @@ type OrgInviteProps = {
   orgName: string
   inviteLink: string
   role: 'admin' | 'member'
-  locale?: Locale
+  locale: Locale
 }
 
 export const OrgInvite = async ({
@@ -19,7 +19,7 @@ export const OrgInvite = async ({
   orgName,
   inviteLink,
   role,
-  locale = DEFAULT_LOCALE,
+  locale,
 }: OrgInviteProps) => {
   const t = await getTranslations(locale)
 

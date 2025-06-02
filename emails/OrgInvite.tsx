@@ -1,5 +1,4 @@
 import { createEmailTemplate } from '@/lib/createEmailTemplate'
-import { BRAND } from '@/lib/starter.config'
 import { OrganizationRole } from '@/organization/organizationRoles'
 import { Button, Heading, Link, Section, Text } from '@react-email/components'
 import { z } from 'zod'
@@ -23,7 +22,6 @@ export const orgInviteEmail = createEmailTemplate({
   subject: async ({ props, t }) => {
     return t.email.orgInvite.subjectText({
       orgName: props.orgName,
-      platformName: BRAND.name,
     })
   },
   Email: async ({ props, t, locale }) => {
@@ -31,7 +29,6 @@ export const orgInviteEmail = createEmailTemplate({
       props
     const previewText = t.email.orgInvite.subjectText({
       orgName,
-      platformName: BRAND.name,
     })
     return (
       <DefaultTemplate previewText={previewText} locale={locale}>
@@ -47,7 +44,6 @@ export const orgInviteEmail = createEmailTemplate({
             invitedByEmail,
             orgName,
             role,
-            platformName: BRAND.name,
           })}
         </Text>
         <Section className="text-center mt-[32px] mb-[32px]">

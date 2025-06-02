@@ -16,13 +16,8 @@ export const t = {
     },
   },
   orgInvite: {
-    subjectText: ({
-      orgName,
-      platformName,
-    }: {
-      orgName: string
-      platformName: string
-    }) => `Tritt ${orgName} auf ${platformName} bei`,
+    subjectText: ({ orgName }: { orgName: string }) =>
+      `Tritt ${orgName} auf ${BRAND.name} bei`,
 
     greeting: 'Hallo',
     welcome: (orgName: string) => (
@@ -35,27 +30,24 @@ export const t = {
       invitedByEmail,
       orgName,
       role,
-      platformName,
     }: {
       invitedByUsername: string | null
       invitedByEmail: string
       orgName: string
       role: string
-      platformName: string
     }) => (
       <>
         <strong>{invitedByUsername ?? invitedByEmail}</strong>
         {invitedByUsername && ` (${invitedByEmail})`} hat dich eingeladen, um
-        der Organisation <strong>{orgName}</strong> auf {platformName} als{' '}
-        {role} beizutreten.
+        der Organisation <strong>{orgName}</strong> auf {BRAND.name} als {role}{' '}
+        beizutreten.
       </>
     ),
     joinButton: (orgName: string) => `${orgName} beitreten`,
     fallback: 'oder kopiere und füge diese URL in deinen Browser ein',
   },
   verifyEmail: {
-    subjectText: ({ platformName }: { platformName: string }) =>
-      `Login zu ${platformName}`,
+    subjectText: `Login zu ${BRAND.name}`,
     previewText: 'Bestätige deine E-Mail-Adresse',
     title: 'Bestätige deine E-Mail-Adresse',
     greeting: 'Hallo',

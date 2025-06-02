@@ -1,5 +1,4 @@
 import { createEmailTemplate } from '@/lib/createEmailTemplate'
-import { BRAND } from '@/lib/starter.config'
 import { Button, Heading, Link, Section, Text } from '@react-email/components'
 import { z } from 'zod'
 import { DefaultTemplate } from './DefaultTemplate'
@@ -51,10 +50,8 @@ export const verifyEmailEmail = createEmailTemplate({
       </DefaultTemplate>
     )
   },
-  subject: async ({ props, t }) => {
-    return t.email.verifyEmail.subjectText({
-      platformName: BRAND.name,
-    })
+  subject: async ({ t }) => {
+    return t.email.verifyEmail.subjectText
   },
 })
 

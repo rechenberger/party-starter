@@ -1,5 +1,5 @@
-import { getEmailTranslations } from '@/i18n/getEmailTranslations'
 import { getMyLocale } from '@/i18n/getMyLocale'
+import { getTranslations } from '@/i18n/getTranslations'
 import { getMailTransporter } from '@/lib/getMailTransporter'
 import { BRAND } from '@/lib/starter.config'
 import type { EmailConfig } from '@auth/core/providers/email'
@@ -13,7 +13,7 @@ export const sendVerificationRequestEmail = async (
   try {
     const transporter = getMailTransporter()
     const locale = await getMyLocale()
-    const emailTranslations = await getEmailTranslations(locale)
+    const t = await getTranslations(locale)
     const emailComponent = <VerifyEmail verifyUrl={url} locale={locale} />
     const emailHtml = await render(emailComponent)
     const emailPlainText = await render(emailComponent, {
@@ -22,7 +22,7 @@ export const sendVerificationRequestEmail = async (
 
     const mailOptions = {
       to: email,
-      subject: emailTranslations.verifyEmail.subjectText(BRAND.name),
+      subject: t.email.verifyEmail.subjectText(BRAND.name),
       html: emailHtml,
       text: emailPlainText,
     }

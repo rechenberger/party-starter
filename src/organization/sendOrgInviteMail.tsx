@@ -1,5 +1,5 @@
-import { getEmailTranslations } from '@/i18n/getEmailTranslations'
 import { getMyLocale } from '@/i18n/getMyLocale'
+import { getTranslations } from '@/i18n/getTranslations'
 import { getMailTransporter } from '@/lib/getMailTransporter'
 import { BRAND } from '@/lib/starter.config'
 import { OrgInvite } from '@emails/OrgInvite'
@@ -24,7 +24,7 @@ export const sendOrgInviteMail = async (params: {
   try {
     const transporter = getMailTransporter()
     const locale = await getMyLocale()
-    const emailTranslations = await getEmailTranslations(locale)
+    const t = await getTranslations(locale)
 
     const emailComponent = (
       <OrgInvite
@@ -46,7 +46,7 @@ export const sendOrgInviteMail = async (params: {
 
     const mailOptions = {
       to: receiverEmail,
-      subject: emailTranslations.orgInvite.subjectText(orgName, BRAND.name),
+      subject: t.email.orgInvite.subjectText(orgName, BRAND.name),
       html: emailHtml,
       text: emailPlainText,
     }

@@ -1,4 +1,4 @@
-import { getEmailTranslations } from '@/i18n/getEmailTranslations'
+import { getTranslations } from '@/i18n/getTranslations'
 import { DEFAULT_LOCALE, Locale } from '@/i18n/locale'
 import { BRAND } from '@/lib/starter.config'
 import { Button, Heading, Link, Section, Text } from '@react-email/components'
@@ -21,19 +21,19 @@ export const OrgInvite = async ({
   role,
   locale = DEFAULT_LOCALE,
 }: OrgInviteProps) => {
-  const { orgInvite: t } = await getEmailTranslations(locale)
+  const t = await getTranslations(locale)
 
   const previewText = `Join ${invitedByUsername} on ${BRAND.name}`
   return (
     <DefaultTemplate previewText={previewText} locale={locale}>
       <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-        {t.welcome(orgName)}
+        {t.email.orgInvite.welcome(orgName)}
       </Heading>
       <Text className="text-black text-[14px] leading-[24px]">
-        {t.greeting}
+        {t.email.orgInvite.greeting}
       </Text>
       <Text className="text-black text-[14px] leading-[24px]">
-        {t.description({
+        {t.email.orgInvite.description({
           invitedByUsername,
           invitedByEmail,
           orgName,
@@ -46,11 +46,11 @@ export const OrgInvite = async ({
           className="bg-primary rounded text-primary-foreground text-[12px] font-semibold no-underline text-center px-5 py-3"
           href={inviteLink}
         >
-          {t.joinButton(orgName)}
+          {t.email.orgInvite.joinButton(orgName)}
         </Button>
       </Section>
       <Text className="text-black text-[14px] leading-[24px]">
-        {t.fallback}:{' '}
+        {t.email.orgInvite.fallback}:{' '}
         <Link href={inviteLink} className="text-blue-600 no-underline">
           {inviteLink}
         </Link>

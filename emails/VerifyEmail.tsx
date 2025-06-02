@@ -1,4 +1,4 @@
-import { getEmailTranslations } from '@/i18n/getEmailTranslations'
+import { getTranslations } from '@/i18n/getTranslations'
 import { DEFAULT_LOCALE, Locale } from '@/i18n/locale'
 import { Button, Heading, Link, Section, Text } from '@react-email/components'
 import { DefaultTemplate } from './DefaultTemplate'
@@ -9,31 +9,33 @@ type VerifyEmailProps = {
 }
 
 export const VerifyEmail = async ({ verifyUrl, locale }: VerifyEmailProps) => {
-  const { verifyEmail: t } = await getEmailTranslations(locale)
-  const previewText = t.previewText
+  const t = await getTranslations(locale)
 
   return (
-    <DefaultTemplate previewText={previewText} locale={locale}>
+    <DefaultTemplate
+      previewText={t.email.verifyEmail.previewText}
+      locale={locale}
+    >
       <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-        {t.title}
+        {t.email.verifyEmail.title}
       </Heading>
       <Text className="text-black text-[14px] leading-[24px]">
-        {t.greeting}
+        {t.email.verifyEmail.greeting}
       </Text>
       <Text className="text-black text-[14px] leading-[24px]">
-        {t.description}
+        {t.email.verifyEmail.description}
       </Text>
       <Section className="text-center mt-[32px] mb-[32px]">
         <Button
           className="bg-primary text-primary-foreground rounded text-[12px] font-semibold no-underline text-center px-5 py-3"
           href={verifyUrl}
         >
-          {t.verifyButton}
+          {t.email.verifyEmail.verifyButton}
         </Button>
       </Section>
       <Section className="mt-0">
         <Text className="text-black text-[14px] leading-[24px] mb-0">
-          {t.fallback}:
+          {t.email.verifyEmail.fallback}:
         </Text>
         <Text className="text-black text-[12px] leading-[16px] mt-0">
           <Link

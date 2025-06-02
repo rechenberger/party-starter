@@ -1,4 +1,4 @@
-import { getEmailTranslations } from '@/i18n/getEmailTranslations'
+import { getTranslations } from '@/i18n/getTranslations'
 import { DEFAULT_LOCALE, Locale } from '@/i18n/locale'
 import { BRAND } from '@/lib/starter.config'
 import {
@@ -23,7 +23,7 @@ export const DefaultTemplate = async ({
   locale: Locale
   children: React.ReactNode
 }) => {
-  const { defaultTemplate: t } = await getEmailTranslations(locale)
+  const t = await getTranslations(locale)
   return (
     <Html>
       <Head />
@@ -54,7 +54,7 @@ export const DefaultTemplate = async ({
             {children}
             <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
             <Text className="text-[#666666] text-[12px] leading-[24px]">
-              {t.footer.signature}
+              {t.email.defaultTemplate.footer.signature}
             </Text>
           </Container>
         </Body>

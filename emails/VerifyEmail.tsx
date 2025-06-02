@@ -4,7 +4,7 @@ import { Button, Heading, Link, Section, Text } from '@react-email/components'
 import { z } from 'zod'
 import { DefaultTemplate } from './DefaultTemplate'
 
-export const VerifyEmail = createEmailTemplate({
+export const verifyEmailEmail = createEmailTemplate({
   schema: z.object({
     verifyUrl: z.string(),
   }),
@@ -58,4 +58,4 @@ export const VerifyEmail = createEmailTemplate({
   },
 })
 
-export default VerifyEmail.preview()
+export default verifyEmailEmail.preview()

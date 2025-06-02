@@ -1,16 +1,17 @@
 import { createEmailTemplate } from '@/lib/createEmailTemplate'
 import { BRAND } from '@/lib/starter.config'
+import { OrganizationRole } from '@/organization/organizationRoles'
 import { Button, Heading, Link, Section, Text } from '@react-email/components'
 import { z } from 'zod'
 import { DefaultTemplate } from './DefaultTemplate'
 
-export const OrgInvite = createEmailTemplate({
+export const orgInviteEmail = createEmailTemplate({
   schema: z.object({
     invitedByUsername: z.string().nullable(),
     invitedByEmail: z.string(),
     orgName: z.string(),
     inviteLink: z.string(),
-    role: z.enum(['admin', 'member']),
+    role: OrganizationRole,
   }),
   previewProps: {
     invitedByUsername: 'Alan',
@@ -68,4 +69,4 @@ export const OrgInvite = createEmailTemplate({
   },
 })
 
-export default OrgInvite.preview()
+export default orgInviteEmail.preview()

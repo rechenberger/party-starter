@@ -24,7 +24,7 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { OrgInvite } from '@emails/OrgInvite'
+import { orgInviteEmail } from '@emails/OrgInvite'
 import { and, desc, eq, or } from 'drizzle-orm'
 import { Mail, Trash2 } from 'lucide-react'
 import {
@@ -107,7 +107,7 @@ const upsertInviteCodeAndSendMail = async ({
   superCache.orgMembers({ orgId }).revalidate()
   const newCode = newCodeRes[0]
 
-  await OrgInvite.send({
+  await orgInviteEmail.send({
     to: receiverEmail,
     props: {
       invitedByEmail: user.email,

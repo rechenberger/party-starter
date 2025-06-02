@@ -2,7 +2,7 @@ import { db } from '@/db/db'
 import { superCache } from '@/lib/superCache'
 import Nodemailer from '@auth/core/providers/nodemailer'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
-import { VerifyEmail } from '@emails/VerifyEmail'
+import { verifyEmailEmail } from '@emails/VerifyEmail'
 import NextAuth from 'next-auth'
 import Discord from 'next-auth/providers/discord'
 import { headers } from 'next/headers'
@@ -33,7 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 params.url,
               )}`
 
-              await VerifyEmail.send({
+              await verifyEmailEmail.send({
                 props: { verifyUrl: url },
                 to: params.identifier,
               })

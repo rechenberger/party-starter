@@ -14,10 +14,10 @@ export const OrgAvatar = ({
     <>
       <SimpleSeededAvatar
         size={size}
-        variant="bauhaus"
+        variant="marble"
         value={org.slug}
         className={className}
-        colors={['#1c1917', '#78716c', '#e7e5e4']}
+        // colors={['#1c1917', '#78716c', '#e7e5e4']}
       />
     </>
   )

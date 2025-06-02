@@ -21,7 +21,7 @@ export const UserAvatar = ({
           <SimpleSeededAvatar
             value={user.email}
             variant="beam"
-            colors={['#44403c', '#d6d3d1']}
+            // colors={['#44403c', '#d6d3d1']}
           />
         </AvatarFallback>
       </Avatar>

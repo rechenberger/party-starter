@@ -27,7 +27,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Organization, OrganizationMembership, User } from '@/db/schema-zod'
-import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
@@ -39,6 +38,10 @@ import {
   organizationRoleDefinitions,
 } from './organizationRoles'
 
+import {
+  changeRoleAction,
+  kickUserAction,
+} from '@/app/org/[orgSlug]/settings/members/actions'
 import { DateFnsFormatDistanceToNow } from '@/components/date-fns-client/DateFnsFormatDistanceToNow'
 import { useTranslations } from '@/i18n/useTranslations'
 type MembershipWithUser = Pick<
@@ -50,20 +53,11 @@ type MembershipWithUser = Pick<
 
 export const MemberList = ({
   org,
-  changeRoleAction,
-  kickUserAction,
   isAdmin,
 }: {
   org: Organization & {
     memberships: MembershipWithUser[]
   }
-  changeRoleAction: SuperActionWithInput<{
-    userId: string
-    role: OrganizationRole
-  }>
-  kickUserAction: SuperActionWithInput<{
-    userId: string
-  }>
   isAdmin: boolean
 }) => {
   const { data: session } = useSession()
@@ -183,6 +177,7 @@ export const MemberList = ({
                               trigger({
                                 userId: membership.userId,
                                 role: value,
+                                orgSlug: org.slug,
                               })
                             }
                             disabled={isChangeRoleLoading}
@@ -233,6 +228,7 @@ export const MemberList = ({
                               action={async () =>
                                 kickUserAction({
                                   userId: membership.userId,
+                                  orgSlug: org.slug,
                                 })
                               }
                               title={

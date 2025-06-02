@@ -20,7 +20,7 @@ export const UserAvatar = ({
         <AvatarFallback asChild>
           <SimpleSeededAvatar
             value={user.email}
-            variant="beam"
+            variant="marble"
             // colors={['#44403c', '#d6d3d1']}
           />
         </AvatarFallback>

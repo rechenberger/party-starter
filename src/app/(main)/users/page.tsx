@@ -2,9 +2,9 @@ import { notFoundIfNotAdmin, throwIfNotAdmin } from '@/auth/getIsAdmin'
 import { getMyUserId } from '@/auth/getMyUser'
 import { impersonate } from '@/auth/impersonate'
 import { TopHeader } from '@/components/TopHeader'
+import { UserAvatar } from '@/components/UserAvatar'
 import { DateFnsFormat } from '@/components/date-fns-client/DateFnsFormat'
 import { SimpleParamSelect } from '@/components/simple/SimpleParamSelect'
-import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
 import {
   Card,
   CardContent,
@@ -94,7 +94,7 @@ export default async function Page({
               <Card className={cn(isCurrentUser && 'border-primary')}>
                 <CardHeader>
                   <CardTitle className="flex gap-2 items-center">
-                    <SimpleUserAvatar user={user} />
+                    <UserAvatar user={user} />
                     <div className="flex flex-col">
                       <div className="font-medium">{user.name}</div>
                       <div

@@ -1,9 +1,9 @@
 import { User } from '@/db/schema-zod'
 import { cn } from '@/lib/utils'
-import SeededAvatar from '../SeededAvatar'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { SimpleSeededAvatar } from './simple/SimpleSeededAvatar'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 
-export const SimpleUserAvatar = ({
+export const UserAvatar = ({
   user,
   className,
 }: {
@@ -18,7 +18,7 @@ export const SimpleUserAvatar = ({
           alt={user.name || 'Member'}
         />
         <AvatarFallback asChild>
-          <SeededAvatar
+          <SimpleSeededAvatar
             value={user.email}
             variant="beam"
             colors={['#44403c', '#d6d3d1']}

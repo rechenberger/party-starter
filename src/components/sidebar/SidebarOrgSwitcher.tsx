@@ -16,8 +16,8 @@ import { getTranslations } from '@/i18n/getTranslations'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { getMyMemberships } from '@/organization/getMyMemberships'
 import Link from 'next/link'
+import { OrgAvatar } from '../OrgAvatar'
 import { ResponsiveDropdownMenuContent } from '../ResponsiveDropdownMenuContent'
-import { SimpleOrgAvatar } from '../simple/SimpleOrgAvatar'
 
 export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
   const [memberships, userCanCreateOrg] = await Promise.all([
@@ -42,10 +42,7 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
             >
               {selectedMembership?.organization && (
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <SimpleOrgAvatar
-                    org={selectedMembership.organization}
-                    size={28}
-                  />
+                  <OrgAvatar org={selectedMembership.organization} size={28} />
                 </div>
               )}
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -72,7 +69,7 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
                 asChild
               >
                 <Link href={`/org/${membership.organization.slug}`}>
-                  <SimpleOrgAvatar org={membership.organization} size={32} />
+                  <OrgAvatar org={membership.organization} size={32} />
                   {membership.organization.name}
                 </Link>
               </DropdownMenuItem>

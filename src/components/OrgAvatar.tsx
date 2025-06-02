@@ -1,7 +1,7 @@
 import { Organization } from '@/db/schema-zod'
-import SeededAvatar from '../SeededAvatar'
+import { SimpleSeededAvatar } from './simple/SimpleSeededAvatar'
 
-export const SimpleOrgAvatar = ({
+export const OrgAvatar = ({
   org,
   size = 20,
   className,
@@ -12,7 +12,7 @@ export const SimpleOrgAvatar = ({
 }) => {
   return (
     <>
-      <SeededAvatar
+      <SimpleSeededAvatar
         size={size}
         variant="bauhaus"
         value={org.slug}

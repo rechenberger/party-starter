@@ -1,25 +1,19 @@
 'use client'
 
+import { impersonateAction } from '@/auth/impersonate.action'
 import { Button } from '@/components/ui/button'
 import { useTranslations } from '@/i18n/useTranslations'
-import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { SuperLoadingIcon } from '@/super-action/button/SuperLoadingIcon'
 import { Check, VenetianMask } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 
-export const ImpersonateButton = ({
-  userId,
-  action,
-}: {
-  userId: string
-  action: SuperActionWithInput<{ userId: string }>
-}) => {
+export const ImpersonateButton = ({ userId }: { userId: string }) => {
   const { data: session, update } = useSession()
   const isCurrentUser = session?.user?.id === userId
   const t = useTranslations()
   const { trigger, isLoading } = useSuperAction({
-    action,
+    action: impersonateAction,
     catchToast: true,
   })
   return (

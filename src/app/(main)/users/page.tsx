@@ -1,6 +1,5 @@
 import { notFoundIfNotAdmin, throwIfNotAdmin } from '@/auth/getIsAdmin'
 import { getMyUserId } from '@/auth/getMyUser'
-import { impersonate } from '@/auth/impersonate'
 import { TopHeader } from '@/components/TopHeader'
 import { DateFnsFormat } from '@/components/date-fns-client/DateFnsFormat'
 import { SimpleParamSelect } from '@/components/simple/SimpleParamSelect'
@@ -203,16 +202,7 @@ export default async function Page({
                     >
                       {t.userManagement.deleteUser.delete}
                     </ActionButton>
-                    <ImpersonateButton
-                      userId={user.id}
-                      action={async () => {
-                        'use server'
-                        return superAction(async () => {
-                          await impersonate({ userId: user.id })
-                          //
-                        })
-                      }}
-                    />
+                    <ImpersonateButton userId={user.id} />
                   </div>
                 </CardContent>
               </Card>

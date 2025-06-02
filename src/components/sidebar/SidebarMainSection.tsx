@@ -6,7 +6,7 @@ import { getMyMemberships } from '@/organization/getMyMemberships'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment } from 'react'
-import SeededAvatar from '../SeededAvatar'
+import { OrgAvatar } from '../OrgAvatar'
 import { getNavEntries } from '../layout/nav'
 import {
   SidebarGroup,
@@ -61,10 +61,7 @@ export const SidebarMainSection = async ({
                   asChild
                 >
                   <Link href={`/org/${membership.organization.slug}`}>
-                    <SeededAvatar
-                      size={32}
-                      value={membership.organization.slug}
-                    />
+                    <OrgAvatar org={membership.organization} size={28} />
                     <span>{membership.organization.name}</span>
                   </Link>
                 </SidebarMenuButton>

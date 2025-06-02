@@ -1,4 +1,5 @@
-import { SimpleUserAvatar } from '@/components/simple/SimpleUserAvatar'
+import { UserAvatar } from '@/components/UserAvatar'
+import { UserMenuDropDownContent } from '@/components/UserMenuDropDownContent'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -6,7 +7,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
-import { UserMenuDropDownContent } from '@/components/UserMenuDropDownContent'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { ChevronDown, ChevronsUpDown, LogInIcon } from 'lucide-react'
 import { Suspense } from 'react'
@@ -38,7 +38,7 @@ export const UserButton = async ({ large }: { large?: boolean }) => {
                 </>
               ) : (
                 <>
-                  <SimpleUserAvatar user={user} />
+                  <UserAvatar user={user} />
                   {large && (
                     <>
                       <div className="grid flex-1 text-left text-sm leading-tight">

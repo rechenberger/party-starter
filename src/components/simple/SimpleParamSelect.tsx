@@ -65,7 +65,7 @@ const useSimpleParamSelect = ({
   const selected = useMemo(
     () =>
       allOptions.find(
-        (option) => option.value === valueFromSearchParams ?? null,
+        (option) => option.value === (valueFromSearchParams ?? null),
       ),
     [allOptions, valueFromSearchParams],
   )

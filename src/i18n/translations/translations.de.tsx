@@ -62,6 +62,10 @@ export const t = {
       dark: 'Dunkel',
       system: 'System',
     },
+    error: 'Fehler',
+    anErrorOccurred: 'Ein Fehler ist aufgetreten.',
+    logo: 'Logo',
+    you: 'Du',
   },
   auth: {
     checkMailTitle: 'Überprüfen Sie Ihre E-Mails',
@@ -93,6 +97,8 @@ export const t = {
     acceptTerms: 'Nutzungsbedingungen akzeptieren',
     emailAlreadyTaken:
       'Diese E-Mail Adresse ist bereits in Verwendung. Bitte verwenden Sie den Link zum Zurücksetzen des Passworts, um Ihr Passwort zurückzusetzen.',
+    invalidCredentials: 'Ungültige Anmeldeinformationen',
+    loginAction: 'Anmelden',
   },
   users: {
     title: 'Benutzer',
@@ -132,6 +138,8 @@ export const t = {
       role: 'Rolle',
       joined: 'Beigetreten',
       actions: 'Aktionen',
+      clearSearch: 'Suche löschen',
+      selectRolePlaceholder: 'Rolle auswählen',
     },
     orgMembers: 'Organisationsmitglieder',
     leave: {
@@ -224,6 +232,9 @@ export const t = {
           `Sind Sie sicher, dass Sie die Einladung an ${sentToEmail} erneut senden möchten?`,
       },
       noEmailFound: 'Keine E-Mail Adresse gefunden',
+    },
+    errors: {
+      noExistingCodeFound: 'Kein bestehender Code gefunden',
     },
     createForm: {
       success: 'Einladungscode erstellt und in die Zwischenablage kopiert',

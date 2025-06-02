@@ -60,6 +60,10 @@ export const t = {
       dark: 'Dark',
       system: 'System',
     },
+    error: 'Error',
+    anErrorOccurred: 'An error occurred.',
+    logo: 'logo',
+    you: 'You',
   },
   auth: {
     checkMailTitle: 'Check your emails',
@@ -88,6 +92,8 @@ export const t = {
     acceptTerms: 'Accept Terms',
     emailAlreadyTaken:
       'This email is already taken. Please use the forgot password link to reset your password.',
+    invalidCredentials: 'Invalid credentials',
+    loginAction: 'Login',
   },
   users: {
     title: 'Users',
@@ -126,6 +132,8 @@ export const t = {
       role: 'Role',
       joined: 'Joined',
       actions: 'Actions',
+      clearSearch: 'Clear search',
+      selectRolePlaceholder: 'Select role',
     },
     leave: {
       title: 'Leave Organization',
@@ -214,6 +222,9 @@ export const t = {
           `Are you sure you want to resend the invitation to ${sentToEmail}?`,
       },
       noEmailFound: 'No email found',
+    },
+    errors: {
+      noExistingCodeFound: 'No existing code found',
     },
     createForm: {
       success: 'Invitation Code created and copied to clipboard',

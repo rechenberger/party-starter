@@ -129,7 +129,7 @@ export const CreateInviteCodeEmailFormClient = ({
                   autoComplete: 'email',
                   autoFocus: true,
                   className: 'flex-1',
-                  placeholder: 'john@example.com',
+                  placeholder: `someone@example.com`,
                   value: receiverEmail,
                   onChange: (e) => setReceiverEmail(e.target.value),
                   onKeyDown: (e) => {

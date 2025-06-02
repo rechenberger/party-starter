@@ -25,7 +25,7 @@ export const LoginForm = async ({ redirectUrl }: { redirectUrl?: string }) => {
                 await signIn('credentials', data)
               } catch (error) {
                 if (error instanceof CredentialsSignin) {
-                  throw new Error('Invalid credentials')
+                  throw new Error(t.auth.invalidCredentials)
                 } else if (error instanceof EmailNotVerifiedAuthorizeError) {
                   streamDialog({
                     title: t.auth.emailNotVerifiedTitle,

@@ -18,8 +18,11 @@ export const metadata: Metadata = {
     template: `${titlePrefix}%s | ${BRAND.name}`,
   },
   description: BRAND.metadata.description,
-
   metadataBase: new URL(BASE_URL),
+  icons: {
+    icon: BRAND.logoUrl,
+    shortcut: BRAND.logoUrl,
+  },
 }
 
 export async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -27,6 +30,19 @@ export async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html suppressHydrationWarning lang={locale}>
       <body className="bg-background min-h-[100svh] flex flex-col">
+        <style>
+          {`
+          :root {
+            --primary: ${BRAND.colors.primary};
+            --primary-foreground: ${BRAND.colors.primaryForeground};
+          }
+          
+          .dark {
+            --primary: ${BRAND.colors.primary};
+            --primary-foreground: ${BRAND.colors.primaryForeground};
+          }
+        `}
+        </style>
         <LocaleProvider value={locale}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <SessionProvider>{children}</SessionProvider>

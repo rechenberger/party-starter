@@ -10,15 +10,17 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { ChevronDown, KeyRound, LogOut } from 'lucide-react'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { auth, signOut } from './auth'
+import { auth } from './auth'
+import { getMySession } from './getMyUser'
 import {
   changePasswordWithRedirect,
   loginWithRedirect,
 } from './loginWithRedirect'
 
 export const UserButton = async () => {
-  const session = await auth()
+  const session = await getMySession()
 
   if (!!session?.user) {
     return (
@@ -59,14 +61,10 @@ export const UserButton = async () => {
                 size={'sm'}
                 action={async () => {
                   'use server'
-                  const signOutResponse = await signOut({ redirect: false })
-                  const url = signOutResponse.redirect
-                  const response = await fetch(url)
-                  if (response.ok) {
-                    redirect(url)
-                  } else {
-                    redirect('/')
-                  }
+                  await auth.api.signOut({
+                    headers: await headers(),
+                  })
+                  redirect('/')
                 }}
               >
                 <LogOut className="w-4 h-4 mr-2" />

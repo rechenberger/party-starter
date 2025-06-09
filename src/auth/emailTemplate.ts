@@ -1,34 +1,41 @@
 // FROM: https://authjs.dev/getting-started/providers/resend#customization
 
-import { Theme } from '@auth/core/types'
-
-export const getDefaultSignInEmailHtml = (params: {
+export type EmailTemplate = 'verify' | 'resetPassword'
+export type EmailTemplateOptions = {
+  template: EmailTemplate
   url: string
-  theme: Theme
-}) => {
-  const { url, theme } = params
+  email: string
+}
+
+export const emailTemplate = ({ template, url }: EmailTemplateOptions) => {
   const host = new URL(url).host
 
   const escapedHost = host.replace(/\./g, '&#8203;.')
 
-  const brandColor = theme.brandColor || '#346df1'
+  const brandColor = '#346df1'
   const color = {
     background: '#f9f9f9',
     text: '#444',
     mainBackground: '#fff',
     buttonBackground: brandColor,
     buttonBorder: brandColor,
-    buttonText: theme.buttonText || '#fff',
+    buttonText: '#fff',
   }
 
-  return `
+  const action = template === 'verify' ? 'Verify Email' : 'Reset Password'
+
+  const subject = `${action} for ${host}`
+
+  const text = `${action} for ${host}\n${url}\n\n`
+
+  const html = `
 <body style="background: ${color.background};">
   <table width="100%" border="0" cellspacing="20" cellpadding="0"
     style="background: ${color.mainBackground}; max-width: 600px; margin: auto; border-radius: 10px;">
     <tr>
       <td align="center"
         style="padding: 10px 0px; font-size: 22px; font-family: Helvetica, Arial, sans-serif; color: ${color.text};">
-        Sign in to <strong>${escapedHost}</strong>
+        ${action} for <strong>${escapedHost}</strong>
       </td>
     </tr>
     <tr>
@@ -37,8 +44,9 @@ export const getDefaultSignInEmailHtml = (params: {
           <tr>
             <td align="center" style="border-radius: 5px;" bgcolor="${color.buttonBackground}"><a href="${url}"
                 target="_blank"
-                style="font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: ${color.buttonText}; text-decoration: none; border-radius: 5px; padding: 10px 20px; border: 1px solid ${color.buttonBorder}; display: inline-block; font-weight: bold;">Sign
-                in</a></td>
+                style="font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: ${color.buttonText}; text-decoration: none; border-radius: 5px; padding: 10px 20px; border: 1px solid ${color.buttonBorder}; display: inline-block; font-weight: bold;">
+                  ${action}
+            </a></td>
           </tr>
         </table>
       </td>
@@ -52,11 +60,10 @@ export const getDefaultSignInEmailHtml = (params: {
   </table>
 </body>
 `
-}
 
-// Email Text body (fallback for email clients that don't render HTML, e.g. feature phones)
-export const getDefaultSignInEmailText = ({ url }: { url: string }) => {
-  const host = new URL(url).host
-
-  return `Sign in to ${host}\n${url}\n\n`
+  return {
+    subject,
+    text,
+    html,
+  }
 }

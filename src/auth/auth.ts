@@ -1,54 +1,42 @@
 import { db } from '@/db/db'
-import Nodemailer from '@auth/core/providers/nodemailer'
-import { DrizzleAdapter } from '@auth/drizzle-adapter'
-import NextAuth from 'next-auth'
-import Discord from 'next-auth/providers/discord'
-import { headers } from 'next/headers'
-import { CredentialsProvider } from './CredentialsProvider'
-import { ImpersonateProvider } from './ImpersonateProvider'
-import { sendVerificationRequestEmail } from './sendVerificationRequestEmail'
+import { schema } from '@/db/schema-export'
+import { betterAuth } from 'better-auth'
+import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { nextCookies } from 'better-auth/next-js'
+import { impersonatePlugin } from './impersonatePlugin'
+import { sendEmail } from './sendEmail'
 
-const hasEmailEnvVars = !!process.env.EMAIL_FROM && !!process.env.SMTP_URL
-
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: DrizzleAdapter(db),
-  providers: [
-    Discord,
-    ...((hasEmailEnvVars
-      ? [
-          Nodemailer({
-            from: process.env.EMAIL_FROM,
-            server: process.env.SMTP_URL,
-
-            sendVerificationRequest: async (params) => {
-              const h = await headers()
-              const baseUrl = h.get('Origin')
-
-              const url = `${baseUrl}/auth/verify-email?redirect=${encodeURIComponent(
-                params.url,
-              )}`
-
-              await sendVerificationRequestEmail({
-                ...params,
-                theme: { brandColor: '#79a913' },
-                url,
-              })
-            },
-          }),
-        ]
-      : []) as any), // TODO: FIXME: looks like a type bug in next-auth
-    CredentialsProvider,
-    ImpersonateProvider,
-  ],
-  session: {
-    strategy: 'jwt',
-  },
-  callbacks: {
-    session({ session, token }) {
-      if (session?.user) {
-        session.user.id = token.sub as string
-      }
-      return session
+export const auth = betterAuth({
+  database: drizzleAdapter(db, {
+    provider: 'sqlite',
+    schema: schema,
+  }),
+  emailAndPassword: {
+    enabled: true,
+    // requireEmailVerification: true,
+    sendResetPassword: async (data) => {
+      await sendEmail({
+        email: data.user.email,
+        url: data.url,
+        template: 'resetPassword',
+      })
     },
   },
+  emailVerification: {
+    sendOnSignUp: true,
+    sendVerificationEmail: async (data) => {
+      await sendEmail({
+        email: data.user.email,
+        url: data.url,
+        template: 'verify',
+      })
+    },
+  },
+  socialProviders: {
+    discord: {
+      clientId: process.env.AUTH_DISCORD_ID!,
+      clientSecret: process.env.AUTH_DISCORD_SECRET!,
+    },
+  },
+  plugins: [impersonatePlugin(), nextCookies()],
 })

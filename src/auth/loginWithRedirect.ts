@@ -3,8 +3,32 @@
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-export const loginWithRedirect = async () => {
+export const loginWithRedirect = async ({
+  forceRedirectUrl,
+}: {
+  forceRedirectUrl?: string
+} = {}) => {
   let url = `/auth/login`
+
+  if (forceRedirectUrl) {
+    url += `?redirect=${encodeURIComponent(forceRedirectUrl)}`
+  } else {
+    const h = await headers()
+    const redirectUrl = h.get('Referer')
+
+    // Prevent unnecessary redirects:
+    if (redirectUrl?.includes(url)) return
+
+    if (redirectUrl) {
+      url += `?redirect=${encodeURIComponent(redirectUrl)}`
+    }
+  }
+
+  redirect(url)
+}
+
+export const changePasswordWithRedirect = async () => {
+  let url = `/auth/change-password`
 
   const h = await headers()
   const redirectUrl = h.get('Referer')
@@ -19,8 +43,8 @@ export const loginWithRedirect = async () => {
   redirect(url)
 }
 
-export const changePasswordWithRedirect = async () => {
-  let url = `/auth/change-password`
+export const changeUsernameWithRedirect = async () => {
+  let url = `/auth/change-username`
 
   const h = await headers()
   const redirectUrl = h.get('Referer')

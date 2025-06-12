@@ -1,5 +1,6 @@
 import { db } from '@/db/db'
 import { users } from '@/db/schema-auth'
+import { superCache } from '@/lib/superCache'
 import { eq } from 'drizzle-orm'
 import { omit } from 'lodash-es'
 import { auth } from './auth'
@@ -19,18 +20,27 @@ export const getMyUserIdOrThrow = async () => {
 }
 
 export const getIsLoggedIn = async () => {
-  const userId = await getMyUserId()
-  return !!userId
+  const user = await getMyUser()
+  return !!user
+}
+
+export const getUserById = async (id: string) => {
+  'use cache'
+  superCache.user({ id }).tag()
+
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, id),
+  })
+  if (!user) {
+    return undefined
+  }
+  return omit(user, ['passwordHash'])
 }
 
 export const getMyUser = async () => {
   const userId = await getMyUserId()
-  if (!userId) return null
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, userId),
-  })
-  const parsed = omit(user, ['passwordHash'])
-  return parsed
+  if (!userId) return undefined
+  return getUserById(userId)
 }
 
 export const getMyUserOrThrow = async () => {
@@ -39,10 +49,14 @@ export const getMyUserOrThrow = async () => {
   return user
 }
 
-export const getMyUserOrLogin = async () => {
+export const getMyUserOrLogin = async ({
+  forceRedirectUrl,
+}: {
+  forceRedirectUrl?: string
+} = {}) => {
   const user = await getMyUser()
   if (!user) {
-    await loginWithRedirect()
+    await loginWithRedirect({ forceRedirectUrl })
     throw new Error('User not found')
   }
   return user

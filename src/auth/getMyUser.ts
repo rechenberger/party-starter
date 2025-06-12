@@ -20,8 +20,8 @@ export const getMyUserIdOrThrow = async () => {
 }
 
 export const getIsLoggedIn = async () => {
-  const userId = await getMyUserId()
-  return !!userId
+  const user = await getMyUser()
+  return !!user
 }
 
 export const getUserById = async (id: string) => {

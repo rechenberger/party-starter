@@ -16,6 +16,21 @@ const main = async () => {
       schedule: cron.schedule,
     }
   })
+  vercelJsonObject.functions = {
+    ...(vercelJsonObject.functions ?? {}),
+    ...Object.fromEntries(
+      activeCrons.map((cron) => {
+        const key = `src/app${cron.url}`
+        return [
+          key,
+          {
+            ...(vercelJsonObject.functions?.[key] ?? {}),
+            maxDuration: 800,
+          },
+        ]
+      }),
+    ),
+  }
   await writeFile(
     'vercel.json',
     JSON.stringify(vercelJsonObject, null, 2) + '\n',

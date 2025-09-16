@@ -13,7 +13,7 @@ export const crons = [
     url: '/api/cron/test',
     schedule: '0 * * * *',
     description: 'Test cron',
-    isActive: false,
+    isActive: true,
   },
 ] as const satisfies CronPre[]
 

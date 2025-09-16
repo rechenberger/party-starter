@@ -35,6 +35,11 @@
   - `EMAIL_FROM`="moin@party-starter.de"
   - `SMTP_URL`="smtp://[user]:[password]@sandbox.smtp.mailtrap.io:[port]"
 - `pnpm db:push` to push schema to DB
+- Cron Jobs
+  - Add cron jobs to [crons.ts](src/super-cron/crons.ts)
+  - Set `isActive` to `true` to activate the cron job
+  - Add `/api/cron/{cronName}` to your app (see [test cron](src/app/api/cron/test/route.ts)) for an example
+  - Run `pnpm install` to sync the cron jobs to vercel.json
 
 ## Run
 

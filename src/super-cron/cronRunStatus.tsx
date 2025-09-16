@@ -59,7 +59,7 @@ export const getCronRunStatus = ({
   const durationMs = end.getTime() - start.getTime()
   const durationSeconds = Math.round(durationMs / 1000)
   const secondsSinceLastHeartbeat = heartbeat
-    ? new Date().getTime() - new Date(heartbeat).getTime() / 1000
+    ? (new Date().getTime() - new Date(heartbeat).getTime()) / 1000
     : 0
 
   if (durationSeconds > 800) {

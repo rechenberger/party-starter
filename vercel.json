@@ -6,7 +6,7 @@
     }
   ],
   "functions": {
-    "src/app/api/cron/test": {
+    "src/app/api/cron/**/*": {
       "maxDuration": 800
     }
   }

@@ -18,18 +18,9 @@ const main = async () => {
   })
   vercelJsonObject.functions = {
     ...(vercelJsonObject.functions ?? {}),
-    ...Object.fromEntries(
-      activeCrons.map((cron) => {
-        const key = `src/app${cron.url}`
-        return [
-          key,
-          {
-            ...(vercelJsonObject.functions?.[key] ?? {}),
-            maxDuration: 800,
-          },
-        ]
-      }),
-    ),
+    'src/app/api/cron/**/*': {
+      maxDuration: 800,
+    },
   }
   await writeFile(
     'vercel.json',

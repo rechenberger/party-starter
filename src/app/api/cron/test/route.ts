@@ -8,7 +8,7 @@ export const GET = async () => {
     cronName: 'Test',
     cron: async () => {
       console.log('Test Cron started')
-      await new Promise((resolve) => setTimeout(resolve, 40_000))
+      await new Promise((resolve) => setTimeout(resolve, 5_000))
       console.log('Test Cron finished')
     },
   })

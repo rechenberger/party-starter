@@ -40,6 +40,8 @@
   - Set `isActive` to `true` to activate the cron job
   - Add `/api/cron/{cronName}` to your app (see [test cron](src/app/api/cron/test/route.ts)) for an example
   - Run `pnpm install` to sync the cron jobs to vercel.json
+  - Add an Environment Variable `CRON_SECRET` to your app
+    - If you use [Gitenvs](https://www.npmjs.com/package/gitenvs) and Vercel you need to set the `CRON_SECRET` directly in Vercel not in Gitenvs
 
 ## Run
 

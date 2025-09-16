@@ -5,17 +5,21 @@ import { superAction } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { Cron } from '@/super-cron/crons'
 
-export const RunCronjobButton = async ({
-  cron,
-}: {
-  cron: Pick<Cron, 'url'>
-}) => {
+export const RunCronjobButton = async ({ cron }: { cron: Cron }) => {
   const t = await getTranslations()
 
   return (
     <ActionButton
       size="sm"
       catchToast
+      askForConfirmation={
+        cron.isActive
+          ? true
+          : {
+              title: t.cron.runCronIfNotActiveQuestion.title,
+              description: t.cron.runCronIfNotActiveQuestion.description,
+            }
+      }
       action={async () => {
         'use server'
         return superAction(async () => {

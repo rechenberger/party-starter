@@ -303,6 +303,11 @@ export const t = {
     endedAt: 'Ended At',
     noHeartbeat: 'No heartbeat',
     noCronRunsFound: 'No cron runs found for',
+    runCronIfNotActiveQuestion: {
+      title: 'Run non active Cron Job?',
+      description:
+        'This cron job is NOT active. Are you sure you still want to run it?',
+    },
   },
 }
 

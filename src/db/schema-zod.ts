@@ -38,3 +38,12 @@ export const OrganizationMembershipInsert = createInsertSchema(
 export type OrganizationMembershipInsert = z.infer<
   typeof OrganizationMembershipInsert
 >
+
+export const CronRun = createSelectSchema(schema.cronRun, {
+  status: schema.CronStatus,
+})
+export type CronRun = z.infer<typeof CronRun>
+export const CronRunInsert = createInsertSchema(schema.cronRun, {
+  status: schema.CronStatus,
+})
+export type CronRunInsert = z.infer<typeof CronRunInsert>

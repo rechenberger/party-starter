@@ -297,6 +297,7 @@ export const t = {
   nav: {
     home: 'Home',
     users: 'Benutzer',
+    crons: 'Cron Jobs',
     dashboard: 'Dashboard',
   },
 } satisfies TranslationsClient

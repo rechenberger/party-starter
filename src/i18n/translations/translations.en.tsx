@@ -287,6 +287,7 @@ export const t = {
   nav: {
     home: 'Home',
     users: 'Users',
+    crons: 'Cron Jobs',
     dashboard: 'Dashboard',
   },
 }

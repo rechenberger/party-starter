@@ -1,0 +1,125 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { db } from '@/db/db'
+import { cronRun } from '@/db/schema'
+import { getCronRunStatusBadge } from '@/super-cron/cronRunStatus'
+import { getCronByName } from '@/super-cron/getCron'
+import { format, formatDistanceToNow, intervalToDuration } from 'date-fns'
+import { desc, eq } from 'drizzle-orm'
+import { notFound } from 'next/navigation'
+import { RunCronjobButton } from '../RunCronjobButton'
+
+export default async function CronRunsPage({
+  params,
+}: {
+  params: Promise<{ cronName: string }>
+}) {
+  const { cronName } = await params
+  const decodedCronName = decodeURIComponent(cronName)
+  const cron = getCronByName(decodedCronName)
+
+  if (!cron) {
+    notFound()
+  }
+
+  const cronRuns = await db.query.cronRun.findMany({
+    where: eq(cronRun.cronName, decodedCronName),
+    orderBy: [desc(cronRun.createdAt)],
+    limit: 50,
+  })
+
+  const formatDuration = ({
+    startTime,
+    endTime,
+  }: {
+    startTime: Date
+    endTime?: Date
+  }) => {
+    const start = new Date(startTime)
+    const end = endTime ? new Date(endTime) : new Date()
+
+    const duration = intervalToDuration({ start, end })
+
+    if (duration.hours && duration.hours > 0) {
+      return `${duration.hours}h ${duration.minutes || 0}m`
+    } else if (duration.minutes && duration.minutes > 0) {
+      return `${duration.minutes}m ${duration.seconds || 0}s`
+    } else {
+      return `${duration.seconds || 0}s`
+    }
+  }
+
+  const getLastHeartbeat = (heartbeat?: Date) => {
+    if (!heartbeat) return 'No heartbeat'
+
+    return formatDistanceToNow(new Date(heartbeat), {
+      addSuffix: true,
+      includeSeconds: true,
+    })
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-4">
+        <h1 className="text-2xl font-bold flex-1">
+          Cron Runs: {decodedCronName}
+        </h1>
+        <RunCronjobButton cron={cron} />
+      </div>
+
+      <div className="flex flex-row gap-2 items-end justify-end">
+        <span className="text-sm text-muted-foreground">
+          {cronRuns.length} runs
+        </span>
+      </div>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Started At</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Duration</TableHead>
+            <TableHead>Last Heartbeat</TableHead>
+            <TableHead>Ended At</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {cronRuns.map((run) => (
+            <TableRow key={run.id}>
+              <TableCell>
+                {format(new Date(run.createdAt), 'MMM dd, yyyy HH:mm:ss')}
+              </TableCell>
+              <TableCell>{getCronRunStatusBadge(run)}</TableCell>
+              <TableCell>
+                {formatDuration({
+                  startTime: run.createdAt,
+                  endTime: run.endedAt || undefined,
+                })}
+              </TableCell>
+              <TableCell title={run.heartbeat?.toISOString() || ''}>
+                {getLastHeartbeat(run.heartbeat || undefined)}
+              </TableCell>
+              <TableCell>
+                {run.endedAt
+                  ? format(new Date(run.endedAt), 'MMM dd, yyyy HH:mm:ss')
+                  : ''}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {cronRuns.length === 0 && (
+        <div className="text-center py-8 text-gray-500">
+          No cron runs found for &quot;{decodedCronName}&quot;.
+        </div>
+      )}
+    </div>
+  )
+}

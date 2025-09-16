@@ -300,4 +300,18 @@ export const t = {
     crons: 'Cron Jobs',
     dashboard: 'Dashboard',
   },
+  cron: {
+    schedule: 'Zeitplan:',
+    viewRuns: 'Läufe anzeigen',
+    runNow: 'Jetzt ausführen',
+    cronRuns: 'Cron Läufe',
+    runs: 'Läufe',
+    startedAt: 'Gestartet um',
+    status: 'Status',
+    duration: 'Dauer',
+    lastHeartbeat: 'Letzter Herzschlag',
+    endedAt: 'Beendet um',
+    noHeartbeat: 'Kein Herzschlag',
+    noCronRunsFound: 'Keine Cron Läufe gefunden für',
+  },
 } satisfies TranslationsClient

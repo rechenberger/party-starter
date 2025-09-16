@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/table'
 import { db } from '@/db/db'
 import { cronRun } from '@/db/schema'
+import { getTranslations } from '@/i18n/getTranslations'
 import { getCronRunStatusBadge } from '@/super-cron/cronRunStatus'
 import { getCronByName } from '@/super-cron/getCron'
 import { format, formatDistanceToNow, intervalToDuration } from 'date-fns'
@@ -23,6 +24,7 @@ export default async function CronRunsPage({
   const { cronName } = await params
   const decodedCronName = decodeURIComponent(cronName)
   const cron = getCronByName(decodedCronName)
+  const t = await getTranslations()
 
   if (!cron) {
     notFound()
@@ -56,7 +58,7 @@ export default async function CronRunsPage({
   }
 
   const getLastHeartbeat = (heartbeat?: Date) => {
-    if (!heartbeat) return 'No heartbeat'
+    if (!heartbeat) return t.cron.noHeartbeat
 
     return formatDistanceToNow(new Date(heartbeat), {
       addSuffix: true,
@@ -68,25 +70,25 @@ export default async function CronRunsPage({
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-4">
         <h1 className="text-2xl font-bold flex-1">
-          Cron Runs: {decodedCronName}
+          {t.cron.cronRuns}: {decodedCronName}
         </h1>
         <RunCronjobButton cron={cron} />
       </div>
 
       <div className="flex flex-row gap-2 items-end justify-end">
         <span className="text-sm text-muted-foreground">
-          {cronRuns.length} runs
+          {cronRuns.length} {t.cron.runs}
         </span>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Started At</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>Last Heartbeat</TableHead>
-            <TableHead>Ended At</TableHead>
+            <TableHead>{t.cron.startedAt}</TableHead>
+            <TableHead>{t.cron.status}</TableHead>
+            <TableHead>{t.cron.duration}</TableHead>
+            <TableHead>{t.cron.lastHeartbeat}</TableHead>
+            <TableHead>{t.cron.endedAt}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -117,7 +119,7 @@ export default async function CronRunsPage({
 
       {cronRuns.length === 0 && (
         <div className="text-center py-8 text-gray-500">
-          No cron runs found for &quot;{decodedCronName}&quot;.
+          {t.cron.noCronRunsFound} &quot;{decodedCronName}&quot;.
         </div>
       )}
     </div>

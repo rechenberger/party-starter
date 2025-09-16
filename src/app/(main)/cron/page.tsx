@@ -27,7 +27,7 @@ export default async function Page() {
                 <div>{cron.description}</div>
                 <div className="text-xs text-muted-foreground font-mono">
                   <p>
-                    Schedule:{' '}
+                    {t.cron.schedule}{' '}
                     <a
                       className="hover:underline"
                       href={`https://crontab.guru/#${cron.schedule.replace(
@@ -48,7 +48,7 @@ export default async function Page() {
               <Button size="sm" variant="outline" asChild>
                 <Link href={`/cron/${encodeURIComponent(cron.name)}`}>
                   <BarChart3 className="size-4" />
-                  View Runs
+                  {t.cron.viewRuns}
                 </Link>
               </Button>
             </CardContent>

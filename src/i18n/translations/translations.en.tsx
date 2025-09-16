@@ -290,6 +290,20 @@ export const t = {
     crons: 'Cron Jobs',
     dashboard: 'Dashboard',
   },
+  cron: {
+    schedule: 'Schedule:',
+    viewRuns: 'View Runs',
+    runNow: 'Run now',
+    cronRuns: 'Cron Runs',
+    runs: 'runs',
+    startedAt: 'Started At',
+    status: 'Status',
+    duration: 'Duration',
+    lastHeartbeat: 'Last Heartbeat',
+    endedAt: 'Ended At',
+    noHeartbeat: 'No heartbeat',
+    noCronRunsFound: 'No cron runs found for',
+  },
 }
 
 export type TranslationsClient = typeof t

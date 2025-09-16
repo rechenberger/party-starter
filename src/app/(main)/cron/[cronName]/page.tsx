@@ -1,3 +1,5 @@
+import { notFoundIfNotAdmin } from '@/auth/getIsAdmin'
+import { TopHeader } from '@/components/TopHeader'
 import {
   Table,
   TableBody,
@@ -15,7 +17,6 @@ import { format, formatDistanceToNow, intervalToDuration } from 'date-fns'
 import { desc, eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { RunCronjobButton } from '../RunCronjobButton'
-import { notFoundIfNotAdmin } from '@/auth/getIsAdmin'
 
 export default async function CronRunsPage({
   params,
@@ -69,61 +70,61 @@ export default async function CronRunsPage({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-4">
-        <h1 className="text-2xl font-bold flex-1">
-          {t.cron.cronRuns}: {decodedCronName}
-        </h1>
-        <RunCronjobButton cron={cron} />
-      </div>
-
-      <div className="flex flex-row gap-2 items-end justify-end">
-        <span className="text-sm text-muted-foreground">
-          {cronRuns.length} {t.cron.runs}
-        </span>
-      </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{t.cron.startedAt}</TableHead>
-            <TableHead>{t.cron.status}</TableHead>
-            <TableHead>{t.cron.duration}</TableHead>
-            <TableHead>{t.cron.lastHeartbeat}</TableHead>
-            <TableHead>{t.cron.endedAt}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {cronRuns.map((run) => (
-            <TableRow key={run.id}>
-              <TableCell>
-                {format(new Date(run.createdAt), 'MMM dd, yyyy HH:mm:ss')}
-              </TableCell>
-              <TableCell>{getCronRunStatusBadge(run)}</TableCell>
-              <TableCell>
-                {formatDuration({
-                  startTime: run.createdAt,
-                  endTime: run.endedAt || undefined,
-                })}
-              </TableCell>
-              <TableCell title={run.heartbeat?.toISOString() || ''}>
-                {getLastHeartbeat(run.heartbeat || undefined)}
-              </TableCell>
-              <TableCell>
-                {run.endedAt
-                  ? format(new Date(run.endedAt), 'MMM dd, yyyy HH:mm:ss')
-                  : ''}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      {cronRuns.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          {t.cron.noCronRunsFound} &quot;{decodedCronName}&quot;.
+    <>
+      <TopHeader>
+        <div className="flex items-center gap-4 w-full">
+          <div className="flex-1">
+            {t.cron.cronRuns}: {decodedCronName}
+          </div>
+          <span className="text-sm text-muted-foreground">
+            {cronRuns.length} {t.cron.runs}
+          </span>
+          <RunCronjobButton cron={cron} />
         </div>
-      )}
-    </div>
+      </TopHeader>
+      <div className="flex flex-col gap-4">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t.cron.startedAt}</TableHead>
+              <TableHead>{t.cron.status}</TableHead>
+              <TableHead>{t.cron.duration}</TableHead>
+              <TableHead>{t.cron.lastHeartbeat}</TableHead>
+              <TableHead>{t.cron.endedAt}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {cronRuns.map((run) => (
+              <TableRow key={run.id}>
+                <TableCell>
+                  {format(new Date(run.createdAt), 'MMM dd, yyyy HH:mm:ss')}
+                </TableCell>
+                <TableCell>{getCronRunStatusBadge(run)}</TableCell>
+                <TableCell>
+                  {formatDuration({
+                    startTime: run.createdAt,
+                    endTime: run.endedAt || undefined,
+                  })}
+                </TableCell>
+                <TableCell title={run.heartbeat?.toISOString() || ''}>
+                  {getLastHeartbeat(run.heartbeat || undefined)}
+                </TableCell>
+                <TableCell>
+                  {run.endedAt
+                    ? format(new Date(run.endedAt), 'MMM dd, yyyy HH:mm:ss')
+                    : ''}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        {cronRuns.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            {t.cron.noCronRunsFound} &quot;{decodedCronName}&quot;.
+          </div>
+        )}
+      </div>
+    </>
   )
 }

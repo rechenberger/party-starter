@@ -1,7 +1,7 @@
 import { superCron } from '@/super-cron/superCron'
 
 export const revalidate = 0
-export const maxDuration = 800 // ~13 minutes (max in vercel pro)
+// export const maxDuration = 800 // ~13 minutes (max in vercel pro)
 
 export const GET = async () => {
   return superCron({

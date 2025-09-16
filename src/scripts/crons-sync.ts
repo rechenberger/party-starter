@@ -18,9 +18,12 @@ const main = async () => {
   })
   vercelJsonObject.functions = {
     ...(vercelJsonObject.functions ?? {}),
-    'src/app/api/cron/**/*': {
-      maxDuration: 800,
-    },
+    'src/app/api/cron/**/*':
+      activeCrons.length > 0
+        ? {
+            maxDuration: 800,
+          }
+        : undefined,
   }
   await writeFile(
     'vercel.json',

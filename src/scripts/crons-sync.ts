@@ -2,16 +2,20 @@ import { crons } from '@/super-cron/crons'
 import { readFile, writeFile } from 'fs/promises'
 
 const main = async () => {
-  const vercelJson = (await readFile('vercel.json', 'utf8')) || '{}'
+  const vercelJson = await readFile('vercel.json', 'utf8').catch(() => '{}')
   const vercelJsonObject = JSON.parse(vercelJson)
-  vercelJsonObject.crons = crons
-    .filter((cron) => cron.isActive)
-    .map((cron) => {
-      return {
-        path: cron.url,
-        schedule: cron.schedule,
-      }
-    })
+  const activeCrons = crons.filter((cron) => cron.isActive)
+
+  if (activeCrons.length === 0 && (vercelJsonObject.crons ?? []).length === 0) {
+    return
+  }
+
+  vercelJsonObject.crons = activeCrons.map((cron) => {
+    return {
+      path: cron.url,
+      schedule: cron.schedule,
+    }
+  })
   await writeFile(
     'vercel.json',
     JSON.stringify(vercelJsonObject, null, 2) + '\n',

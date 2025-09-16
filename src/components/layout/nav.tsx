@@ -2,7 +2,7 @@ import { getIsAdmin } from '@/auth/getIsAdmin'
 import { getIsLoggedIn } from '@/auth/getMyUser'
 import { getMyLocale } from '@/i18n/getMyLocale'
 import { getTranslations } from '@/i18n/getTranslations'
-import { Building2, Home, Users } from 'lucide-react'
+import { Building2, Clock, Home, Users } from 'lucide-react'
 
 export type NavEntry = {
   name: string
@@ -38,6 +38,14 @@ export const getNavEntries = async ({
       href: '/users',
       hidden: !isAdminOrDev,
       icon: <Users />,
+      mainSidebarSection: 'admin',
+      showOnLanding: true,
+    },
+    {
+      name: t.nav.crons,
+      href: '/cron',
+      hidden: !isAdminOrDev,
+      icon: <Clock />,
       mainSidebarSection: 'admin',
       showOnLanding: true,
     },

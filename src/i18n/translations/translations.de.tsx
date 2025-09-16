@@ -297,6 +297,26 @@ export const t = {
   nav: {
     home: 'Home',
     users: 'Benutzer',
+    crons: 'Cron Jobs',
     dashboard: 'Dashboard',
+  },
+  cron: {
+    schedule: 'Zeitplan:',
+    viewRuns: 'Läufe anzeigen',
+    runNow: 'Jetzt ausführen',
+    cronRuns: 'Cron Läufe',
+    runs: 'Läufe',
+    startedAt: 'Gestartet um',
+    status: 'Status',
+    duration: 'Dauer',
+    lastHeartbeat: 'Letzter Herzschlag',
+    endedAt: 'Beendet um',
+    noHeartbeat: 'Kein Herzschlag',
+    noCronRunsFound: 'Keine Cron Läufe gefunden für',
+    runCronIfNotActiveQuestion: {
+      title: 'Nicht aktiven Cron Job ausführen?',
+      description:
+        'Dieser Cron Job ist NICHT aktiv. Sind Sie sicher, dass Sie ihn trotzdem ausführen möchten?',
+    },
   },
 } satisfies TranslationsClient

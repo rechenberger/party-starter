@@ -287,7 +287,27 @@ export const t = {
   nav: {
     home: 'Home',
     users: 'Users',
+    crons: 'Cron Jobs',
     dashboard: 'Dashboard',
+  },
+  cron: {
+    schedule: 'Schedule:',
+    viewRuns: 'View Runs',
+    runNow: 'Run now',
+    cronRuns: 'Cron Runs',
+    runs: 'runs',
+    startedAt: 'Started At',
+    status: 'Status',
+    duration: 'Duration',
+    lastHeartbeat: 'Last Heartbeat',
+    endedAt: 'Ended At',
+    noHeartbeat: 'No heartbeat',
+    noCronRunsFound: 'No cron runs found for',
+    runCronIfNotActiveQuestion: {
+      title: 'Run non active Cron Job?',
+      description:
+        'This cron job is NOT active. Are you sure you still want to run it?',
+    },
   },
 }
 

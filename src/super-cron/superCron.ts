@@ -40,7 +40,7 @@ export const superCron = async ({
     await db
       .update(cronRun)
       .set({
-        heartbeat: new Date().toISOString(),
+        heartbeat: new Date(),
       })
       .where(eq(cronRun.id, cronRunRecord.id))
 
@@ -60,7 +60,7 @@ export const superCron = async ({
       .update(cronRun)
       .set({
         status: 'success',
-        endedAt: new Date().toISOString(),
+        endedAt: new Date(),
       })
       .where(eq(cronRun.id, cronRunRecord.id))
 
@@ -73,7 +73,7 @@ export const superCron = async ({
       .set({
         status: 'error',
         statusText: error instanceof Error ? error.message : String(error),
-        endedAt: new Date().toISOString(),
+        endedAt: new Date(),
       })
       .where(eq(cronRun.id, cronRunRecord.id))
 

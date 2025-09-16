@@ -15,12 +15,14 @@ import { format, formatDistanceToNow, intervalToDuration } from 'date-fns'
 import { desc, eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { RunCronjobButton } from '../RunCronjobButton'
+import { notFoundIfNotAdmin } from '@/auth/getIsAdmin'
 
 export default async function CronRunsPage({
   params,
 }: {
   params: Promise<{ cronName: string }>
 }) {
+  await notFoundIfNotAdmin({ allowDev: true })
   const { cronName } = await params
   const decodedCronName = decodeURIComponent(cronName)
   const cron = getCronByName(decodedCronName)

@@ -1,3 +1,4 @@
+import { notFoundIfNotAdmin } from '@/auth/getIsAdmin'
 import { TopHeader } from '@/components/TopHeader'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,6 +15,7 @@ import Link from 'next/link'
 import { RunCronjobButton } from './RunCronjobButton'
 
 export default async function Page() {
+  await notFoundIfNotAdmin({ allowDev: true })
   const t = await getTranslations()
   return (
     <>

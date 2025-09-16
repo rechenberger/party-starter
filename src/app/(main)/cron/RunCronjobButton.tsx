@@ -1,3 +1,4 @@
+import { throwIfNotAdmin } from '@/auth/getIsAdmin'
 import { getTranslations } from '@/i18n/getTranslations'
 import { BASE_URL } from '@/lib/config'
 import { superAction } from '@/super-action/action/createSuperAction'
@@ -18,6 +19,7 @@ export const RunCronjobButton = async ({
       action={async () => {
         'use server'
         return superAction(async () => {
+          await throwIfNotAdmin({ allowDev: true })
           const url = `${BASE_URL}/${cron.url}`
           const response = await fetch(url, {
             method: 'GET',

@@ -1,78 +1,63 @@
-import { SimpleDataCard } from '@/components/simple/SimpleDataCard'
+import { UserAvatar } from '@/components/UserAvatar'
+import { UserMenuDropDownContent } from '@/components/UserMenuDropDownContent'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { ChevronDown, KeyRound, LogOut } from 'lucide-react'
-import { redirect } from 'next/navigation'
-import { auth, signOut } from './auth'
-import {
-  changePasswordWithRedirect,
-  loginWithRedirect,
-} from './loginWithRedirect'
+import { getTranslations } from '@/i18n/getTranslations'
+import { ChevronDown, ChevronsUpDown, LogInIcon } from 'lucide-react'
+import { Suspense } from 'react'
+import { getMyUser } from './getMyUser'
+import { loginWithRedirect } from './loginWithRedirect'
 
-export const UserButton = async () => {
-  const session = await auth()
+export const UserButtonSuspense = ({ large }: { large?: boolean }) => {
+  return (
+    <Suspense fallback={<Skeleton className="w-[38px] h-8" />}>
+      <UserButton large={large} />
+    </Suspense>
+  )
+}
 
-  if (!!session?.user) {
+export const UserButton = async ({ large }: { large?: boolean }) => {
+  const user = await getMyUser()
+  const t = await getTranslations()
+  const showName = false
+
+  if (!!user) {
     return (
       <>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              <span>{session.user?.name ?? session.user?.email ?? 'You'}</span>
-              <ChevronDown className="size-4" />
+            <Button size="vanilla" variant="vanilla">
+              {showName ? (
+                <>
+                  <span>{user.name ?? user.email ?? t.standardWords.you}</span>
+                  <ChevronDown className="size-4" />
+                </>
+              ) : (
+                <>
+                  <UserAvatar user={user} />
+                  {large && (
+                    <>
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-medium">
+                          {user.name}
+                        </span>
+                        <span className="truncate text-xs">{user.email}</span>
+                      </div>
+                      <ChevronsUpDown className="ml-auto size-4" />
+                    </>
+                  )}
+                </>
+              )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>
-              <SimpleDataCard
-                data={session.user}
-                classNameCell="max-w-40 overflow-hidden text-ellipsis"
-              />
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <ActionButton
-                variant={'ghost'}
-                hideIcon
-                className="w-full text-left"
-                size={'sm'}
-                action={changePasswordWithRedirect}
-              >
-                <KeyRound className="w-4 h-4 mr-2" />
-                Change Password
-              </ActionButton>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <ActionButton
-                variant={'ghost'}
-                hideIcon
-                className="w-full text-left"
-                size={'sm'}
-                action={async () => {
-                  'use server'
-                  const signOutResponse = await signOut({ redirect: false })
-                  const url = signOutResponse.redirect
-                  const response = await fetch(url)
-                  if (response.ok) {
-                    redirect(url)
-                  } else {
-                    redirect('/')
-                  }
-                }}
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </ActionButton>
-            </DropdownMenuItem>
+          <DropdownMenuContent side="bottom" align="end">
+            <UserMenuDropDownContent user={user} />
           </DropdownMenuContent>
         </DropdownMenu>
       </>
@@ -87,7 +72,8 @@ export const UserButton = async () => {
         hideIcon
         action={loginWithRedirect}
       >
-        Login
+        <span className="hidden md:block">{t.auth.loginAction}</span>
+        <LogInIcon className="size-4" />
       </ActionButton>
     </>
   )

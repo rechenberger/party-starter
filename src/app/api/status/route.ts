@@ -1,4 +1,10 @@
 import { db } from '@/db/db'
+import { schema } from '@/db/schema-export'
+import { getCronRunStatus } from '@/super-cron/cronRunStatus'
+import { crons } from '@/super-cron/crons'
+import { CronExpressionParser } from 'cron-parser'
+import { desc, eq } from 'drizzle-orm'
+import ms from 'ms'
 import { z } from 'zod'
 
 // CONFIG:
@@ -13,6 +19,44 @@ const checks = [
       await db.query.users.findFirst()
     },
   },
+  ...crons
+    .filter((cron) => cron.isActive)
+    .map((cron) => {
+      return {
+        name: `${cron.name} Cron`,
+        test: async () => {
+          const cronRun = await db.query.cronRun.findFirst({
+            where: eq(schema.cronRun.cronName, cron.name),
+            orderBy: [desc(schema.cronRun.createdAt)],
+          })
+
+          if (!cronRun) {
+            throw new Error('Cron run not found')
+          }
+
+          const cronExpression = CronExpressionParser.parse(cron.schedule, {
+            currentDate: cronRun.createdAt,
+          })
+          const nextRun =
+            cronExpression.next().toDate().getTime() + ms('5 minutes')
+          if (nextRun < Date.now()) {
+            throw new Error('Cron run is overdue')
+          }
+
+          const status = getCronRunStatus(cronRun)
+
+          if (!status) {
+            throw new Error('Cron run status not found')
+          }
+
+          if (status.value === 'success' || status.value === 'running') {
+            return
+          }
+
+          throw new Error(status.value)
+        },
+      }
+    }),
 ]
 
 // HANDLER:

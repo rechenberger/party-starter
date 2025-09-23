@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
@@ -27,7 +28,11 @@ const ChangePasswordSchema = z
       ctx.addIssue({
         path: ['confirmPassword'],
         code: 'custom',
-        message: 'Passwords do not match',
+        params: {
+          i18n: {
+            key: 'auth.confirmPasswordMismatch',
+          },
+        },
       })
     }
   })
@@ -59,11 +64,12 @@ export const ChangePasswordFormClient = ({
     },
     disabled,
   })
+  const t = useTranslations()
 
   return (
     <>
       <div className="mb-2">
-        <CardTitle>Change Password</CardTitle>
+        <CardTitle>{t.userManagement.changePasswordTitle}</CardTitle>
       </div>
       <Form {...form}>
         <form
@@ -76,7 +82,13 @@ export const ChangePasswordFormClient = ({
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input name="email" type="email" disabled value={email} />
+                <Input
+                  name="email"
+                  autoComplete="username"
+                  type="email"
+                  disabled
+                  value={email}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -87,9 +99,13 @@ export const ChangePasswordFormClient = ({
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t.standardWords.password}</FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <Input
+                    type="password"
+                    autoComplete="new-password"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -101,9 +117,13 @@ export const ChangePasswordFormClient = ({
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel>{t.standardWords.confirmPassword}</FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <Input
+                    type="password"
+                    autoComplete="new-password"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -113,12 +133,12 @@ export const ChangePasswordFormClient = ({
             {!!redirectUrl && (
               <Link href={redirectUrl} passHref>
                 <Button variant={'outline'} type="button" disabled={disabled}>
-                  Skip
+                  {t.standardWords.skip}
                 </Button>
               </Link>
             )}
             <Button type="submit" disabled={disabled}>
-              Change Password
+              {t.userManagement.changePasswordAction}
             </Button>
           </div>
         </form>

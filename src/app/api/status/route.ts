@@ -1,10 +1,10 @@
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
-import { crons } from '@/super-cron/crons'
-import { eq } from 'drizzle-orm'
-import { desc } from 'drizzle-orm'
-import { CronExpressionParser } from 'cron-parser'
 import { getCronRunStatus } from '@/super-cron/cronRunStatus'
+import { crons } from '@/super-cron/crons'
+import { CronExpressionParser } from 'cron-parser'
+import { desc, eq } from 'drizzle-orm'
+import ms from 'ms'
 import { z } from 'zod'
 
 // CONFIG:
@@ -37,8 +37,9 @@ const checks = [
           const cronExpression = CronExpressionParser.parse(cron.schedule, {
             currentDate: cronRun.createdAt,
           })
-          const nextRun = cronExpression.next().toDate()
-          if (nextRun < new Date()) {
+          const nextRun =
+            cronExpression.next().toDate().getTime() + ms('5 minutes')
+          if (nextRun < Date.now()) {
             throw new Error('Cron run is overdue')
           }
 

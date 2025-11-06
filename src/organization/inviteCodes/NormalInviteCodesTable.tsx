@@ -97,8 +97,14 @@ export const NormalInviteCodesTable = async (
 
                             superCache.orgMembers({ orgId }).revalidate()
 
+                            const url = getInviteCodeUrl({
+                              organizationSlug: orgSlug,
+                              code: code.id,
+                            })
+
                             return {
                               id: code.id,
+                              url,
                             }
                           })
                         }}

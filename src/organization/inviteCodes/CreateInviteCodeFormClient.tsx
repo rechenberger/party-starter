@@ -26,7 +26,6 @@ import { useShowDialog } from '@/super-action/dialog/DialogProvider'
 import { z } from 'zod'
 import { organizationRoleDefinitions } from '../organizationRoles'
 import { ExpirationTime, expirationTimesDefinitions } from './expirationTimes'
-import { getInviteCodeUrl } from './getInviteCodeUrl'
 
 const CreateInviteCodeSchema = z.object({
   role: z.enum(['admin', 'member']),
@@ -46,7 +45,7 @@ export const CreateInviteCodeFormClient = ({
   organizationSlug: string
   action: (
     data: CreateInviteCodeData,
-  ) => SuperActionPromise<{ id: string }, CreateInviteCodeData>
+  ) => SuperActionPromise<{ id?: string; url?: string }, CreateInviteCodeData>
 }) => {
   const { trigger, isLoading } = useSuperAction({
     action,
@@ -74,13 +73,8 @@ export const CreateInviteCodeFormClient = ({
         <form
           onSubmit={form.handleSubmit(async (formData) => {
             const result = await trigger(formData)
-            if (result?.id) {
-              const url = getInviteCodeUrl({
-                organizationSlug: organizationSlug,
-                code: result.id,
-              })
-
-              navigator.clipboard.writeText(url)
+            if (result?.url) {
+              navigator.clipboard.writeText(result.url)
               showDialog(null)
               toast({
                 title: t.inviteCodes.createForm.success,

@@ -27,7 +27,7 @@ export const createEmailTemplate = <Schema extends ZodType>(template: {
   }) => {
     try {
       const locale = params.locale ?? (await getMyLocale())
-      const t = await getTranslations(locale)
+      const t = await getTranslations({ locale })
 
       const props = typedParse(template.schema, params.props)
       const renderProps = { props, t, locale }
@@ -59,7 +59,7 @@ export const createEmailTemplate = <Schema extends ZodType>(template: {
   const preview = () => {
     const Email = async (props: z.infer<Schema>) => {
       const locale = DEFAULT_LOCALE
-      const t = await getTranslations(locale)
+      const t = await getTranslations({ locale })
       return <template.Email props={props} t={t} locale={locale} />
     }
     Email.PreviewProps = template.previewProps

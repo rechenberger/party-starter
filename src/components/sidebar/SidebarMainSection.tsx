@@ -30,7 +30,7 @@ export const SidebarMainSection = async ({
     getMyMemberships(),
     canUserCreateOrg(),
   ])
-  const t = await getTranslations(locale)
+  const t = await getTranslations({ locale })
 
   let entries = await getNavEntries({
     filter: isLanding ? 'landing' : 'main',

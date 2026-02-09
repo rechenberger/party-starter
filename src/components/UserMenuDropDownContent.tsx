@@ -34,7 +34,7 @@ export const UserMenuDropDownContent = async ({
   if (!user) {
     return null
   }
-  const t = await getTranslations(locale)
+  const t = await getTranslations({ locale })
   const currentLocale = await getMyLocale({ paramsLocale: locale })
   return (
     <>

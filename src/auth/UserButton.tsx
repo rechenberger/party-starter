@@ -37,7 +37,7 @@ export const UserButton = async ({
   locale?: Locale
 }) => {
   const user = await getMyUser()
-  const t = await getTranslations(locale)
+  const t = await getTranslations({ locale })
   const showName = false
 
   if (!!user) {

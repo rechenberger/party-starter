@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 
 export const StartPage = async ({ locale }: { locale: Locale }) => {
-  const t = await getTranslations(locale)
+  const t = await getTranslations({ locale })
   return (
     <>
       <div className="flex-1 flex flex-col items-center justify-center gap-12 py-8">

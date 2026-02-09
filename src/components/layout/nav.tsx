@@ -25,7 +25,7 @@ export const getNavEntries = async ({
   const isAdminOrDev = await getIsAdmin({ allowDev: true })
   const isLoggedIn = await getIsLoggedIn()
   const resolvedLocale = await getMyLocale({ paramsLocale: locale })
-  const t = await getTranslations(resolvedLocale)
+  const t = await getTranslations({ locale: resolvedLocale })
 
   let entries: NavEntry[] = [
     {

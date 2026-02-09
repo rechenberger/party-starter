@@ -62,13 +62,16 @@ const getTypeKey = (
   if (typeof value === 'object') return 'object'
 
   const primitiveType = typeof value
-  if (primitiveType in {
-    string: true,
-    number: true,
-    boolean: true,
-    bigint: true,
-    symbol: true,
-  }) {
+  if (
+    primitiveType in
+    {
+      string: true,
+      number: true,
+      boolean: true,
+      bigint: true,
+      symbol: true,
+    }
+  ) {
     return primitiveType as keyof ZodErrorTranslations['types']
   }
 
@@ -107,7 +110,8 @@ export const useZodErrorMapTranslated = (t: ZodErrorTranslations) => {
   const customErrorMap: z.ZodErrorMap = (issue) => {
     switch (issue.code) {
       case 'invalid_type': {
-        if (issue.input === undefined) return t.errors.invalid_type_received_undefined
+        if (issue.input === undefined)
+          return t.errors.invalid_type_received_undefined
         if (issue.input === null) return t.errors.invalid_type_received_null
 
         const expected = issue.expected as keyof ZodErrorTranslations['types']
@@ -177,7 +181,8 @@ export const useZodErrorMapTranslated = (t: ZodErrorTranslations) => {
         return t.errors.invalid_union
 
       case 'invalid_value': {
-        const received = issue.input === undefined ? 'undefined' : String(issue.input)
+        const received =
+          issue.input === undefined ? 'undefined' : String(issue.input)
         return t.errors.invalid_enum_value(joinValues(issue.values), received)
       }
 
@@ -185,7 +190,10 @@ export const useZodErrorMapTranslated = (t: ZodErrorTranslations) => {
         return t.errors.not_multiple_of(issue.divisor.toString())
 
       case 'custom': {
-        const { key, values } = getKeyAndValues(issue.params?.i18n, 'errors.custom')
+        const { key, values } = getKeyAndValues(
+          issue.params?.i18n,
+          'errors.custom',
+        )
         const message = getNestedValue(t.custom, key)
 
         if (!message) return t.errors.custom

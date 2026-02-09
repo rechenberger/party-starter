@@ -4,11 +4,7 @@ import Negotiator from 'negotiator'
 import { cookies, headers } from 'next/headers'
 import { COOKIE_NAME, DEFAULT_LOCALE, LOCALES, Locale } from './locale'
 
-export const getMyLocale = async (
-  options?: {
-    paramsLocale?: unknown
-  },
-) => {
+export const getMyLocale = async (options?: { paramsLocale?: unknown }) => {
   if (!LOCALIZATION.isActive) {
     return DEFAULT_LOCALE
   }

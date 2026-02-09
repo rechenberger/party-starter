@@ -1,4 +1,4 @@
-import { unstable_cacheTag as cacheTag, revalidateTag } from 'next/cache'
+import { cacheTag, revalidateTag } from 'next/cache'
 
 const ALL_TAG = 'all'
 

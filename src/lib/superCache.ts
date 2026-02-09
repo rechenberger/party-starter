@@ -10,7 +10,7 @@ const singleTag = (tag: string, additionalTagsToRevalidate: string[] = []) => {
       cacheTag(ALL_TAG)
     },
     revalidate: () => {
-      tags.forEach((tag) => revalidateTag(tag))
+      tags.forEach((tag) => revalidateTag(tag, 'max'))
     },
   }
 }

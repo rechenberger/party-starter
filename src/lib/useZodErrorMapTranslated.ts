@@ -1,206 +1,12 @@
 import { ZodErrorTranslations } from '@/i18n/translations/zodTranslations.en'
-import { z, ZodIssueCode, ZodParsedType } from 'zod'
+import { z } from 'zod'
 
-/*
-inspired by https://github.com/aiji42/zod-i18n/blob/main/packages/core/src/index.ts
-*/
-
-// switch (issue.code) {
-//   case ZodIssueCode.invalid_type:
-//     if (issue.received === ZodParsedType.undefined) {
-//       message = t('errors.invalid_type_received_undefined', {
-//         ns,
-//         defaultValue: message,
-//         ...path,
-//       })
-//     } else if (issue.received === ZodParsedType.null) {
-//       message = t('errors.invalid_type_received_null', {
-//         ns,
-//         defaultValue: message,
-//         ...path,
-//       })
-//     } else {
-//       message = t('errors.invalid_type', {
-//         expected: t(`types.${issue.expected}`, {
-//           defaultValue: issue.expected,
-//           ns,
-//         }),
-//         received: t(`types.${issue.received}`, {
-//           defaultValue: issue.received,
-//           ns,
-//         }),
-//         ns,
-//         defaultValue: message,
-//         ...path,
-//       })
-//     }
-//     break
-//   case ZodIssueCode.invalid_literal:
-//     message = t('errors.invalid_literal', {
-//       expected: JSON.stringify(issue.expected, jsonStringifyReplacer),
-//       ns,
-//       defaultValue: message,
-//       ...path,
-//     })
-//     break
-//   case ZodIssueCode.unrecognized_keys:
-//     message = t('errors.unrecognized_keys', {
-//       keys: joinValues(issue.keys, ', '),
-//       count: issue.keys.length,
-//       ns,
-//       defaultValue: message,
-//       ...path,
-//     })
-//     break
-//   case ZodIssueCode.invalid_union:
-//     message = t('errors.invalid_union', {
-//       ns,
-//       defaultValue: message,
-//       ...path,
-//     })
-//     break
-//   case ZodIssueCode.invalid_union_discriminator:
-//     message = t('errors.invalid_union_discriminator', {
-//       options: joinValues(issue.options),
-//       ns,
-//       defaultValue: message,
-//       ...path,
-//     })
-//     break
-//   case ZodIssueCode.invalid_enum_value:
-//     message = t('errors.invalid_enum_value', {
-//       options: joinValues(issue.options),
-//       received: issue.received,
-//       ns,
-//       defaultValue: message,
-//       ...path,
-//     })
-//     break
-//   case ZodIssueCode.invalid_arguments:
-//     message = t('errors.invalid_arguments', {
-//       ns,
-//       defaultValue: message,
-//       ...path,
-//     })
-//     break
-//   case ZodIssueCode.invalid_return_type:
-//     message = t('errors.invalid_return_type', {
-//       ns,
-//       defaultValue: message,
-//       ...path,
-//     })
-//     break
-//   case ZodIssueCode.invalid_date:
-//     message = t('errors.invalid_date', {
-//       ns,
-//       defaultValue: message,
-//       ...path,
-//     })
-//     break
-//   case ZodIssueCode.invalid_string:
-//     if (typeof issue.validation === 'object') {
-//       if ('startsWith' in issue.validation) {
-//         message = t(`errors.invalid_string.startsWith`, {
-//           startsWith: issue.validation.startsWith,
-//           ns,
-//           defaultValue: message,
-//           ...path,
-//         })
-//       } else if ('endsWith' in issue.validation) {
-//         message = t(`errors.invalid_string.endsWith`, {
-//           endsWith: issue.validation.endsWith,
-//           ns,
-//           defaultValue: message,
-//           ...path,
-//         })
-//       }
-//     } else {
-//       message = t(`errors.invalid_string.${issue.validation}`, {
-//         validation: t(`validations.${issue.validation}`, {
-//           defaultValue: issue.validation,
-//           ns,
-//         }),
-//         ns,
-//         defaultValue: message,
-//         ...path,
-//       })
-//     }
-//     break
-//   case ZodIssueCode.too_small:
-//     const minimum =
-//       issue.type === 'date' ? new Date(issue.minimum as number) : issue.minimum
-//     message = t(
-//       `errors.too_small.${issue.type}.${
-//         issue.exact ? 'exact' : issue.inclusive ? 'inclusive' : 'not_inclusive'
-//       }`,
-//       {
-//         minimum,
-//         count: typeof minimum === 'number' ? minimum : undefined,
-//         ns,
-//         defaultValue: message,
-//         ...path,
-//       },
-//     )
-//     break
-//   case ZodIssueCode.too_big:
-//     const maximum =
-//       issue.type === 'date' ? new Date(issue.maximum as number) : issue.maximum
-//     message = t(
-//       `errors.too_big.${issue.type}.${
-//         issue.exact ? 'exact' : issue.inclusive ? 'inclusive' : 'not_inclusive'
-//       }`,
-//       {
-//         maximum,
-//         count: typeof maximum === 'number' ? maximum : undefined,
-//         ns,
-//         defaultValue: message,
-//         ...path,
-//       },
-//     )
-//     break
-//   case ZodIssueCode.custom:
-//     const { key, values } = getKeyAndValues(issue.params?.i18n, 'errors.custom')
-
-//     message = t(key, {
-//       ...values,
-//       ns,
-//       defaultValue: message,
-//       ...path,
-//     })
-//     break
-//   case ZodIssueCode.invalid_intersection_types:
-//     message = t('errors.invalid_intersection_types', {
-//       ns,
-//       defaultValue: message,
-//       ...path,
-//     })
-//     break
-//   case ZodIssueCode.not_multiple_of:
-//     message = t('errors.not_multiple_of', {
-//       multipleOf: issue.multipleOf,
-//       ns,
-//       defaultValue: message,
-//       ...path,
-//     })
-//     break
-//   case ZodIssueCode.not_finite:
-//     message = t('errors.not_finite', {
-//       ns,
-//       defaultValue: message,
-//       ...path,
-//     })
-//     break
-//   default:
-// }
-const jsonStringifyReplacer = (_: string, value: any): any => {
-  if (typeof value === 'bigint') {
-    return value.toString()
-  }
-  return value
-}
-function joinValues<T extends any[]>(array: T, separator = ' | '): string {
+function joinValues(
+  array: Array<string | number | boolean | bigint | symbol | null | undefined>,
+  separator = ' | ',
+) {
   return array
-    .map((val) => (typeof val === 'string' ? `'${val}'` : val))
+    .map((val) => (typeof val === 'string' ? `'${val}'` : String(val)))
     .join(separator)
 }
 
@@ -234,157 +40,162 @@ const getKeyAndValues = (
   return { key: defaultKey, values: {} }
 }
 
-function getNestedValue(obj: any, keyString: string) {
+function getNestedValue(obj: unknown, keyString: string) {
+  if (!isRecord(obj)) return undefined
+
   const keys = keyString.split('.')
-  return keys.reduce(
-    (acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined),
-    obj,
-  )
+  return keys.reduce<unknown>((acc, key) => {
+    if (!isRecord(acc)) return undefined
+    return acc[key]
+  }, obj)
+}
+
+const getTypeKey = (
+  value: unknown,
+): keyof ZodErrorTranslations['types'] | 'unknown' => {
+  if (value === undefined) return 'undefined'
+  if (value === null) return 'null'
+  if (typeof value === 'number' && Number.isNaN(value)) return 'nan'
+  if (Array.isArray(value)) return 'array'
+  if (value instanceof Date) return 'date'
+  if (typeof value === 'function') return 'function'
+  if (typeof value === 'object') return 'object'
+
+  const primitiveType = typeof value
+  if (primitiveType in {
+    string: true,
+    number: true,
+    boolean: true,
+    bigint: true,
+    symbol: true,
+  }) {
+    return primitiveType as keyof ZodErrorTranslations['types']
+  }
+
+  return 'unknown'
+}
+
+const getRangeType = (
+  origin: string,
+): keyof ZodErrorTranslations['errors']['too_small'] => {
+  if (origin === 'string') return 'string'
+  if (origin === 'array') return 'array'
+  if (origin === 'set') return 'set'
+  if (origin === 'date') return 'date'
+  return 'number'
+}
+
+const getStringValidation = (format: string) => {
+  switch (format) {
+    case 'email':
+    case 'url':
+    case 'uuid':
+    case 'cuid':
+    case 'regex':
+    case 'datetime':
+    case 'emoji':
+    case 'cuid2':
+    case 'ulid':
+    case 'ip':
+      return format
+    default:
+      return null
+  }
 }
 
 export const useZodErrorMapTranslated = (t: ZodErrorTranslations) => {
-  const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
-    let message: string | Function = ctx.defaultError
+  const customErrorMap: z.ZodErrorMap = (issue) => {
     switch (issue.code) {
-      case ZodIssueCode.invalid_type:
-        if (issue.received === ZodParsedType.undefined) {
-          message = t.errors.invalid_type_received_undefined
-        } else if (issue.received === ZodParsedType.null) {
-          message = t.errors.invalid_type_received_null
-        } else {
-          message = t.errors.invalid_type(
-            t.types[issue.expected],
-            t.types[issue.received],
-          )
+      case 'invalid_type': {
+        if (issue.input === undefined) return t.errors.invalid_type_received_undefined
+        if (issue.input === null) return t.errors.invalid_type_received_null
+
+        const expected = issue.expected as keyof ZodErrorTranslations['types']
+        const received = getTypeKey(issue.input)
+
+        return t.errors.invalid_type(
+          t.types[expected] ?? String(issue.expected),
+          t.types[received] ?? String(received),
+        )
+      }
+
+      case 'invalid_format': {
+        if (issue.format === 'starts_with') {
+          const prefix = 'prefix' in issue ? String(issue.prefix) : ''
+          return t.errors.invalid_string.startsWith(prefix)
         }
-        break
-      case ZodIssueCode.invalid_literal:
-        message = t.errors.invalid_literal(
-          JSON.stringify(issue.expected, jsonStringifyReplacer),
-        )
-        break
-      case ZodIssueCode.unrecognized_keys:
-        message = t.errors.unrecognized_keys(joinValues(issue.keys, ', '))
-        break
-      case ZodIssueCode.invalid_union:
-        message = t.errors.invalid_union
-        break
-      case ZodIssueCode.invalid_union_discriminator:
-        message = t.errors.invalid_union_discriminator(
-          joinValues(issue.options),
-        )
-        break
-      case ZodIssueCode.invalid_enum_value:
-        message = t.errors.invalid_enum_value(
-          joinValues(issue.options),
-          issue.received.toString(),
-        )
-        break
-      case ZodIssueCode.invalid_arguments:
-        message = t.errors.invalid_arguments
-        break
-      case ZodIssueCode.invalid_return_type:
-        message = t.errors.invalid_return_type
-        break
-      case ZodIssueCode.invalid_date:
-        message = t.errors.invalid_date
-        break
-      case ZodIssueCode.invalid_string:
-        if (typeof issue.validation === 'object') {
-          if ('startsWith' in issue.validation) {
-            message = t.errors.invalid_string.startsWith(
-              issue.validation.startsWith,
-            )
-          } else if ('endsWith' in issue.validation) {
-            message = t.errors.invalid_string.endsWith(
-              issue.validation.endsWith,
-            )
-          }
-        } else {
-          message = t.errors.invalid_string[issue.validation](
-            t.validations[issue.validation],
-          )
+
+        if (issue.format === 'ends_with') {
+          const suffix = 'suffix' in issue ? String(issue.suffix) : ''
+          return t.errors.invalid_string.endsWith(suffix)
         }
-        break
-      case ZodIssueCode.too_small:
+
+        const validation = getStringValidation(issue.format)
+        if (!validation) {
+          return issue.message || t.errors.custom
+        }
+
+        return t.errors.invalid_string[validation](t.validations[validation])
+      }
+
+      case 'too_small': {
+        const rangeType = getRangeType(issue.origin)
         const minimum =
-          issue.type === 'date'
-            ? new Date(issue.minimum as number).toString()
+          issue.origin === 'date'
+            ? new Date(Number(issue.minimum)).toString()
             : issue.minimum.toString()
-        const issueTypeTooSmall =
-          issue.type === 'bigint' ? 'number' : issue.type
-        message =
-          t.errors.too_small[issueTypeTooSmall][
-            issue.exact
-              ? 'exact'
-              : issue.inclusive
-                ? 'inclusive'
-                : 'not_inclusive'
-          ]
-        if (typeof message === 'function') {
-          message = message(minimum)
-        }
+        const variant = issue.exact
+          ? 'exact'
+          : issue.inclusive
+            ? 'inclusive'
+            : 'not_inclusive'
 
-        break
-      case ZodIssueCode.too_big:
+        const message = t.errors.too_small[rangeType][variant]
+        return typeof message === 'function' ? message(minimum) : message
+      }
+
+      case 'too_big': {
+        const rangeType = getRangeType(issue.origin)
         const maximum =
-          issue.type === 'date'
-            ? new Date(issue.maximum as number).toString()
+          issue.origin === 'date'
+            ? new Date(Number(issue.maximum)).toString()
             : issue.maximum.toString()
-        const issueTypeTooBig = issue.type === 'bigint' ? 'number' : issue.type
-        message =
-          t.errors.too_big[issueTypeTooBig][
-            issue.exact
-              ? 'exact'
-              : issue.inclusive
-                ? 'inclusive'
-                : 'not_inclusive'
-          ]
+        const variant = issue.exact
+          ? 'exact'
+          : issue.inclusive
+            ? 'inclusive'
+            : 'not_inclusive'
 
-        if (typeof message === 'function') {
-          message = message(maximum)
-        }
-        break
-      case ZodIssueCode.custom:
-        const { key, values } = getKeyAndValues(
-          issue.params?.i18n,
-          'errors.custom',
-        )
-        // console.log({ key, values })
+        const message = t.errors.too_big[rangeType][variant]
+        return typeof message === 'function' ? message(maximum) : message
+      }
 
-        if (issue.message && issue.params) {
-          console.warn(
-            'There is a message specified in the zod object and a custom issue param path. The message in the zod object will always win.',
-          )
-        }
+      case 'unrecognized_keys':
+        return t.errors.unrecognized_keys(joinValues(issue.keys, ', '))
 
-        message = getNestedValue(t.custom, key)
-        if (!message) {
-          console.error(
-            `No message found for key t.custom.${key}\nFallback to default error message...`,
-          )
-          message = t.errors.custom
-          break
-        }
-        if (typeof message === 'function') {
-          message = message(values)
-        }
-        // console.log({ message })
+      case 'invalid_union':
+        return t.errors.invalid_union
 
-        break
-      case ZodIssueCode.invalid_intersection_types:
-        message = t.errors.invalid_intersection_types
-        break
-      case ZodIssueCode.not_multiple_of:
-        message = t.errors.not_multiple_of(issue.multipleOf.toString())
-        break
-      case ZodIssueCode.not_finite:
-        message = t.errors.not_finite
-        break
+      case 'invalid_value': {
+        const received = issue.input === undefined ? 'undefined' : String(issue.input)
+        return t.errors.invalid_enum_value(joinValues(issue.values), received)
+      }
+
+      case 'not_multiple_of':
+        return t.errors.not_multiple_of(issue.divisor.toString())
+
+      case 'custom': {
+        const { key, values } = getKeyAndValues(issue.params?.i18n, 'errors.custom')
+        const message = getNestedValue(t.custom, key)
+
+        if (!message) return t.errors.custom
+        return typeof message === 'function' ? message(values) : String(message)
+      }
+
       default:
+        return issue.message || t.errors.custom
     }
-
-    return { message: message as string }
   }
+
   return customErrorMap
 }

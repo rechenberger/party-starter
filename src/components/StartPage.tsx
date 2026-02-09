@@ -1,4 +1,3 @@
-import { PartyButton } from '@/components/demo/PartyButton'
 import { Readme } from '@/components/demo/Readme'
 import { Button } from '@/components/ui/button'
 import { getTranslations } from '@/i18n/getTranslations'
@@ -14,7 +13,6 @@ export const StartPage = async ({ locale }: { locale: Locale }) => {
       <div className="flex-1 flex flex-col items-center justify-center gap-12 py-8">
         <h1 className="text-2xl lg:text-6xl">🎉 {t.landing.title} 🥳</h1>
         <div className="flex flex-col gap-2">
-          <PartyButton />
           <Link
             href="https://github.com/new?template_name=party-starter&template_owner=rechenberger"
             target="_blank"

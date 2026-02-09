@@ -1,21 +1,31 @@
 import { useZodTranslations } from '@/i18n/useZodTranslations'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm, useFormContext, type UseFormProps } from 'react-hook-form'
-import { type ZodType } from 'zod'
+import {
+  type FieldValues,
+  useForm,
+  useFormContext,
+  type UseFormProps,
+} from 'react-hook-form'
+import { z, type ZodType } from 'zod'
 import { useZodErrorMapTranslated } from './useZodErrorMapTranslated'
 
+type ZodFormValues<TSchema extends ZodType> = z.output<TSchema> & FieldValues
+
 export const useZodForm = <TSchema extends ZodType>(
-  props: Omit<UseFormProps<TSchema['_input']>, 'resolver'> & {
+  props: Omit<UseFormProps<ZodFormValues<TSchema>>, 'resolver'> & {
     schema: TSchema
   },
 ) => {
   const t = useZodTranslations()
   const errorMap = useZodErrorMapTranslated(t)
-  const form = useForm<TSchema['_input']>({
+
+  const resolver = (zodResolver as any)(props.schema, {
+    error: errorMap as any,
+  }) as any
+
+  const form = useForm<ZodFormValues<TSchema>>({
     ...props,
-    resolver: zodResolver(props.schema, {
-      errorMap: errorMap,
-    }),
+    resolver,
   })
 
   return form
@@ -23,7 +33,7 @@ export const useZodForm = <TSchema extends ZodType>(
 
 export const createZodForm = <TSchema extends ZodType>(schema: TSchema) => {
   const useCreatedZodForm = (
-    props?: Omit<UseFormProps<TSchema['_input']>, 'resolver'>,
+    props?: Omit<UseFormProps<ZodFormValues<TSchema>>, 'resolver'>,
   ) => {
     const form = useZodForm({
       ...props,
@@ -34,7 +44,7 @@ export const createZodForm = <TSchema extends ZodType>(schema: TSchema) => {
   }
 
   const useZodFormContext = () => {
-    const form = useFormContext<TSchema['_input']>()
+    const form = useFormContext<ZodFormValues<TSchema>>()
 
     return form
   }

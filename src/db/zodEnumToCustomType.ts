@@ -1,7 +1,7 @@
 import { customType } from 'drizzle-orm/pg-core'
 import { z } from 'zod'
 
-export const zodEnumToCustomType = <Schema extends z.Schema>(
+export const zodEnumToCustomType = <Schema extends z.ZodType<string>>(
   schema: Schema,
 ) => {
   return customType<{

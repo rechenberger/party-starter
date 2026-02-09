@@ -9,6 +9,7 @@ import {
   SidebarRail,
   Sidebar as UiSidebar,
 } from '@/components/ui/sidebar'
+import { Locale } from '@/i18n/locale'
 import { BRAND, ORGS } from '@/lib/starter.config'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -23,10 +24,12 @@ import { SidebarOrgSwitcher } from './SidebarOrgSwitcher'
 
 export const Sidebar = ({
   orgSlug,
+  locale,
   isLanding,
   ...props
 }: React.ComponentProps<typeof UiSidebar> & {
   orgSlug?: string
+  locale?: Locale
   isLanding?: boolean
 }) => {
   return (
@@ -65,9 +68,9 @@ export const Sidebar = ({
       <SidebarContent>
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
           {!!orgSlug && ORGS.isActive ? (
-            <SidebarOrgSection />
+            <SidebarOrgSection orgSlug={orgSlug} />
           ) : (
-            <SidebarMainSection isLanding={isLanding} />
+            <SidebarMainSection isLanding={isLanding} locale={locale} />
           )}
         </Suspense>
         {!isLanding && (
@@ -82,7 +85,7 @@ export const Sidebar = ({
       <SidebarFooter>
         <DevBadges className="px-2 group-data-[collapsible=icon]:hidden" />
         <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
-          <SidebarUserSection />
+          <SidebarUserSection locale={locale} />
         </Suspense>
       </SidebarFooter>
       <SidebarRail />

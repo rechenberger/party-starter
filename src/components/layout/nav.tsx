@@ -2,6 +2,7 @@ import { getIsAdmin } from '@/auth/getIsAdmin'
 import { getIsLoggedIn } from '@/auth/getMyUser'
 import { getMyLocale } from '@/i18n/getMyLocale'
 import { getTranslations } from '@/i18n/getTranslations'
+import { Locale } from '@/i18n/locale'
 import { Building2, Clock, Home, Users } from 'lucide-react'
 
 export type NavEntry = {
@@ -16,18 +17,20 @@ export type NavEntry = {
 
 export const getNavEntries = async ({
   filter,
+  locale,
 }: {
   filter: 'landing' | 'main' | 'admin'
+  locale?: Locale
 }) => {
   const isAdminOrDev = await getIsAdmin({ allowDev: true })
   const isLoggedIn = await getIsLoggedIn()
-  const locale = await getMyLocale()
-  const t = await getTranslations()
+  const resolvedLocale = await getMyLocale({ paramsLocale: locale })
+  const t = await getTranslations(resolvedLocale)
 
   let entries: NavEntry[] = [
     {
       name: t.nav.home,
-      href: `/${locale}`,
+      href: `/${resolvedLocale}`,
       icon: <Home />,
       mainSidebarSection: isLoggedIn ? undefined : 'main',
       showOnLanding: true,

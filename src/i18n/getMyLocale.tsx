@@ -2,16 +2,19 @@ import { LOCALIZATION } from '@/lib/starter.config'
 import { match } from '@formatjs/intl-localematcher'
 import Negotiator from 'negotiator'
 import { cookies, headers } from 'next/headers'
-import { unstable_rootParams } from 'next/server'
 import { COOKIE_NAME, DEFAULT_LOCALE, LOCALES, Locale } from './locale'
 
-export const getMyLocale = async () => {
+export const getMyLocale = async (
+  options?: {
+    paramsLocale?: unknown
+  },
+) => {
   if (!LOCALIZATION.isActive) {
     return DEFAULT_LOCALE
   }
 
   const locale =
-    (await getFromParams()) ??
+    options?.paramsLocale ??
     (await getFromCookies()) ??
     (await getFromHeaders())
 
@@ -21,15 +24,6 @@ export const getMyLocale = async () => {
   }
 
   return DEFAULT_LOCALE
-}
-
-const getFromParams = async () => {
-  const params = await unstable_rootParams()
-  const locale = params?.locale
-  const parsedParamLocale = Locale.safeParse(locale)
-  if (parsedParamLocale.success) {
-    return parsedParamLocale.data
-  }
 }
 
 const getFromCookies = async () => {

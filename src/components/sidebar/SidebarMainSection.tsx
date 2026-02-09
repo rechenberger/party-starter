@@ -1,5 +1,6 @@
 import { getIsLoggedIn } from '@/auth/getMyUser'
 import { getTranslations } from '@/i18n/getTranslations'
+import { Locale } from '@/i18n/locale'
 import { ORGS } from '@/lib/starter.config'
 import { canUserCreateOrg } from '@/organization/canUserCreateOrg'
 import { getMyMemberships } from '@/organization/getMyMemberships'
@@ -19,17 +20,22 @@ import { SidebarNavEntry } from './SidebarNavEntry'
 
 export const SidebarMainSection = async ({
   isLanding,
+  locale,
 }: {
   isLanding?: boolean
+  locale?: Locale
 }) => {
   const [isLoggedIn, memberships, userCanCreateOrg] = await Promise.all([
     getIsLoggedIn(),
     getMyMemberships(),
     canUserCreateOrg(),
   ])
-  const t = await getTranslations()
+  const t = await getTranslations(locale)
 
-  let entries = await getNavEntries({ filter: isLanding ? 'landing' : 'main' })
+  let entries = await getNavEntries({
+    filter: isLanding ? 'landing' : 'main',
+    locale,
+  })
   return (
     <>
       <SidebarGroup>

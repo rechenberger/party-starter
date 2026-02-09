@@ -132,6 +132,7 @@ export const MailInvitationCodesList = async (
 
   await getMyMembershipOrNotFound({
     allowedRoles,
+    orgSlug,
   })
   const t = await getTranslations()
 

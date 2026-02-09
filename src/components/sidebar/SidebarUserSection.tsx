@@ -2,6 +2,7 @@ import { ChevronsUpDown, LogIn } from 'lucide-react'
 
 import { getMyUser } from '@/auth/getMyUser'
 import { loginWithRedirect } from '@/auth/loginWithRedirect'
+import { Locale } from '@/i18n/locale'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -16,7 +17,7 @@ import { ResponsiveDropdownMenuContent } from '../ResponsiveDropdownMenuContent'
 import { UserAvatar } from '../UserAvatar'
 import { UserMenuDropDownContent } from '../UserMenuDropDownContent'
 
-export const SidebarUserSection = async () => {
+export const SidebarUserSection = async ({ locale }: { locale?: Locale }) => {
   const user = await getMyUser()
 
   if (!user) {
@@ -56,7 +57,7 @@ export const SidebarUserSection = async () => {
             align="end"
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
           >
-            <UserMenuDropDownContent user={user} />
+            <UserMenuDropDownContent user={user} locale={locale} />
           </ResponsiveDropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

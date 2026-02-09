@@ -15,6 +15,7 @@ import { User } from '@/db/schema-zod'
 import { LocaleSwitcher } from '@/i18n/LocaleSwitcher'
 import { getMyLocale } from '@/i18n/getMyLocale'
 import { getTranslations } from '@/i18n/getTranslations'
+import { Locale } from '@/i18n/locale'
 import { LOCALIZATION } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import { ActionButton } from '@/super-action/button/ActionButton'
@@ -25,14 +26,16 @@ import { ThemeSwitcher } from './layout/ThemeSwitcher'
 
 export const UserMenuDropDownContent = async ({
   user,
+  locale,
 }: {
   user: Pick<User, 'name' | 'email' | 'image'>
+  locale?: Locale
 }) => {
   if (!user) {
     return null
   }
-  const t = await getTranslations()
-  const currentLocale = await getMyLocale()
+  const t = await getTranslations(locale)
+  const currentLocale = await getMyLocale({ paramsLocale: locale })
   return (
     <>
       <DropdownMenuLabel className="p-0 font-normal">

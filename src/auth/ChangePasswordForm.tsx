@@ -32,7 +32,7 @@ export const ChangePasswordForm = async ({
               ? t.standardWords.redirecting
               : undefined
 
-            superCache.user({ id: userId }).revalidate()
+            superCache.user({ id: userId }).update()
 
             streamToast({
               title: t.userManagement.passwordChanged,

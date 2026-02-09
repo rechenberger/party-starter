@@ -160,8 +160,8 @@ export default async function JoinOrgPage({
                 }),
               ])
 
-              superCache.userOrgMemberships({ userId: user.id }).revalidate()
-              superCache.orgMembers({ orgId: org.id }).revalidate()
+              superCache.userOrgMemberships({ userId: user.id }).update()
+              superCache.orgMembers({ orgId: org.id }).update()
             })
           }}
         >

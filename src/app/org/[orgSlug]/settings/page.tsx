@@ -65,7 +65,7 @@ export default async function Page({
                       .delete(schema.organizations)
                       .where(eq(schema.organizations.slug, org.slug))
 
-                    superCache.all().revalidate()
+                    superCache.all().update()
 
                     redirect('/')
                   }}

@@ -96,7 +96,7 @@ export const NormalInviteCodesTable = async (
                                 id: schema.inviteCodes.id,
                               })
 
-                            superCache.orgMembers({ orgId }).revalidate()
+                            superCache.orgMembers({ orgId }).update()
 
                             const url = getInviteCodeUrl({
                               organizationSlug: orgSlug,
@@ -264,7 +264,7 @@ export const NormalInviteCodesTable = async (
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))
 
-                                superCache.orgMembers({ orgId }).revalidate()
+                                superCache.orgMembers({ orgId }).update()
                               })
                             }}
                             title={t.inviteCodes.delete.action}

@@ -105,7 +105,7 @@ const upsertInviteCodeAndSendMail = async ({
     })
     .returning({ id: schema.inviteCodes.id, role: schema.inviteCodes.role })
 
-  superCache.orgMembers({ orgId }).revalidate()
+  superCache.orgMembers({ orgId }).update()
   const newCode = newCodeRes[0]
 
   await orgInviteEmail.send({
@@ -358,7 +358,7 @@ export const MailInvitationCodesList = async (
                                     deletedAt: new Date(),
                                   })
                                   .where(eq(schema.inviteCodes.id, code.id))
-                                superCache.orgMembers({ orgId }).revalidate()
+                                superCache.orgMembers({ orgId }).update()
                               })
                             }}
                             title={t.inviteCodes.delete.action}

@@ -84,8 +84,8 @@ export const changeRoleAction = async (data: {
         ),
       )
 
-    superCache.orgMembers({ orgId: org.id }).revalidate()
-    superCache.userOrgMemberships({ userId: data.userId }).revalidate()
+    superCache.orgMembers({ orgId: org.id }).update()
+    superCache.userOrgMemberships({ userId: data.userId }).update()
   })
 }
 
@@ -137,8 +137,8 @@ export const kickUserAction = async (data: {
         ),
       )
 
-    superCache.orgMembers({ orgId: org.id }).revalidate()
-    superCache.userOrgMemberships({ userId: data.userId }).revalidate()
+    superCache.orgMembers({ orgId: org.id }).update()
+    superCache.userOrgMemberships({ userId: data.userId }).update()
 
     if (myUserId === data.userId) {
       redirect(`/`)

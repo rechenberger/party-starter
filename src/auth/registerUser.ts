@@ -33,5 +33,5 @@ export const registerUser = async (credentials: Credentials) => {
     throw new Error('Failed to register user')
   }
 
-  superCache.user({ id: user.id }).revalidate()
+  superCache.user({ id: user.id }).update()
 }

@@ -156,7 +156,7 @@ export default async function Page({
                             .set({ isAdmin: !isAdmin })
                             .where(eq(usersTable.id, user.id))
 
-                          superCache.user({ id: user.id }).revalidate()
+                          superCache.user({ id: user.id }).update()
 
                           streamToast({
                             title: isAdmin
@@ -201,7 +201,7 @@ export default async function Page({
                             .where(eq(usersTable.id, user.id))
                             .execute()
 
-                          superCache.all().revalidate()
+                          superCache.all().update()
 
                           streamToast({
                             title: t.userManagement.deleteUser.success(

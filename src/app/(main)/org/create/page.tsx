@@ -57,9 +57,9 @@ export default async function CreateOrg() {
               role: 'admin',
             })
 
-            superCache.org({ id: org.id }).revalidate()
-            superCache.orgMembers({ orgId: org.id }).revalidate()
-            superCache.userOrgMemberships({ userId }).revalidate()
+            superCache.org({ id: org.id }).update()
+            superCache.orgMembers({ orgId: org.id }).update()
+            superCache.userOrgMemberships({ userId }).update()
 
             redirect(`/org/${org.slug}`)
           })

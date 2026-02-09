@@ -1,4 +1,4 @@
-import { cacheTag, revalidateTag } from 'next/cache'
+import { cacheTag, revalidateTag, updateTag } from 'next/cache'
 
 const ALL_TAG = 'all'
 
@@ -11,6 +11,9 @@ const singleTag = (tag: string, additionalTagsToRevalidate: string[] = []) => {
     },
     revalidate: () => {
       tags.forEach((tag) => revalidateTag(tag, 'max'))
+    },
+    update: () => {
+      tags.forEach((tag) => updateTag(tag))
     },
   }
 }

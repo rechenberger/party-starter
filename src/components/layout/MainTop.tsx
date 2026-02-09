@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { Locale } from '@/i18n/locale'
 import { BRAND } from '@/lib/starter.config'
 import { cn } from '@/lib/utils'
 import { Github, MenuIcon } from 'lucide-react'
@@ -11,7 +12,7 @@ import { MainDashboardButton } from './MainDashboardButton'
 import { MainTopContent } from './MainTopContent'
 import { MainTopUserSettings } from './MainTopUserSettings'
 
-export const MainTop = async () => {
+export const MainTop = async ({ locale }: { locale?: Locale }) => {
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 bg-background/95 backdrop-blur-sm">
       <SidebarProvider className="min-h-auto">
@@ -35,7 +36,7 @@ export const MainTop = async () => {
                 'hidden md:flex flex-1 flex-wrap items-center gap-4 lg:gap-6',
               )}
             >
-              <MainTopContent />
+              <MainTopContent locale={locale} />
             </nav>
           </Suspense>
           <div className="flex-1 md:hidden" />
@@ -50,13 +51,13 @@ export const MainTop = async () => {
                 </Button>
               )}
 
-              <MainTopUserSettings />
+              <MainTopUserSettings locale={locale} />
             </div>
             <MainDashboardButton />
           </div>
         </div>
         <div className="md:hidden">
-          <Sidebar collapsible="icon" isLanding={true} />
+          <Sidebar collapsible="icon" isLanding={true} locale={locale} />
         </div>
       </SidebarProvider>
     </header>

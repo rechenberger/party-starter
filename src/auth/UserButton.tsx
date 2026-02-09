@@ -9,22 +9,35 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { getTranslations } from '@/i18n/getTranslations'
+import { Locale } from '@/i18n/locale'
 import { ChevronDown, ChevronsUpDown, LogInIcon } from 'lucide-react'
 import { Suspense } from 'react'
 import { getMyUser } from './getMyUser'
 import { loginWithRedirect } from './loginWithRedirect'
 
-export const UserButtonSuspense = ({ large }: { large?: boolean }) => {
+export const UserButtonSuspense = ({
+  large,
+  locale,
+}: {
+  large?: boolean
+  locale?: Locale
+}) => {
   return (
     <Suspense fallback={<Skeleton className="w-[38px] h-8" />}>
-      <UserButton large={large} />
+      <UserButton large={large} locale={locale} />
     </Suspense>
   )
 }
 
-export const UserButton = async ({ large }: { large?: boolean }) => {
+export const UserButton = async ({
+  large,
+  locale,
+}: {
+  large?: boolean
+  locale?: Locale
+}) => {
   const user = await getMyUser()
-  const t = await getTranslations()
+  const t = await getTranslations({ locale })
   const showName = false
 
   if (!!user) {
@@ -57,7 +70,7 @@ export const UserButton = async ({ large }: { large?: boolean }) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end">
-            <UserMenuDropDownContent user={user} />
+            <UserMenuDropDownContent user={user} locale={locale} />
           </DropdownMenuContent>
         </DropdownMenu>
       </>

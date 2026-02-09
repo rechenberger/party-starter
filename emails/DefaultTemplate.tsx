@@ -23,7 +23,7 @@ export const DefaultTemplate = async ({
   locale?: Locale
   children: React.ReactNode
 }) => {
-  const t = await getTranslations(locale)
+  const t = await getTranslations({ locale })
   return (
     <Html>
       <Head />

@@ -17,9 +17,15 @@ import { redirect } from 'next/navigation'
 
 const allowedRoles: OrganizationRole[] = ['admin']
 
-export default async function Page() {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ orgSlug: string }>
+}) {
+  const { orgSlug } = await params
   const { org } = await getMyMembershipOrNotFound({
     allowedRoles,
+    orgSlug,
   })
   const t = await getTranslations()
 

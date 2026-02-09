@@ -69,7 +69,7 @@ export const generateMetadataLocalized = <
 ) => {
   return async (props: PageProps, parent: ResolvingMetadata) => {
     const locale = Locale.parse((await props.params).locale)
-    const t = await getTranslations(locale)
+    const t = await getTranslations({ locale })
     const metadata = cb ? await cb({ ...props, locale, parent, t }) : {}
     return {
       alternates: await generateMetadataLocalizedAlternates({

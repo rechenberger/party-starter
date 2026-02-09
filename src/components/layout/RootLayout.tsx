@@ -2,6 +2,7 @@ import { isDev } from '@/auth/dev'
 import { Toaster } from '@/components/ui/toaster'
 import { LocaleProvider } from '@/i18n/LocaleContext'
 import { getMyLocale } from '@/i18n/getMyLocale'
+import { Locale } from '@/i18n/locale'
 import { BASE_URL } from '@/lib/config'
 import { BRAND } from '@/lib/starter.config'
 import { ActionCommandProvider } from '@/super-action/command/ActionCommandProvider'
@@ -22,12 +23,18 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
 }
 
-export async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getMyLocale()
+export async function RootLayout({
+  children,
+  locale,
+}: {
+  children: React.ReactNode
+  locale?: Locale
+}) {
+  const localeResolved = locale ?? (await getMyLocale())
   return (
-    <html suppressHydrationWarning lang={locale}>
+    <html suppressHydrationWarning lang={localeResolved}>
       <body className="bg-background min-h-[100svh] flex flex-col">
-        <LocaleProvider value={locale}>
+        <LocaleProvider value={localeResolved}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <SessionProvider>{children}</SessionProvider>
             <ActionCommandProvider />

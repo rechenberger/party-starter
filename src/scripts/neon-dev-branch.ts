@@ -5,7 +5,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 
-type Command = 'create' | 'reset' | 'sync' | 'url'
+type Command = 'create' | 'reset' | 'sync' | 'url' | 'env'
 
 type CliOptions = {
   branch?: string
@@ -29,6 +29,7 @@ Usage:
   pnpm neon:dev:create
   pnpm neon:dev:reset
   pnpm neon:dev:url
+  pnpm neon:dev:env
 
 Direct:
   tsx src/scripts/neon-dev-branch.ts <command> [options]
@@ -38,6 +39,7 @@ Commands:
   create  Create branch from parent
   reset   Reset existing branch to parent
   url     Print connection string for branch
+  env     Update DATABASE_URL in .env.local for the target branch
 
 Options:
   --username <name>       Username used for default branch name (dev/<username>)
@@ -58,7 +60,7 @@ function parseArgs(argv: string[]) {
   let optionTokens = argv
 
   if (argv[0] && !argv[0].startsWith('-')) {
-    if (!['create', 'reset', 'sync', 'url'].includes(argv[0])) {
+    if (!['create', 'reset', 'sync', 'url', 'env'].includes(argv[0])) {
       throw new Error(`Unknown command "${argv[0]}"`)
     }
     command = argv[0] as Command

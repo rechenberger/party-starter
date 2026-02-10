@@ -21,7 +21,9 @@
   - copy `AUTH_SECRET` to [.env.local](.env.local)
 - Connect DB
   - [Create Neon Database](https://console.neon.tech/app/projects)
-  - `DATABASE_URL`: looks like postgresql://...
+  - add `NEON_PROJECT_ID` to [.env.local](.env.local)
+  - run `pnpm neon:auth` once
+  - run `pnpm neon:dev:use` to create/reset your `dev/<username>` branch and set `DATABASE_URL`
 - Connect OAuth
   - [Create Discord Developer App](https://discord.com/developers/applications)
   - Goto OAuth2
@@ -42,6 +44,14 @@
   - Run `pnpm install` to sync the cron jobs to vercel.json
   - Add an Environment Variable `CRON_SECRET` to your app
     - If you use [Gitenvs](https://www.npmjs.com/package/gitenvs) and Vercel you need to set the `CRON_SECRET` directly in Vercel not in Gitenvs
+
+## Neon Branches (Dev)
+
+- `pnpm neon:dev:use`: create-or-reset your `dev/<username>` branch from `production` and update `DATABASE_URL`
+- `pnpm neon:dev:env`: only update `DATABASE_URL` for your branch (no create/reset)
+- `pnpm neon:prod:env`: set `DATABASE_URL` to the `production` branch
+- `pnpm neon:dev:create` / `pnpm neon:dev:reset`: explicit branch actions
+- override target with `--username <name>` or `--branch <branch-name>`
 
 ## Run
 

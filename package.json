@@ -20,6 +20,7 @@
     "neon:dev:reset": "tsx src/scripts/neon-dev-branch.ts reset",
     "neon:dev:url": "tsx src/scripts/neon-dev-branch.ts url",
     "neon:dev:env": "tsx src/scripts/neon-dev-branch.ts env",
+    "neon:prod:env": "tsx src/scripts/neon-dev-branch.ts env --branch production",
     "neon:dev:help": "tsx src/scripts/neon-dev-branch.ts --help"
   },
   "dependencies": {

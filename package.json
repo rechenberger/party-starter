@@ -52,8 +52,6 @@
     "@react-email/components": "1.0.7",
     "@sodefa/next-server-context": "^0.0.3",
     "@tailwindcss/postcss": "^4.1.18",
-    "@teampilot/sdk": "^0.0.36",
-    "ai": "^6.0.77",
     "boring-avatars": "^2.0.4",
     "change-case": "^5.4.4",
     "class-variance-authority": "^0.7.1",

@@ -1,4 +1,4 @@
-import { unstable_cacheTag as cacheTag, revalidateTag } from 'next/cache'
+import { cacheTag, revalidateTag, updateTag } from 'next/cache'
 
 const ALL_TAG = 'all'
 
@@ -10,7 +10,10 @@ const singleTag = (tag: string, additionalTagsToRevalidate: string[] = []) => {
       cacheTag(ALL_TAG)
     },
     revalidate: () => {
-      tags.forEach((tag) => revalidateTag(tag))
+      tags.forEach((tag) => revalidateTag(tag, 'max'))
+    },
+    update: () => {
+      tags.forEach((tag) => updateTag(tag))
     },
   }
 }

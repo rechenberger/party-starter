@@ -9,7 +9,7 @@ import { getMailTransporter } from './getMailTransporter'
 import { typedParse } from './typedParse'
 
 type EmailRenderProps<Schema extends ZodType> = {
-  props: z.infer<Schema>
+  props: z.output<Schema>
   t: TranslationsServerAndClient
   locale: Locale
 }
@@ -18,12 +18,12 @@ export const createEmailTemplate = <Schema extends ZodType>(template: {
   schema: Schema
   Email: (props: EmailRenderProps<Schema>) => Promise<ReactNode>
   subject: (props: EmailRenderProps<Schema>) => Promise<string>
-  previewProps: z.infer<Schema>
+  previewProps: z.input<Schema>
 }) => {
   const send = async (params: {
     to: string
     locale?: Locale
-    props: z.infer<Schema>
+    props: z.input<Schema>
   }) => {
     try {
       const locale = params.locale ?? (await getMyLocale())
@@ -57,10 +57,11 @@ export const createEmailTemplate = <Schema extends ZodType>(template: {
   }
 
   const preview = () => {
-    const Email = async (props: z.infer<Schema>) => {
+    const Email = async (props: z.input<Schema>) => {
       const locale = DEFAULT_LOCALE
       const t = await getTranslations({ locale })
-      return <template.Email props={props} t={t} locale={locale} />
+      const parsedProps = typedParse(template.schema, props)
+      return <template.Email props={parsedProps} t={t} locale={locale} />
     }
     Email.PreviewProps = template.previewProps
     return Email

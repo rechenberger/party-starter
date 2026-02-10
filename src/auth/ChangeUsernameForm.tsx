@@ -31,7 +31,7 @@ export const ChangeUsernameForm = async ({
               })
               .where(eq(schema.users.id, userId))
 
-            superCache.user({ id: userId }).revalidate()
+            superCache.user({ id: userId }).update()
 
             const t = await getTranslations()
             const description = redirectUrl

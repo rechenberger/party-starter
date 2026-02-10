@@ -185,7 +185,9 @@ export const MemberList = ({
                           >
                             <SelectTrigger className="w-[110px]">
                               <SelectValue
-                                placeholder={t.org.members.selectRolePlaceholder}
+                                placeholder={
+                                  t.org.members.selectRolePlaceholder
+                                }
                               />
                             </SelectTrigger>
                             <SelectContent>

@@ -127,6 +127,7 @@ export default async function JoinOrgPage({
       </CardContent>
       <CardFooter className="flex flex-col gap-2">
         <ActionButton
+          data-testid="join-org-submit"
           variant="default"
           className="w-full"
           action={async () => {
@@ -168,6 +169,7 @@ export default async function JoinOrgPage({
           {t.org.join.joinOrganization}
         </ActionButton>
         <ActionButton
+          data-testid="join-org-cancel"
           variant="outline"
           className="w-full"
           action={async () => {

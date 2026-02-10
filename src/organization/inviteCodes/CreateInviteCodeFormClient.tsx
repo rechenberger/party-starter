@@ -91,6 +91,7 @@ export const CreateInviteCodeFormClient = ({
                 <FormLabel>{t.inviteCodes.createForm.role}</FormLabel>
                 <FormControl>
                   <Select
+                    data-testid="invite-create-role-select"
                     {...field}
                     name="role"
                     value={field.value}
@@ -98,7 +99,10 @@ export const CreateInviteCodeFormClient = ({
                       field.onChange(value)
                     }}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger
+                      className="w-full"
+                      data-testid="invite-create-role-trigger"
+                    >
                       <SelectValue
                         placeholder={t.inviteCodes.createForm.selectRole}
                       />
@@ -124,6 +128,7 @@ export const CreateInviteCodeFormClient = ({
                 <FormLabel>{t.inviteCodes.createForm.expiresAt}</FormLabel>
                 <FormControl>
                   <Select
+                    data-testid="invite-create-expires-select"
                     {...field}
                     name="expiresAt"
                     value={field.value}
@@ -131,7 +136,10 @@ export const CreateInviteCodeFormClient = ({
                       field.onChange(value)
                     }}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger
+                      className="w-full"
+                      data-testid="invite-create-expires-trigger"
+                    >
                       <SelectValue
                         placeholder={t.inviteCodes.createForm.selectExpiresAt}
                       />
@@ -160,6 +168,7 @@ export const CreateInviteCodeFormClient = ({
                 <FormLabel>{t.inviteCodes.createForm.usesMax}</FormLabel>
                 <FormControl>
                   <Input
+                    data-testid="invite-create-uses-max"
                     type="number"
                     {...field}
                     placeholder={t.inviteCodes.createForm.usesMaxPlaceholder}
@@ -177,6 +186,7 @@ export const CreateInviteCodeFormClient = ({
                 <FormLabel>{t.inviteCodes.createForm.comment}</FormLabel>
                 <FormControl>
                   <Input
+                    data-testid="invite-create-comment"
                     type="text"
                     {...field}
                     placeholder={t.inviteCodes.createForm.commentPlaceholder}
@@ -187,7 +197,12 @@ export const CreateInviteCodeFormClient = ({
             )}
           />
 
-          <Button type="submit" className="mt-2" disabled={disabled}>
+          <Button
+            data-testid="invite-create-submit"
+            type="submit"
+            className="mt-2"
+            disabled={disabled}
+          >
             {t.inviteCodes.createForm.create}
           </Button>
         </form>

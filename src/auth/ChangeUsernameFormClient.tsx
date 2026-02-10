@@ -66,14 +66,18 @@ export const ChangeUsernameFormClient = ({
               <FormItem>
                 <FormLabel>{t.standardWords.username}</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input data-testid="change-username-input" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           <div className="flex flex-row gap-2 mt-4 justify-end">
-            <Button type="submit" disabled={disabled}>
+            <Button
+              data-testid="change-username-submit"
+              type="submit"
+              disabled={disabled}
+            >
               {t.userManagement.changeUsernameAction}
             </Button>
           </div>

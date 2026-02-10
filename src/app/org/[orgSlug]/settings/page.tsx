@@ -53,6 +53,7 @@ export default async function Page({
               </Alert>
               <div className="flex justify-end">
                 <ActionButton
+                  data-testid="delete-org-button"
                   variant="destructive"
                   action={async () => {
                     'use server'

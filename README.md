@@ -53,6 +53,61 @@
 - `pnpm neon:dev:create` / `pnpm neon:dev:reset`: explicit branch actions
 - override target with `--username <name>` or `--branch <branch-name>`
 
+## E2E Testing
+
+This template has a dual-mode Playwright setup:
+
+- CI mode (`next build` + `next start`) with a dedicated schema-only Neon branch per run
+- Dev mode (`next dev`) for fast local iteration without forced branch lifecycle
+
+### Setup
+
+- Install Playwright browser once:
+  - `pnpm e2e:install`
+- Ensure `AUTH_SECRET` is set
+- CI mode additionally requires:
+  - `NEON_PROJECT_ID`
+  - `NEON_API_KEY`
+
+### CI Mode (production-like)
+
+- Run full orchestration:
+  - `pnpm e2e:ci`
+- This does:
+  - create unique Neon test branch (`e2e/<run-id>`, schema-only)
+  - `pnpm db:push`
+  - `pnpm e2e:seed`
+  - `next build` + `next start`
+  - Playwright run (`playwright.ci.config.ts`)
+  - branch cleanup (delete, plus expiration fallback)
+
+### Dev Mode (local changes)
+
+- Use existing local dev server or let Playwright start one:
+  - `pnpm e2e:dev`
+- Run specific files:
+  - `pnpm e2e:dev -- e2e/specs/org-members.spec.ts`
+- Run grep filter:
+  - `pnpm e2e:dev -- --grep \"impersonate\"`
+
+### Seed and Artifacts
+
+- Seed script (manual in dev mode):
+  - `pnpm e2e:seed`
+- Default artifacts:
+  - `.e2e-artifacts/<run-id>/...`
+- E2E env contracts:
+  - `E2E_MODE=ci|dev`
+  - `E2E_RUN_ID`
+  - `E2E_WORKERS`
+  - `E2E_SEED_MANIFEST`
+  - `E2E_MAIL_CAPTURE_DIR`
+
+### Mail Capture
+
+- If `E2E_MAIL_CAPTURE_DIR` is set, mails are rendered and written as JSON artifacts instead of being sent via SMTP.
+- This is used by E2E tests to validate invite email content and links without external delivery.
+
 ## Run
 
 ```bash

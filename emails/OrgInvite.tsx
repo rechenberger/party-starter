@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { DefaultTemplate } from './DefaultTemplate'
 
 export const orgInviteEmail = createEmailTemplate({
+  name: 'org-invite',
   schema: z.object({
     invitedByUsername: z.string().nullable(),
     invitedByEmail: z.string(),

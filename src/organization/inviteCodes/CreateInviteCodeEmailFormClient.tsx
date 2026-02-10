@@ -125,6 +125,7 @@ export const CreateInviteCodeEmailFormClient = ({
             <div className="flex flex-col gap-2">
               <InputWithButton
                 inputProps={{
+                  'data-testid': 'invite-email-receiver-input',
                   type: 'email',
                   autoComplete: 'email',
                   autoFocus: true,
@@ -192,7 +193,12 @@ export const CreateInviteCodeEmailFormClient = ({
                 </p>
               )}
           </FormItem>
-          <Button type="submit" className="" disabled={isLoading}>
+          <Button
+            data-testid="invite-email-submit"
+            type="submit"
+            className=""
+            disabled={isLoading}
+          >
             {isLoading
               ? t.inviteCodes.createForm.sending
               : t.inviteCodes.createForm.sendInvitation}

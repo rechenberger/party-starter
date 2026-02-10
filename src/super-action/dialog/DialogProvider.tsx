@@ -71,12 +71,20 @@ const SuperDialog = ({
           {(!!dialog.confirm || !!dialog.cancel) && (
             <DialogFooter>
               {dialog.cancel && (
-                <Button variant={'outline'} onClick={() => onConfirm?.(false)}>
+                <Button
+                  data-testid="dialog-cancel"
+                  variant={'outline'}
+                  onClick={() => onConfirm?.(false)}
+                >
                   {dialog.cancel}
                 </Button>
               )}
               {dialog.confirm && (
-                <Button onClick={() => onConfirm?.(true)} autoFocus>
+                <Button
+                  data-testid="dialog-confirm"
+                  onClick={() => onConfirm?.(true)}
+                  autoFocus
+                >
                   {dialog.confirm}
                 </Button>
               )}

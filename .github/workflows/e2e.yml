@@ -1,0 +1,51 @@
+name: E2E
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  playwright-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      BASE_URL: http://127.0.0.1:3000
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+      NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+      AUTH_DISCORD_ID: dummy
+      AUTH_DISCORD_SECRET: dummy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Chromium
+        run: pnpm e2e:install
+
+      - name: Run E2E suite (CI mode)
+        run: pnpm e2e:ci
+
+      - name: Upload E2E artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-artifacts
+          path: |
+            .e2e-artifacts
+            playwright-report
+            test-results
+          if-no-files-found: ignore

@@ -24,6 +24,7 @@
   - add `NEON_PROJECT_ID` to [.env.local](.env.local)
   - run `pnpm neon:auth` once
   - run `pnpm neon:dev:use` to create/reset your `dev/<username>` branch and set `DATABASE_URL`
+  - run `pnpm neon:dev:seed` for a fresh schema-only branch + seeded local data
 - Connect OAuth
   - [Create Discord Developer App](https://discord.com/developers/applications)
   - Goto OAuth2
@@ -50,7 +51,8 @@
 - `pnpm neon:dev:use`: create-or-reset your `dev/<username>` branch from `production` and update `DATABASE_URL`
 - `pnpm neon:dev:env`: only update `DATABASE_URL` for your branch (no create/reset)
 - `pnpm neon:prod:env`: set `DATABASE_URL` to the `production` branch
-- `pnpm neon:dev:create` / `pnpm neon:dev:reset`: explicit branch actions
+- `pnpm neon:dev:create` / `pnpm neon:dev:reset` / `pnpm neon:dev:delete`: explicit branch actions
+- `pnpm neon:dev:seed`: delete `dev/<username>`, recreate schema-only, set `DATABASE_URL`, run `pnpm db:push`, then `pnpm e2e:seed`
 - override target with `--username <name>` or `--branch <branch-name>`
 
 ## E2E Testing
@@ -94,6 +96,8 @@ This template has a dual-mode Playwright setup:
 
 - Seed script (manual in dev mode):
   - `pnpm e2e:seed`
+- Full local Neon refresh + seed:
+  - `pnpm neon:dev:seed`
 - Default artifacts:
   - `.e2e-artifacts/<run-id>/...`
 - E2E env contracts:

@@ -5,7 +5,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 
-type Command = 'create' | 'reset' | 'sync' | 'url' | 'env'
+type Command = 'create' | 'reset' | 'sync' | 'url' | 'env' | 'delete'
 
 type CliOptions = {
   branch?: string
@@ -28,6 +28,7 @@ Usage:
   pnpm neon:dev:use
   pnpm neon:dev:create
   pnpm neon:dev:reset
+  pnpm neon:dev:delete
   pnpm neon:dev:url
   pnpm neon:dev:env
 
@@ -38,6 +39,7 @@ Commands:
   sync    Create branch if missing, otherwise reset it to parent (default)
   create  Create branch from parent
   reset   Reset existing branch to parent
+  delete  Delete branch if it exists
   url     Print connection string for branch
   env     Update DATABASE_URL in .env.local for the target branch
 
@@ -60,7 +62,7 @@ function parseArgs(argv: string[]) {
   let optionTokens = argv
 
   if (argv[0] && !argv[0].startsWith('-')) {
-    if (!['create', 'reset', 'sync', 'url', 'env'].includes(argv[0])) {
+    if (!['create', 'reset', 'sync', 'url', 'env', 'delete'].includes(argv[0])) {
       throw new Error(`Unknown command "${argv[0]}"`)
     }
     command = argv[0] as Command
@@ -74,7 +76,11 @@ function parseArgs(argv: string[]) {
     roleName: process.env.NEON_ROLE_NAME,
     pooled: true,
     schemaOnly: false,
-    setEnv: command !== 'url',
+    setEnv:
+      command === 'create' ||
+      command === 'reset' ||
+      command === 'sync' ||
+      command === 'env',
     printUrl: command === 'url',
   }
 
@@ -219,6 +225,19 @@ function resetBranch(branch: string, options: CliOptions) {
   )
 }
 
+function deleteBranch(branch: string, options: CliOptions) {
+  if (!branchExists(branch, options)) {
+    return false
+  }
+
+  requireSuccess(
+    runNeon(['branches', 'delete', branch], options),
+    `Failed to delete branch "${branch}"`,
+  )
+
+  return true
+}
+
 function findConnectionString(input: unknown): string | undefined {
   if (typeof input === 'string' && /^postgres(ql)?:\/\//i.test(input)) {
     return input
@@ -305,6 +324,16 @@ function main() {
   options.projectId = projectId
 
   const branch = resolveBranchName(options)
+
+  if (command === 'delete') {
+    const deleted = deleteBranch(branch, options)
+    if (deleted) {
+      console.log(`Deleted branch: ${branch}`)
+    } else {
+      console.log(`Branch does not exist, skipping delete: ${branch}`)
+    }
+    return
+  }
 
   if (command === 'create') {
     createBranch(branch, options)

@@ -1,9 +1,9 @@
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
+import { verifyEmailEmail } from '@/emails/VerifyEmail'
 import { superCache } from '@/lib/superCache'
 import Nodemailer from '@auth/core/providers/nodemailer'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
-import { verifyEmailEmail } from '@/emails/VerifyEmail'
 import { and, eq, lt } from 'drizzle-orm'
 import NextAuth from 'next-auth'
 import Discord from 'next-auth/providers/discord'
@@ -13,6 +13,7 @@ import { ImpersonateProvider } from './ImpersonateProvider'
 const hasEmailEnvVars = !!process.env.EMAIL_FROM && !!process.env.SMTP_URL
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   adapter: {
     ...DrizzleAdapter(db),
     useVerificationToken: async (params) => {

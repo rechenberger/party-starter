@@ -54,6 +54,19 @@
 - `pnpm neon:dev:create` / `pnpm neon:dev:reset` / `pnpm neon:dev:delete`: explicit branch actions
 - `pnpm neon:dev:seed`: delete `dev/<username>`, recreate schema-only, set `DATABASE_URL`, run `pnpm db:push`, then `pnpm e2e:seed`
 - override target with `--username <name>` or `--branch <branch-name>`
+- destructive commands (`sync`, `reset`, `delete`) now refuse protected/default branches by name and Neon metadata checks
+- add extra protected branch names with `NEON_PROTECTED_BRANCHES="production,main"`
+- emergency bypass exists via `--unsafe-allow-protected` (not recommended)
+
+### Protect production branch in Neon
+
+- In Neon Console, open your `production` branch and enable **Protected branch**
+- Recommended because it blocks dangerous branch-level actions such as reset/delete on that branch
+- Existing workflow impact:
+  - `pnpm neon:dev:*` commands for `dev/<username>` continue to work
+  - `pnpm neon:prod:env` continues to work (it only reads connection info)
+  - `pnpm db:push` still works as long as `DATABASE_URL` has valid credentials for the target branch
+- If branch password is enabled for protected branches in Neon, ensure your `DATABASE_URL` includes valid credentials
 
 ## E2E Testing
 

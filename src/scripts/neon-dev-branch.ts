@@ -11,16 +11,20 @@ type CliOptions = {
   branch?: string
   username?: string
   parent: string
+  protectedBranches: string[]
   projectId?: string
   databaseName?: string
   roleName?: string
   pooled: boolean
   schemaOnly: boolean
+  unsafeAllowProtected: boolean
   setEnv: boolean
   printUrl: boolean
 }
 
 const DEFAULT_BRANCH = 'production'
+const DEFAULT_PROTECTED_BRANCHES = [DEFAULT_BRANCH]
+const DESTRUCTIVE_COMMANDS = new Set<Command>(['sync', 'reset', 'delete'])
 
 const HELP_TEXT = `Neon dev branch helper
 
@@ -47,15 +51,40 @@ Options:
   --username <name>       Username used for default branch name (dev/<username>)
   --branch <name>         Explicit branch name (overrides --username)
   --parent <branch>       Parent branch (default: ${DEFAULT_BRANCH})
+  --protected-branches    Comma-separated protected branch names (default: production)
   --project-id <id>       Neon project id (defaults to NEON_PROJECT_ID from dotenv-flow)
   --database-name <name>  Optional database name for connection string
   --role-name <name>      Optional role name for connection string
   --schema-only           Use schema-only branch creation (create/sync only)
+  --unsafe-allow-protected
+                          Bypass protection checks for destructive commands
   --no-pooled             Get direct connection string (default: pooled)
   --no-set-env            Do not write DATABASE_URL to .env.local
   --print-url             Print connection string to stdout
   --help                  Show this help
 `
+
+function normalizeBranchName(input: string) {
+  return input.trim().toLowerCase()
+}
+
+function parseProtectedBranches(input?: string) {
+  if (!input) return []
+  return input
+    .split(',')
+    .map((value) => normalizeBranchName(value))
+    .filter(Boolean)
+}
+
+function resolveProtectedBranches(input: string[]) {
+  return Array.from(
+    new Set(
+      [...DEFAULT_PROTECTED_BRANCHES, ...input]
+        .map((value) => normalizeBranchName(value))
+        .filter(Boolean),
+    ),
+  )
+}
 
 function parseArgs(argv: string[]) {
   let command: Command = 'sync'
@@ -71,11 +100,15 @@ function parseArgs(argv: string[]) {
 
   const options: CliOptions = {
     parent: process.env.NEON_PARENT_BRANCH ?? DEFAULT_BRANCH,
+    protectedBranches: resolveProtectedBranches(
+      parseProtectedBranches(process.env.NEON_PROTECTED_BRANCHES),
+    ),
     projectId: process.env.NEON_PROJECT_ID,
     databaseName: process.env.NEON_DATABASE_NAME,
     roleName: process.env.NEON_ROLE_NAME,
     pooled: true,
     schemaOnly: false,
+    unsafeAllowProtected: false,
     setEnv:
       command === 'create' ||
       command === 'reset' ||
@@ -105,6 +138,10 @@ function parseArgs(argv: string[]) {
     }
     if (key === 'schema-only') {
       options.schemaOnly = true
+      continue
+    }
+    if (key === 'unsafe-allow-protected') {
+      options.unsafeAllowProtected = true
       continue
     }
     if (key === 'pooled') {
@@ -137,6 +174,12 @@ function parseArgs(argv: string[]) {
     }
     if (key === 'parent') {
       options.parent = readValue()
+      continue
+    }
+    if (key === 'protected-branches') {
+      options.protectedBranches = resolveProtectedBranches(
+        parseProtectedBranches(readValue()),
+      )
       continue
     }
     if (key === 'project-id') {
@@ -204,6 +247,111 @@ function runNeon(baseArgs: string[], options: CliOptions, captureOutput = false)
 function branchExists(branch: string, options: CliOptions) {
   const result = runNeon(['branches', 'get', branch, '-o', 'json'], options, true)
   return result.status === 0
+}
+
+function parseJson(text: string) {
+  try {
+    return JSON.parse(text)
+  } catch {
+    return undefined
+  }
+}
+
+function keyMatches(key: string, candidates: Set<string>) {
+  const normalized = key.toLowerCase().replace(/[^a-z0-9]/g, '')
+  return candidates.has(normalized)
+}
+
+function hasTrueBooleanKey(input: unknown, candidateKeys: Set<string>): boolean {
+  if (Array.isArray(input)) {
+    return input.some((value) => hasTrueBooleanKey(value, candidateKeys))
+  }
+
+  if (!input || typeof input !== 'object') {
+    return false
+  }
+
+  const record = input as Record<string, unknown>
+
+  for (const [key, value] of Object.entries(record)) {
+    if (keyMatches(key, candidateKeys) && value === true) {
+      return true
+    }
+    if (hasTrueBooleanKey(value, candidateKeys)) {
+      return true
+    }
+  }
+
+  return false
+}
+
+function readBranchSafetyFlags(branch: string, options: CliOptions) {
+  const result = runNeon(['branches', 'get', branch, '-o', 'json'], options, true)
+  if (result.status !== 0) {
+    return { exists: false, isDefault: false, isProtected: false }
+  }
+
+  const parsed = parseJson(result.stdout || '')
+  if (!parsed) {
+    return { exists: true, isDefault: false, isProtected: false }
+  }
+
+  const defaultKeys = new Set([
+    'default',
+    'isdefault',
+    'defaultbranch',
+    'isdefaultbranch',
+  ])
+  const protectedKeys = new Set([
+    'protected',
+    'isprotected',
+    'protectedbranch',
+    'isprotectedbranch',
+  ])
+
+  return {
+    exists: true,
+    isDefault: hasTrueBooleanKey(parsed, defaultKeys),
+    isProtected: hasTrueBooleanKey(parsed, protectedKeys),
+  }
+}
+
+function assertDestructiveCommandIsSafe(
+  command: Command,
+  branch: string,
+  options: CliOptions,
+) {
+  if (!DESTRUCTIVE_COMMANDS.has(command)) return
+  if (options.unsafeAllowProtected) return
+
+  const normalizedBranch = normalizeBranchName(branch)
+  const protectedNames = new Set(
+    options.protectedBranches.map((value) => normalizeBranchName(value)),
+  )
+  protectedNames.add(normalizeBranchName(options.parent))
+
+  if (protectedNames.has(normalizedBranch)) {
+    throw new Error(
+      `Refusing to run "${command}" on protected branch "${branch}". ` +
+        `Protected names: ${Array.from(protectedNames).join(', ')}. ` +
+        'Use a non-protected dev branch or pass --unsafe-allow-protected.',
+    )
+  }
+
+  const branchFlags = readBranchSafetyFlags(branch, options)
+  if (!branchFlags.exists) return
+
+  if (branchFlags.isDefault || branchFlags.isProtected) {
+    const reasons = [
+      branchFlags.isDefault ? 'default' : null,
+      branchFlags.isProtected ? 'protected' : null,
+    ].filter(Boolean)
+    throw new Error(
+      `Refusing to run "${command}" on "${branch}" because Neon marks it as ` +
+        `${reasons.join(' and ')}. ` +
+        'Use a non-protected dev branch or pass --unsafe-allow-protected.',
+    )
+  }
 }
 
 function requireSuccess(result: ReturnType<typeof runNeon>, message: string) {
@@ -324,6 +472,7 @@ function main() {
   options.projectId = projectId
 
   const branch = resolveBranchName(options)
+  assertDestructiveCommandIsSafe(command, branch, options)
 
   if (command === 'delete') {
     const deleted = deleteBranch(branch, options)

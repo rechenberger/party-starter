@@ -1,8 +1,6 @@
 import { expect, test } from '@playwright/test'
-import { loginWithCredentials, setEnglishLocale } from '../support/auth'
+import { baseURL, loginWithCredentials, setEnglishLocale } from '../support/auth'
 import { getPartitionForWorker } from '../support/seed-manifest'
-
-const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:3000'
 
 test('credentials login plus username/password update works', async ({
   page,

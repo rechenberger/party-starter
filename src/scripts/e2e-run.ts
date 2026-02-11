@@ -2,8 +2,8 @@ import 'dotenv-flow/config'
 
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
 import fs from 'node:fs'
-import os from 'node:os'
 import path from 'node:path'
+import { findConnectionString, getWorkerCount } from './e2e-shared'
 
 type Mode = 'ci' | 'dev'
 
@@ -27,7 +27,6 @@ const DEFAULT_BASE_URL = 'http://127.0.0.1:3000'
 const DEFAULT_BRANCH_TTL_HOURS = 24
 const DEFAULT_EMAIL_FROM = 'e2e@example.com'
 const DEFAULT_SMTP_URL = 'smtp://e2e:e2e@127.0.0.1:2525'
-const DEFAULT_MAX_WORKERS = 6
 
 function parseArgs(argv: string[]): CliOptions {
   const options: CliOptions = {
@@ -74,16 +73,6 @@ function parseArgs(argv: string[]): CliOptions {
   }
 
   return options
-}
-
-function getWorkerCount() {
-  const fromEnv = Number(process.env.E2E_WORKERS)
-  if (Number.isInteger(fromEnv) && fromEnv > 0) {
-    return fromEnv
-  }
-
-  const cpuCount = os.cpus().length
-  return Math.max(1, Math.min(cpuCount, DEFAULT_MAX_WORKERS))
 }
 
 function createRunId() {
@@ -182,46 +171,6 @@ function requireSuccess(result: ReturnType<typeof runNeon>, message: string) {
   throw new Error(details ? `${message}\n${details}` : message)
 }
 
-function findConnectionString(input: unknown): string | undefined {
-  if (typeof input === 'string' && /^postgres(ql)?:\/\//i.test(input)) {
-    return input
-  }
-
-  if (Array.isArray(input)) {
-    for (const value of input) {
-      const match = findConnectionString(value)
-      if (match) {
-        return match
-      }
-    }
-    return undefined
-  }
-
-  if (!input || typeof input !== 'object') {
-    return undefined
-  }
-
-  const record = input as Record<string, unknown>
-  const preferredKeys = ['connectionString', 'connection_string', 'uri', 'url']
-
-  for (const key of preferredKeys) {
-    const value = record[key]
-    const match = findConnectionString(value)
-    if (match) {
-      return match
-    }
-  }
-
-  for (const value of Object.values(record)) {
-    const match = findConnectionString(value)
-    if (match) {
-      return match
-    }
-  }
-
-  return undefined
-}
-
 function getConnectionString({
   branch,
   projectId,
@@ -272,7 +221,7 @@ async function waitForServer(baseUrl: string) {
         method: 'GET',
         cache: 'no-store',
       })
-      if (response.status >= 200 && response.status < 600) {
+      if (response.status >= 200 && response.status < 400) {
         return
       }
     } catch {

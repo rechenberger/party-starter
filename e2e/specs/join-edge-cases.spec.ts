@@ -1,8 +1,6 @@
 import { expect, test } from '@playwright/test'
-import { loginWithCredentials } from '../support/auth'
+import { baseURL, loginWithCredentials } from '../support/auth'
 import { getPartitionForWorker } from '../support/seed-manifest'
-
-const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:3000'
 
 test('join flow handles expired/maxed/invalid codes, cancel, and already-member state', async ({
   page,

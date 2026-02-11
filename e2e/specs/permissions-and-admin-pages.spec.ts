@@ -1,8 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
-import { loginWithCredentials } from '../support/auth'
+import { baseURL, loginWithCredentials } from '../support/auth'
 import { getPartitionForWorker } from '../support/seed-manifest'
-
-const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:3000'
 
 test.describe.configure({ mode: 'serial' })
 

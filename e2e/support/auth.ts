@@ -1,13 +1,13 @@
 import { expect, type Page } from '@playwright/test'
 
-const baseUrl = process.env.BASE_URL ?? 'http://127.0.0.1:3000'
+export const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:3000'
 
 export const setEnglishLocale = async (page: Page) => {
   await page.context().addCookies([
     {
       name: 'locale',
       value: 'en',
-      url: baseUrl,
+      url: baseURL,
     },
   ])
 }

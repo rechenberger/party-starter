@@ -1,6 +1,7 @@
 import 'dotenv-flow/config'
 
 import { spawn, spawnSync } from 'node:child_process'
+import { findConnectionString } from './e2e-shared'
 
 const HELP_TEXT = `Neon dev seed helper
 
@@ -67,12 +68,19 @@ function resolveConnectionString(args: string[]) {
   }
 
   const output = [result.stdout, result.stderr].filter(Boolean).join('\n')
-  const match = output.match(/postgres(?:ql)?:\/\/[^\s"'`]+/i)
-  if (!match) {
-    throw new Error('Could not parse DATABASE_URL from neon-dev-branch url output')
+
+  try {
+    const parsed = JSON.parse(result.stdout || '{}')
+    const fromJson = findConnectionString(parsed)
+    if (fromJson) return fromJson
+  } catch {
+    // fall back to regex extraction
   }
 
-  return match[0]
+  const match = output.match(/postgres(?:ql)?:\/\/[^\s"'`]+/i)
+  if (match) return match[0]
+
+  throw new Error('Could not parse DATABASE_URL from neon-dev-branch url output')
 }
 
 async function main() {

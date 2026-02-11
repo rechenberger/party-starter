@@ -53,7 +53,12 @@ export const waitForCapturedMail = async ({
         continue
       }
 
-      const parsed = JSON.parse(raw) as CapturedMail
+      let parsed: CapturedMail
+      try {
+        parsed = JSON.parse(raw) as CapturedMail
+      } catch {
+        continue
+      }
       const createdAtMs = Number.isNaN(Date.parse(parsed.createdAt))
         ? 0
         : Date.parse(parsed.createdAt)

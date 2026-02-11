@@ -1,9 +1,7 @@
 import { expect, test } from '@playwright/test'
-import { setEnglishLocale } from '../support/auth'
+import { baseURL, setEnglishLocale } from '../support/auth'
 import { extractVerifyUrl, waitForCapturedMail } from '../support/mail-capture'
 import { getPartitionForWorker } from '../support/seed-manifest'
-
-const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:3000'
 
 test.describe.configure({ mode: 'serial' })
 

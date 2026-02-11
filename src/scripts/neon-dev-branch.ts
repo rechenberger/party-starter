@@ -4,6 +4,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { findConnectionString } from './e2e-shared'
 
 type Command = 'create' | 'reset' | 'sync' | 'url' | 'env' | 'delete'
 
@@ -384,33 +385,6 @@ function deleteBranch(branch: string, options: CliOptions) {
   )
 
   return true
-}
-
-function findConnectionString(input: unknown): string | undefined {
-  if (typeof input === 'string' && /^postgres(ql)?:\/\//i.test(input)) {
-    return input
-  }
-  if (Array.isArray(input)) {
-    for (const value of input) {
-      const match = findConnectionString(value)
-      if (match) return match
-    }
-    return undefined
-  }
-  if (!input || typeof input !== 'object') return undefined
-
-  const record = input as Record<string, unknown>
-  const preferredKeys = ['connectionString', 'connection_string', 'uri', 'url']
-  for (const key of preferredKeys) {
-    const value = record[key]
-    const match = findConnectionString(value)
-    if (match) return match
-  }
-  for (const value of Object.values(record)) {
-    const match = findConnectionString(value)
-    if (match) return match
-  }
-  return undefined
 }
 
 function getConnectionString(branch: string, options: CliOptions) {

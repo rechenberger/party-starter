@@ -5,8 +5,8 @@ import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { and, asc, eq, inArray } from 'drizzle-orm'
 import fs from 'node:fs/promises'
-import os from 'node:os'
 import path from 'node:path'
+import { getWorkerCount } from './e2e-shared'
 
 type SeedUserName =
   | 'owner'
@@ -50,21 +50,11 @@ type SeedManifest = {
   partitions: SeedPartition[]
 }
 
-const DEFAULT_MAX_WORKERS = 6
-
 function sanitize(input: string) {
   return input
     .toLowerCase()
     .replace(/[^a-z0-9-]+/g, '-')
     .replace(/-+/g, '-')
-}
-
-function getWorkerCount() {
-  const fromEnv = Number(process.env.E2E_WORKERS)
-  if (Number.isInteger(fromEnv) && fromEnv > 0) {
-    return fromEnv
-  }
-  return Math.max(1, Math.min(os.cpus().length, DEFAULT_MAX_WORKERS))
 }
 
 async function upsertUser({
@@ -92,6 +82,9 @@ async function upsertUser({
 
   if (existingUsers.length > 1) {
     const duplicateIds = existingUsers.slice(1).map((entry) => entry.id)
+    console.warn(
+      `Removing ${duplicateIds.length} duplicate user(s) for ${email}: ${duplicateIds.join(', ')}`,
+    )
     await db.delete(schema.users).where(inArray(schema.users.id, duplicateIds))
   }
 

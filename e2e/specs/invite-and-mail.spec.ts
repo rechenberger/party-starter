@@ -1,9 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
-import { loginWithCredentials } from '../support/auth'
+import { baseURL, loginWithCredentials } from '../support/auth'
 import { extractJoinUrl, waitForCapturedMail } from '../support/mail-capture'
 import { getPartitionForWorker } from '../support/seed-manifest'
-
-const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:3000'
 
 const maybeLoginOnCurrentPage = async ({
   page,
@@ -57,7 +55,9 @@ const completeJoinFlow = async ({
 
   if (joinButtonVisible) {
     await joinButton.click()
-    await page.waitForLoadState('networkidle').catch(() => undefined)
+    await expect(page).not.toHaveURL(/\/join\//, { timeout: 20_000 }).catch(
+      () => undefined,
+    )
   }
 
   await expect(page).not.toHaveURL(/\/auth\/login/)

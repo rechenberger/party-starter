@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { DefaultTemplate } from './DefaultTemplate'
 
 export const verifyEmailEmail = createEmailTemplate({
+  name: 'verify-email',
   schema: z.object({
     verifyUrl: z.string(),
   }),

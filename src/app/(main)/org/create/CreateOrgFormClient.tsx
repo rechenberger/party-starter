@@ -69,6 +69,7 @@ export const CreateOrgFormClient = ({
                     <FormLabel>{t.org.createOrg.name}</FormLabel>
                     <FormControl>
                       <Input
+                        data-testid="create-org-name"
                         {...field}
                         placeholder={t.org.createOrg.placeholder}
                       />
@@ -78,7 +79,11 @@ export const CreateOrgFormClient = ({
                 )}
               />
               <div className="flex flex-row gap-2 justify-end">
-                <Button type="submit" disabled={disabled}>
+                <Button
+                  data-testid="create-org-submit"
+                  type="submit"
+                  disabled={disabled}
+                >
                   {t.org.create}
                 </Button>
               </div>

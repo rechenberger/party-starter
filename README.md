@@ -24,6 +24,7 @@
   - add `NEON_PROJECT_ID` to [.env.local](.env.local)
   - run `pnpm neon:auth` once
   - run `pnpm neon:dev:use` to create/reset your `dev/<username>` branch and set `DATABASE_URL`
+  - run `pnpm neon:dev:seed` for a fresh schema-only branch + seeded local data
 - Connect OAuth
   - [Create Discord Developer App](https://discord.com/developers/applications)
   - Goto OAuth2
@@ -50,8 +51,93 @@
 - `pnpm neon:dev:use`: create-or-reset your `dev/<username>` branch from `production` and update `DATABASE_URL`
 - `pnpm neon:dev:env`: only update `DATABASE_URL` for your branch (no create/reset)
 - `pnpm neon:prod:env`: set `DATABASE_URL` to the `production` branch
-- `pnpm neon:dev:create` / `pnpm neon:dev:reset`: explicit branch actions
+- `pnpm neon:dev:create` / `pnpm neon:dev:reset` / `pnpm neon:dev:delete`: explicit branch actions
+- `pnpm neon:dev:seed`: delete `dev/<username>`, recreate schema-only, set `DATABASE_URL`, run `pnpm db:push`, then `pnpm e2e:seed`
 - override target with `--username <name>` or `--branch <branch-name>`
+- destructive commands (`sync`, `reset`, `delete`) now refuse protected/default branches by name and Neon metadata checks
+- add extra protected branch names with `NEON_PROTECTED_BRANCHES="production,main"`
+- emergency bypass exists via `--unsafe-allow-protected` (not recommended)
+
+### Protect production branch in Neon
+
+- In Neon Console, open your `production` branch and enable **Protected branch**
+- Recommended because it blocks dangerous branch-level actions such as reset/delete on that branch
+- Existing workflow impact:
+  - `pnpm neon:dev:*` commands for `dev/<username>` continue to work
+  - `pnpm neon:prod:env` continues to work (it only reads connection info)
+  - `pnpm db:push` still works as long as `DATABASE_URL` has valid credentials for the target branch
+- If branch password is enabled for protected branches in Neon, ensure your `DATABASE_URL` includes valid credentials
+
+## E2E Testing
+
+This template has a dual-mode Playwright setup:
+
+- CI mode (`next build` + `next start`) with a dedicated schema-only Neon branch per run
+- Dev mode (`next dev`) for fast local iteration without forced branch lifecycle
+
+### Setup
+
+- Install Playwright browser once:
+  - `pnpm e2e:install`
+- Ensure `AUTH_SECRET` is set
+- CI mode additionally requires:
+  - `NEON_PROJECT_ID`
+  - `NEON_API_KEY`
+
+### GitHub Actions Setup
+
+- Workflow file:
+  - `.github/workflows/e2e.yml`
+- Add these **Repository secrets** in GitHub:
+  - `Settings` -> `Secrets and variables` -> `Actions` -> `Repository secrets`
+  - `AUTH_SECRET`
+  - `NEON_PROJECT_ID`
+  - `NEON_API_KEY`
+- Optional repository variable:
+  - `E2E_WORKERS` (override automatic worker count in CI)
+- Note:
+  - This workflow currently reads `secrets.*` and does not set `jobs.<job>.environment`, so use repository secrets (not environment-scoped secrets).
+
+### CI Mode (production-like)
+
+- Run full orchestration:
+  - `pnpm e2e:ci`
+- This does:
+  - create unique Neon test branch (`e2e/<run-id>`, schema-only)
+  - `pnpm db:push`
+  - `pnpm e2e:seed`
+  - `next build` + `next start`
+  - Playwright run (`playwright.ci.config.ts`)
+  - branch cleanup (delete, plus expiration fallback)
+
+### Dev Mode (local changes)
+
+- Use existing local dev server or let Playwright start one:
+  - `pnpm e2e:dev`
+- Run specific files:
+  - `pnpm e2e:dev -- e2e/specs/org-members.spec.ts`
+- Run grep filter:
+  - `pnpm e2e:dev -- --grep \"impersonate\"`
+
+### Seed and Artifacts
+
+- Seed script (manual in dev mode):
+  - `pnpm e2e:seed`
+- Full local Neon refresh + seed:
+  - `pnpm neon:dev:seed`
+- Default artifacts:
+  - `.e2e-artifacts/<run-id>/...`
+- E2E env contracts:
+  - `E2E_MODE=ci|dev`
+  - `E2E_RUN_ID`
+  - `E2E_WORKERS`
+  - `E2E_SEED_MANIFEST`
+  - `E2E_MAIL_CAPTURE_DIR`
+
+### Mail Capture
+
+- If `E2E_MAIL_CAPTURE_DIR` is set, mails are rendered and written as JSON artifacts instead of being sent via SMTP.
+- This is used by E2E tests to validate invite email content and links without external delivery.
 
 ## Run
 

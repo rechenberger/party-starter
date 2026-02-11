@@ -147,6 +147,7 @@ export const LoginFormClient = ({
                     <FormLabel>{t.standardWords.email}</FormLabel>
                     <FormControl>
                       <Input
+                        data-testid="login-email"
                         type="text"
                         autoComplete="username email"
                         {...field}
@@ -184,6 +185,7 @@ export const LoginFormClient = ({
                       </div>
                       <FormControl>
                         <Input
+                          data-testid="login-password"
                           type="password"
                           autoComplete={
                             type === 'login'
@@ -208,6 +210,7 @@ export const LoginFormClient = ({
                         <FormLabel>{t.standardWords.confirmPassword}</FormLabel>
                         <FormControl>
                           <Input
+                            data-testid="register-confirm-password"
                             type="password"
                             autoComplete="new-password"
                             {...field}
@@ -243,6 +246,7 @@ export const LoginFormClient = ({
               )}
               <div className="flex flex-row gap-2 mt-4 justify-end">
                 <Button
+                  data-testid="login-toggle-mode"
                   variant={'outline'}
                   type="button"
                   className={cn('flex-1')}
@@ -255,7 +259,12 @@ export const LoginFormClient = ({
                     ? t.auth.registerAction
                     : t.auth.backToLogin}
                 </Button>
-                <Button type="submit" className="flex-1" disabled={disabled}>
+                <Button
+                  data-testid="login-submit"
+                  type="submit"
+                  className="flex-1"
+                  disabled={disabled}
+                >
                   {mainLabel}
                 </Button>
               </div>

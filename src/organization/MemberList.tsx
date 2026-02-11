@@ -147,7 +147,10 @@ export const MemberList = ({
                 {filteredMemberships.map((membership) => {
                   const isMyMember = membership.userId === myUserId
                   return (
-                    <TableRow key={membership.userId}>
+                    <TableRow
+                      key={membership.userId}
+                      data-testid={`member-row-${membership.userId}`}
+                    >
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <UserAvatar user={membership.user} />
@@ -183,7 +186,10 @@ export const MemberList = ({
                             disabled={isChangeRoleLoading}
                             value={membership.role}
                           >
-                            <SelectTrigger className="w-[110px]">
+                            <SelectTrigger
+                              className="w-[110px]"
+                              data-testid={`member-role-trigger-${membership.userId}`}
+                            >
                               <SelectValue
                                 placeholder={
                                   t.org.members.selectRolePlaceholder
@@ -192,7 +198,11 @@ export const MemberList = ({
                             </SelectTrigger>
                             <SelectContent>
                               {organizationRoleDefinitions.map((role) => (
-                                <SelectItem key={role.name} value={role.name}>
+                                <SelectItem
+                                  data-testid={`member-role-option-${membership.userId}-${role.name}`}
+                                  key={role.name}
+                                  value={role.name}
+                                >
                                   {t.roles[role.i18nKey]}
                                 </SelectItem>
                               ))}
@@ -213,6 +223,7 @@ export const MemberList = ({
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <ActionButton
+                              data-testid={`member-kick-${membership.userId}`}
                               variant="ghost"
                               size="icon"
                               // disabled={isDeleting}

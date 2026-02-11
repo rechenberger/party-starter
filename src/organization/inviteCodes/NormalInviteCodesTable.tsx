@@ -58,6 +58,7 @@ export const NormalInviteCodesTable = async (
           <CardTitle>{t.inviteCodes.normalCodes.title}</CardTitle>
           <div className="flex gap-2">
             <ActionButton
+              data-testid="invite-normal-create-button"
               size="sm"
               icon={<PlusCircle className="mr-2 h-4 w-4" />}
               action={async () => {
@@ -147,7 +148,11 @@ export const NormalInviteCodesTable = async (
               ) : (
                 inviteCodes.map((code) => {
                   return (
-                    <TableRow key={code.id}>
+                    <TableRow
+                      key={code.id}
+                      data-testid={`invite-code-row-${code.id}`}
+                      data-invite-code={code.id}
+                    >
                       <TableCell
                         className={cn(
                           'font-mono',
@@ -155,6 +160,7 @@ export const NormalInviteCodesTable = async (
                         )}
                       >
                         <CopyToClipboardButton
+                          data-testid={`invite-code-copy-${code.id}`}
                           textToDisplay={code.id}
                           size="vanilla"
                           textToCopy={getInviteCodeUrl({

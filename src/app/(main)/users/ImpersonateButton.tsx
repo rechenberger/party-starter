@@ -21,6 +21,7 @@ export const ImpersonateButton = ({ userId }: { userId: string }) => {
   return (
     <>
       <Button
+        data-testid={`impersonate-button-${userId}`}
         size="sm"
         variant={'outline'}
         className="flex-1"

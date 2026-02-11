@@ -15,7 +15,9 @@ export const InputWithButton = ({
 }: {
   label?: string
   icon: React.ReactNode
-  inputProps: React.ComponentProps<typeof Input>
+  inputProps: React.ComponentProps<typeof Input> & {
+    'data-testid'?: string
+  }
   buttonProps: React.ComponentProps<typeof Button>
 }) => {
   const id = useId()

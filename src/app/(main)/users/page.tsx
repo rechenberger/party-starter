@@ -93,7 +93,10 @@ export default async function Page({
           const isCurrentUser = myUserId === user.id
           return (
             <Fragment key={user.id}>
-              <Card className={cn(isCurrentUser && 'border-primary')}>
+              <Card
+                data-testid={`user-card-${user.id}`}
+                className={cn(isCurrentUser && 'border-primary')}
+              >
                 <CardHeader>
                   <CardTitle className="flex gap-2 items-center">
                     <UserAvatar user={user} />
@@ -179,6 +182,7 @@ export default async function Page({
                   </label>
                   <div className="flex flex-row gap-2 items-center flex-1">
                     <ActionButton
+                      data-testid={`user-delete-${user.id}`}
                       size="sm"
                       variant={'outline'}
                       askForConfirmation={{

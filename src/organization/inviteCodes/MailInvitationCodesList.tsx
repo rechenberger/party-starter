@@ -143,6 +143,7 @@ export const MailInvitationCodesList = async (
           <CardTitle>{t.inviteCodes.mailInvitations.title}</CardTitle>
           <div className="flex gap-2">
             <ActionButton
+              data-testid="invite-mail-create-button"
               size="sm"
               icon={<Mail className="h-4 w-4" />}
               action={async () => {
@@ -224,7 +225,10 @@ export const MailInvitationCodesList = async (
                       ? t.inviteCodes.status.expired
                       : t.inviteCodes.status.pending
                   return (
-                    <TableRow key={code.id}>
+                    <TableRow
+                      key={code.id}
+                      data-testid={`invite-mail-row-${code.id}`}
+                    >
                       <TableCell className={cn()}>{code.sentToEmail}</TableCell>
                       <TableCell>
                         <Badge

@@ -83,6 +83,7 @@ export const ChangePasswordFormClient = ({
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
+                  data-testid="change-password-email"
                   name="email"
                   autoComplete="username"
                   type="email"
@@ -102,6 +103,7 @@ export const ChangePasswordFormClient = ({
                 <FormLabel>{t.standardWords.password}</FormLabel>
                 <FormControl>
                   <Input
+                    data-testid="change-password-input"
                     type="password"
                     autoComplete="new-password"
                     {...field}
@@ -120,6 +122,7 @@ export const ChangePasswordFormClient = ({
                 <FormLabel>{t.standardWords.confirmPassword}</FormLabel>
                 <FormControl>
                   <Input
+                    data-testid="change-password-confirm"
                     type="password"
                     autoComplete="new-password"
                     {...field}
@@ -137,7 +140,11 @@ export const ChangePasswordFormClient = ({
                 </Button>
               </Link>
             )}
-            <Button type="submit" disabled={disabled}>
+            <Button
+              data-testid="change-password-submit"
+              type="submit"
+              disabled={disabled}
+            >
               {t.userManagement.changePasswordAction}
             </Button>
           </div>

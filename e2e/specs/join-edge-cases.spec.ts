@@ -32,8 +32,8 @@ test('join flow handles expired/maxed/invalid codes, cancel, and already-member 
   await expect(page.getByText(/page not found/i)).toBeVisible()
 
   await page.goto(`/join/${orgSlug}/${codes.valid}`)
-  await expect(page.getByTestId('join-org-submit')).toBeVisible()
-  await page.getByTestId('join-org-cancel').click()
+  await expect(page.getByTestId('join-org-submit').first()).toBeVisible()
+  await page.getByTestId('join-org-cancel').first().click()
   await expect(page).not.toHaveURL(/\/join\//)
 
   const ownerContext = await browser.newContext({ baseURL })

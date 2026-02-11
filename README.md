@@ -71,6 +71,20 @@ This template has a dual-mode Playwright setup:
   - `NEON_PROJECT_ID`
   - `NEON_API_KEY`
 
+### GitHub Actions Setup
+
+- Workflow file:
+  - `.github/workflows/e2e.yml`
+- Add these **Repository secrets** in GitHub:
+  - `Settings` -> `Secrets and variables` -> `Actions` -> `Repository secrets`
+  - `AUTH_SECRET`
+  - `NEON_PROJECT_ID`
+  - `NEON_API_KEY`
+- Optional repository variable:
+  - `E2E_WORKERS` (override automatic worker count in CI)
+- Note:
+  - This workflow currently reads `secrets.*` and does not set `jobs.<job>.environment`, so use repository secrets (not environment-scoped secrets).
+
 ### CI Mode (production-like)
 
 - Run full orchestration:

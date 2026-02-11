@@ -2,6 +2,7 @@
   "name": "party-starter",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.19.0",
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:e2e": "next dev -p 3000",

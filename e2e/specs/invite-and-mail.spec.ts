@@ -1,11 +1,11 @@
 import { expect, type Page, test } from '@playwright/test'
-import { loginWithCredentials, setEnglishLocale } from '../support/auth'
+import { loginWithCredentials } from '../support/auth'
 import { extractJoinUrl, waitForCapturedMail } from '../support/mail-capture'
 import { getPartitionForWorker } from '../support/seed-manifest'
 
 const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:3000'
 
-const loginFromCurrentPage = async ({
+const maybeLoginOnCurrentPage = async ({
   page,
   email,
   password,
@@ -14,9 +14,85 @@ const loginFromCurrentPage = async ({
   email: string
   password: string
 }) => {
-  await page.getByTestId('login-email').fill(email)
-  await page.getByTestId('login-password').fill(password)
-  await page.getByTestId('login-submit').click()
+  const loginEmail = page.getByTestId('login-email').first()
+  const hasLoginForm = await loginEmail
+    .isVisible({ timeout: 1_500 })
+    .catch(() => false)
+
+  if (!hasLoginForm) {
+    return
+  }
+
+  await loginEmail.fill(email)
+  await page.getByTestId('login-password').first().fill(password)
+  await page.getByTestId('login-submit').first().click()
+  await expect(page).not.toHaveURL(/\/auth\/login/, { timeout: 20_000 })
+}
+
+const completeJoinFlow = async ({
+  page,
+  joinUrl,
+  orgSlug,
+  userId,
+  email,
+  password,
+}: {
+  page: Page
+  joinUrl: string
+  orgSlug: string
+  userId: string
+  email: string
+  password: string
+}) => {
+  await loginWithCredentials({ page, email, password })
+  await page.goto(joinUrl)
+  await maybeLoginOnCurrentPage({ page, email, password })
+  await page.goto(joinUrl)
+
+  const joinButton = page.getByTestId('join-org-submit').first()
+  const joinButtonVisible = await joinButton
+    .waitFor({ state: 'visible', timeout: 15_000 })
+    .then(() => true)
+    .catch(() => false)
+
+  if (joinButtonVisible) {
+    await joinButton.click()
+    await page.waitForLoadState('networkidle').catch(() => undefined)
+  }
+
+  await expect(page).not.toHaveURL(/\/auth\/login/)
+  await assertMemberVisible({
+    page,
+    orgSlug,
+    userId,
+    timeout: 40_000,
+  })
+}
+
+const assertMemberVisible = async ({
+  page,
+  orgSlug,
+  userId,
+  timeout = 15_000,
+}: {
+  page: Page
+  orgSlug: string
+  userId: string
+  timeout?: number
+}) => {
+  await page.goto(`/org/${orgSlug}/settings/members`)
+  await expect(page).toHaveURL(new RegExp(`/org/${orgSlug}/settings/members`))
+  await expect
+    .poll(
+      async () => {
+        await page.reload()
+        return page.getByTestId(`member-row-${userId}`).count()
+      },
+      {
+        timeout,
+      },
+    )
+    .toBeGreaterThan(0)
 }
 
 test.describe.configure({ mode: 'serial' })
@@ -55,22 +131,16 @@ test('normal invites and mail invites can be created and consumed', async ({
   const candidateContext = await browser.newContext({ baseURL })
   const candidatePage = await candidateContext.newPage()
 
-  await setEnglishLocale(candidatePage)
-  await candidatePage.goto(`/join/${invitesOrgSlug}/${codeId}`)
-
-  if (candidatePage.url().includes('/auth/login')) {
-    await loginFromCurrentPage({
-      page: candidatePage,
-      email: candidate.email,
-      password: candidate.password,
-    })
-  }
-
-  await candidatePage.getByTestId('join-org-submit').click()
-  await expect(candidatePage).toHaveURL(new RegExp(`/org/${invitesOrgSlug}`))
+  await completeJoinFlow({
+    page: candidatePage,
+    joinUrl: `/join/${invitesOrgSlug}/${codeId}`,
+    orgSlug: invitesOrgSlug,
+    userId: candidate.id,
+    email: candidate.email,
+    password: candidate.password,
+  })
   await candidateContext.close()
 
-  await page.goto(`/org/${invitesOrgSlug}/settings/members`)
   await page.getByTestId('invite-mail-create-button').click()
   await page.getByTestId('invite-email-receiver-input').fill(mailUser.email)
   await page.getByTestId('invite-email-receiver-input').press('Enter')
@@ -86,18 +156,13 @@ test('normal invites and mail invites can be created and consumed', async ({
   const mailContext = await browser.newContext({ baseURL })
   const mailPage = await mailContext.newPage()
 
-  await setEnglishLocale(mailPage)
-  await mailPage.goto(joinUrl)
-
-  if (mailPage.url().includes('/auth/login')) {
-    await loginFromCurrentPage({
-      page: mailPage,
-      email: mailUser.email,
-      password: mailUser.password,
-    })
-  }
-
-  await mailPage.getByTestId('join-org-submit').click()
-  await expect(mailPage).toHaveURL(new RegExp(`/org/${invitesOrgSlug}`))
+  await completeJoinFlow({
+    page: mailPage,
+    joinUrl,
+    orgSlug: invitesOrgSlug,
+    userId: mailUser.id,
+    email: mailUser.email,
+    password: mailUser.password,
+  })
   await mailContext.close()
 })

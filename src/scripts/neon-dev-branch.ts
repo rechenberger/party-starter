@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
-import { findConnectionString } from './e2e-shared'
+import { extractConnectionString } from './e2e-shared'
 
 type Command = 'create' | 'reset' | 'sync' | 'url' | 'env' | 'delete'
 
@@ -396,20 +396,7 @@ function getConnectionString(branch: string, options: CliOptions) {
   const result = runNeon(args, options, true)
   requireSuccess(result, `Failed to fetch connection string for "${branch}"`)
 
-  const output = [result.stdout, result.stderr].filter(Boolean).join('\n')
-
-  try {
-    const parsed = JSON.parse(result.stdout || '{}')
-    const fromJson = findConnectionString(parsed)
-    if (fromJson) return fromJson
-  } catch {
-    // Fall back to regex extraction for non-json output.
-  }
-
-  const regexMatch = output.match(/postgres(?:ql)?:\/\/[^\s"'`]+/i)
-  if (regexMatch) return regexMatch[0]
-
-  throw new Error('Could not parse connection string from neonctl output')
+  return extractConnectionString(result.stdout || '', result.stderr || '')
 }
 
 function upsertEnvDatabaseUrl(connectionString: string) {

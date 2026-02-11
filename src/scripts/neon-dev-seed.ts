@@ -1,7 +1,7 @@
 import 'dotenv-flow/config'
 
-import { spawn, spawnSync } from 'node:child_process'
-import { findConnectionString } from './e2e-shared'
+import { spawnSync } from 'node:child_process'
+import { extractConnectionString, spawnAndWait } from './e2e-shared'
 
 const HELP_TEXT = `Neon dev seed helper
 
@@ -18,34 +18,6 @@ This command runs:
 
 All CLI options are forwarded to neon-dev-branch.ts.
 `
-
-function spawnAndWait(
-  command: string,
-  args: string[],
-  env: NodeJS.ProcessEnv = process.env,
-) {
-  return new Promise<void>((resolve, reject) => {
-    const child = spawn(command, args, {
-      stdio: 'inherit',
-      env,
-    })
-
-    child.on('error', reject)
-    child.on('exit', (code, signal) => {
-      if (code === 0) {
-        resolve()
-        return
-      }
-      reject(
-        new Error(
-          `${command} ${args.join(' ')} failed with ${
-            signal ? `signal ${signal}` : `exit code ${code}`
-          }`,
-        ),
-      )
-    })
-  })
-}
 
 function resolveConnectionString(args: string[]) {
   const result = spawnSync(
@@ -67,20 +39,7 @@ function resolveConnectionString(args: string[]) {
     throw new Error(details || 'Failed to resolve Neon branch connection string')
   }
 
-  const output = [result.stdout, result.stderr].filter(Boolean).join('\n')
-
-  try {
-    const parsed = JSON.parse(result.stdout || '{}')
-    const fromJson = findConnectionString(parsed)
-    if (fromJson) return fromJson
-  } catch {
-    // fall back to regex extraction
-  }
-
-  const match = output.match(/postgres(?:ql)?:\/\/[^\s"'`]+/i)
-  if (match) return match[0]
-
-  throw new Error('Could not parse DATABASE_URL from neon-dev-branch url output')
+  return extractConnectionString(result.stdout || '', result.stderr || '')
 }
 
 async function main() {

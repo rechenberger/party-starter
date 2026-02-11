@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process'
 import os from 'node:os'
 
 const DEFAULT_MAX_WORKERS = 6
@@ -8,6 +9,34 @@ export function getWorkerCount() {
     return fromEnv
   }
   return Math.max(1, Math.min(os.cpus().length, DEFAULT_MAX_WORKERS))
+}
+
+export function spawnAndWait(
+  command: string,
+  args: string[],
+  env: NodeJS.ProcessEnv = process.env,
+) {
+  return new Promise<void>((resolve, reject) => {
+    const child = spawn(command, args, {
+      stdio: 'inherit',
+      env,
+    })
+
+    child.on('error', reject)
+    child.on('exit', (code, signal) => {
+      if (code === 0) {
+        resolve()
+        return
+      }
+      reject(
+        new Error(
+          `${command} ${args.join(' ')} failed with ${
+            signal ? `signal ${signal}` : `exit code ${code}`
+          }`,
+        ),
+      )
+    })
+  })
 }
 
 export function findConnectionString(input: unknown): string | undefined {
@@ -37,4 +66,24 @@ export function findConnectionString(input: unknown): string | undefined {
     if (match) return match
   }
   return undefined
+}
+
+export function extractConnectionString(
+  stdout: string,
+  stderr?: string,
+): string {
+  const output = [stdout, stderr].filter(Boolean).join('\n')
+
+  try {
+    const parsed = JSON.parse(stdout || '{}')
+    const fromJson = findConnectionString(parsed)
+    if (fromJson) return fromJson
+  } catch {
+    // fall back to regex extraction
+  }
+
+  const regexMatch = output.match(/postgres(?:ql)?:\/\/[^\s"'`]+/i)
+  if (regexMatch) return regexMatch[0]
+
+  throw new Error('Could not parse connection string from neonctl output')
 }

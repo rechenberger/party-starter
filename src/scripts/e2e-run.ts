@@ -3,7 +3,11 @@ import 'dotenv-flow/config'
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
-import { findConnectionString, getWorkerCount } from './e2e-shared'
+import {
+  extractConnectionString,
+  getWorkerCount,
+  spawnAndWait,
+} from './e2e-shared'
 
 type Mode = 'ci' | 'dev'
 
@@ -91,30 +95,6 @@ function sanitizeRunId(runId: string) {
   return runId.toLowerCase().replace(/[^a-z0-9-]+/g, '-')
 }
 
-function spawnAndWait(command: string, args: string[], env: NodeJS.ProcessEnv) {
-  return new Promise<void>((resolve, reject) => {
-    const child = spawn(command, args, {
-      stdio: 'inherit',
-      env,
-    })
-
-    child.on('error', reject)
-    child.on('exit', (code, signal) => {
-      if (code === 0) {
-        resolve()
-        return
-      }
-      reject(
-        new Error(
-          `${command} ${args.join(' ')} failed with ${
-            signal ? `signal ${signal}` : `exit code ${code}`
-          }`,
-        ),
-      )
-    })
-  })
-}
-
 function waitForExit(child: ChildProcess) {
   return new Promise<void>((resolve) => {
     child.once('exit', () => resolve())
@@ -191,24 +171,7 @@ function getConnectionString({
     `Failed to get connection string for branch "${branch}"`,
   )
 
-  const output = [result.stdout, result.stderr].filter(Boolean).join('\n')
-
-  try {
-    const parsed = JSON.parse(result.stdout || '{}')
-    const fromJson = findConnectionString(parsed)
-    if (fromJson) {
-      return fromJson
-    }
-  } catch {
-    // fall back to regex extraction
-  }
-
-  const regexMatch = output.match(/postgres(?:ql)?:\/\/[^\s"'`]+/i)
-  if (regexMatch) {
-    return regexMatch[0]
-  }
-
-  throw new Error('Could not parse connection string from neonctl output')
+  return extractConnectionString(result.stdout || '', result.stderr || '')
 }
 
 async function waitForServer(baseUrl: string) {

@@ -300,10 +300,12 @@ function createCiEnv({
   databaseUrl: string
   workerCount: number
 }) {
+  const baseUrl = process.env.BASE_URL ?? DEFAULT_BASE_URL
   return withAuthMailDefaults({
     ...process.env,
     DATABASE_URL: databaseUrl,
-    BASE_URL: process.env.BASE_URL ?? DEFAULT_BASE_URL,
+    BASE_URL: baseUrl,
+    AUTH_URL: process.env.AUTH_URL ?? baseUrl,
     E2E_MODE: 'ci',
     E2E_RUN_ID: runId,
     E2E_WORKERS: String(workerCount),
@@ -325,9 +327,11 @@ function createDevEnv() {
 
   fs.mkdirSync(mailCaptureDir, { recursive: true })
 
+  const baseUrl = process.env.BASE_URL ?? DEFAULT_BASE_URL
   return withAuthMailDefaults({
     ...process.env,
-    BASE_URL: process.env.BASE_URL ?? DEFAULT_BASE_URL,
+    BASE_URL: baseUrl,
+    AUTH_URL: process.env.AUTH_URL ?? baseUrl,
     E2E_MODE: 'dev',
     E2E_RUN_ID: runId,
     E2E_WORKERS: String(workerCount),

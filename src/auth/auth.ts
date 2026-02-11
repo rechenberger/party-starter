@@ -13,7 +13,6 @@ import { ImpersonateProvider } from './ImpersonateProvider'
 const hasEmailEnvVars = !!process.env.EMAIL_FROM && !!process.env.SMTP_URL
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  trustHost: true,
   adapter: {
     ...DrizzleAdapter(db),
     useVerificationToken: async (params) => {

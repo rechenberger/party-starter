@@ -12,6 +12,7 @@ jobs:
     timeout-minutes: 45
     env:
       BASE_URL: http://127.0.0.1:3000
+      AUTH_URL: http://127.0.0.1:3000
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
       NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
       NEON_API_KEY: ${{ secrets.NEON_API_KEY }}

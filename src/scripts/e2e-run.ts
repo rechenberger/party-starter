@@ -25,6 +25,9 @@ Direct:
 const DEFAULT_PARENT_BRANCH = 'production'
 const DEFAULT_BASE_URL = 'http://127.0.0.1:3000'
 const DEFAULT_BRANCH_TTL_HOURS = 24
+const DEFAULT_EMAIL_FROM = 'e2e@example.com'
+const DEFAULT_SMTP_URL = 'smtp://e2e:e2e@127.0.0.1:2525'
+const DEFAULT_MAX_WORKERS = 6
 
 function parseArgs(argv: string[]): CliOptions {
   const options: CliOptions = {
@@ -80,7 +83,7 @@ function getWorkerCount() {
   }
 
   const cpuCount = os.cpus().length
-  return Math.max(1, cpuCount)
+  return Math.max(1, Math.min(cpuCount, DEFAULT_MAX_WORKERS))
 }
 
 function createRunId() {
@@ -297,7 +300,7 @@ function createCiEnv({
   databaseUrl: string
   workerCount: number
 }) {
-  return {
+  return withAuthMailDefaults({
     ...process.env,
     DATABASE_URL: databaseUrl,
     BASE_URL: process.env.BASE_URL ?? DEFAULT_BASE_URL,
@@ -307,7 +310,7 @@ function createCiEnv({
     E2E_ARTIFACTS_DIR: artifactsDir,
     E2E_MAIL_CAPTURE_DIR: mailCaptureDir,
     E2E_SEED_MANIFEST: manifestPath,
-  }
+  })
 }
 
 function createDevEnv() {
@@ -322,7 +325,7 @@ function createDevEnv() {
 
   fs.mkdirSync(mailCaptureDir, { recursive: true })
 
-  return {
+  return withAuthMailDefaults({
     ...process.env,
     BASE_URL: process.env.BASE_URL ?? DEFAULT_BASE_URL,
     E2E_MODE: 'dev',
@@ -331,6 +334,14 @@ function createDevEnv() {
     E2E_ARTIFACTS_DIR: artifactsDir,
     E2E_MAIL_CAPTURE_DIR: mailCaptureDir,
     E2E_SEED_MANIFEST: manifestPath,
+  })
+}
+
+function withAuthMailDefaults(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  return {
+    ...env,
+    EMAIL_FROM: env.EMAIL_FROM?.trim() || DEFAULT_EMAIL_FROM,
+    SMTP_URL: env.SMTP_URL?.trim() || DEFAULT_SMTP_URL,
   }
 }
 

@@ -13,14 +13,25 @@ export type SeedPartition = {
   orgs: {
     members: string
     invites: string
+    membersReadonly: string
+    joinEdge: string
+  }
+  inviteCodes: {
+    joinEdge: {
+      valid: string
+      expired: string
+      maxed: string
+    }
   }
   users: {
     owner: SeedUser
     adminAlt: SeedUser
     member: SeedUser
+    memberReadonly: SeedUser
     candidate: SeedUser
     mailUser: SeedUser
     victim: SeedUser
+    passwordReset: SeedUser
     deleteTarget: SeedUser
   }
 }

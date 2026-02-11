@@ -24,9 +24,25 @@ export const loginWithCredentials = async ({
   await setEnglishLocale(page)
   await page.goto('/auth/login')
 
-  await page.getByTestId('login-email').fill(email)
-  await page.getByTestId('login-password').fill(password)
-  await page.getByTestId('login-submit').click()
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    await page.getByTestId('login-email').fill(email)
+    await page.getByTestId('login-password').fill(password)
+    await page.getByTestId('login-submit').click()
 
-  await expect(page).not.toHaveURL(/\/auth\/login/)
+    try {
+      await expect(page).not.toHaveURL(/\/auth\/login/, {
+        timeout: 20_000,
+      })
+      return
+    } catch (error) {
+      if (attempt === 3) {
+        throw error
+      }
+
+      await page.waitForTimeout(1_000)
+      if (!page.url().includes('/auth/login')) {
+        return
+      }
+    }
+  }
 }

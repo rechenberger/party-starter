@@ -5,10 +5,11 @@ import path from 'node:path'
 const runId = process.env.E2E_RUN_ID ?? 'local'
 const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:3000'
 const workers = Number(process.env.E2E_WORKERS)
+const maxWorkers = 6
 const resolvedWorkers =
   Number.isInteger(workers) && workers > 0
     ? workers
-    : Math.max(1, os.cpus().length)
+    : Math.max(1, Math.min(os.cpus().length, maxWorkers))
 
 const artifactsDir =
   process.env.E2E_ARTIFACTS_DIR ??

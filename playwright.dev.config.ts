@@ -3,10 +3,11 @@ import os from 'node:os'
 
 const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:3000'
 const workers = Number(process.env.E2E_WORKERS)
+const maxWorkers = 6
 const resolvedWorkers =
   Number.isInteger(workers) && workers > 0
     ? workers
-    : Math.max(1, os.cpus().length)
+    : Math.max(1, Math.min(os.cpus().length, maxWorkers))
 
 export default defineConfig({
   testDir: './e2e/specs',
@@ -29,7 +30,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev:e2e',
+    command:
+      'E2E_MODE=dev EMAIL_FROM=e2e@example.com SMTP_URL=smtp://e2e:e2e@127.0.0.1:2525 pnpm dev:e2e',
     url: `${baseURL}/api/auth/session`,
     reuseExistingServer: true,
     timeout: 120_000,

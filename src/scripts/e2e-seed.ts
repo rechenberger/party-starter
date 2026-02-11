@@ -12,9 +12,11 @@ type SeedUserName =
   | 'owner'
   | 'adminAlt'
   | 'member'
+  | 'memberReadonly'
   | 'candidate'
   | 'mailUser'
   | 'victim'
+  | 'passwordReset'
   | 'deleteTarget'
 
 type SeedUser = {
@@ -28,6 +30,15 @@ type SeedPartition = {
   orgs: {
     members: string
     invites: string
+    membersReadonly: string
+    joinEdge: string
+  }
+  inviteCodes: {
+    joinEdge: {
+      valid: string
+      expired: string
+      maxed: string
+    }
   }
   users: Record<SeedUserName, SeedUser>
 }
@@ -38,6 +49,8 @@ type SeedManifest = {
   workers: number
   partitions: SeedPartition[]
 }
+
+const DEFAULT_MAX_WORKERS = 6
 
 function sanitize(input: string) {
   return input
@@ -51,7 +64,7 @@ function getWorkerCount() {
   if (Number.isInteger(fromEnv) && fromEnv > 0) {
     return fromEnv
   }
-  return Math.max(1, os.cpus().length)
+  return Math.max(1, Math.min(os.cpus().length, DEFAULT_MAX_WORKERS))
 }
 
 async function upsertUser({
@@ -160,6 +173,104 @@ async function upsertMembership({
   })
 }
 
+async function syncOrgMemberships({
+  organizationId,
+  admins,
+  members,
+  allSeededUserIds,
+}: {
+  organizationId: string
+  admins: string[]
+  members: string[]
+  allSeededUserIds: string[]
+}) {
+  const keepUserIds = [...admins, ...members]
+
+  const removeUserIds = allSeededUserIds.filter(
+    (userId) => !keepUserIds.includes(userId),
+  )
+
+  if (removeUserIds.length > 0) {
+    await db
+      .delete(schema.organizationMemberships)
+      .where(
+        and(
+          eq(schema.organizationMemberships.organizationId, organizationId),
+          inArray(schema.organizationMemberships.userId, removeUserIds),
+        ),
+      )
+  }
+
+  for (const userId of admins) {
+    await upsertMembership({
+      userId,
+      organizationId,
+      role: 'admin',
+    })
+  }
+
+  for (const userId of members) {
+    await upsertMembership({
+      userId,
+      organizationId,
+      role: 'member',
+    })
+  }
+}
+
+async function upsertInviteCode({
+  id,
+  organizationId,
+  role,
+  createdById,
+  updatedById,
+  expiresAt,
+  usesMax,
+  usesCurrent,
+  sentToEmail,
+}: {
+  id: string
+  organizationId: string
+  role: 'admin' | 'member'
+  createdById: string
+  updatedById: string
+  expiresAt?: Date | null
+  usesMax?: number | null
+  usesCurrent?: number | null
+  sentToEmail?: string | null
+}) {
+  await db
+    .insert(schema.inviteCodes)
+    .values({
+      id,
+      organizationId,
+      role,
+      createdById,
+      updatedById,
+      expiresAt: expiresAt ?? null,
+      usesMax: usesMax ?? null,
+      usesCurrent: usesCurrent ?? null,
+      sentToEmail: sentToEmail ?? null,
+      deletedAt: null,
+      comment: 'E2E seeded',
+    })
+    .onConflictDoUpdate({
+      target: [schema.inviteCodes.id],
+      set: {
+        organizationId,
+        role,
+        createdById,
+        updatedById,
+        expiresAt: expiresAt ?? null,
+        usesMax: usesMax ?? null,
+        usesCurrent: usesCurrent ?? null,
+        sentToEmail: sentToEmail ?? null,
+        deletedAt: null,
+        comment: 'E2E seeded',
+      },
+    })
+}
+
 async function writeManifest(manifest: SeedManifest) {
   const defaultPath = path.resolve(
     process.cwd(),
@@ -212,6 +323,13 @@ async function main() {
         name: `E2E Member ${index}`,
         isAdmin: false,
       }),
+      memberReadonly: await upsertUser({
+        id: `${prefix}-member-readonly`,
+        email: `${prefix}.member.readonly@example.com`,
+        password: `MemberReadonlyPass!${index}`,
+        name: `E2E Member Readonly ${index}`,
+        isAdmin: false,
+      }),
       candidate: await upsertUser({
         id: `${prefix}-candidate`,
         email: `${prefix}.candidate@example.com`,
@@ -233,6 +351,13 @@ async function main() {
         name: `E2E Victim ${index}`,
         isAdmin: false,
       }),
+      passwordReset: await upsertUser({
+        id: `${prefix}-password-reset`,
+        email: `${prefix}.password.reset@example.com`,
+        password: `ResetPass!${index}`,
+        name: `E2E Password Reset ${index}`,
+        isAdmin: false,
+      }),
       deleteTarget: await upsertUser({
         id: `${prefix}-delete-target`,
         email: `${prefix}.delete.target@example.com`,
@@ -244,6 +369,8 @@ async function main() {
 
     const membersOrgSlug = `${prefix}-members-org`
     const invitesOrgSlug = `${prefix}-invites-org`
+    const membersReadonlyOrgSlug = `${prefix}-members-readonly-org`
+    const joinEdgeOrgSlug = `${prefix}-join-edge-org`
 
     const membersOrg = await upsertOrg({
       slug: membersOrgSlug,
@@ -255,21 +382,83 @@ async function main() {
       name: `E2E Invites Org ${index}`,
     })
 
-    await upsertMembership({
-      userId: users.owner.id,
-      organizationId: membersOrg.id,
-      role: 'admin',
-    })
-    await upsertMembership({
-      userId: users.member.id,
-      organizationId: membersOrg.id,
-      role: 'member',
+    const membersReadonlyOrg = await upsertOrg({
+      slug: membersReadonlyOrgSlug,
+      name: `E2E Members Readonly Org ${index}`,
     })
 
-    await upsertMembership({
-      userId: users.owner.id,
+    const joinEdgeOrg = await upsertOrg({
+      slug: joinEdgeOrgSlug,
+      name: `E2E Join Edge Org ${index}`,
+    })
+
+    const allSeededUserIds = Object.values(users).map((user) => user.id)
+
+    await syncOrgMemberships({
+      organizationId: membersOrg.id,
+      admins: [users.owner.id],
+      members: [users.member.id],
+      allSeededUserIds,
+    })
+
+    await syncOrgMemberships({
       organizationId: invitesOrg.id,
-      role: 'admin',
+      admins: [users.owner.id],
+      members: [],
+      allSeededUserIds,
+    })
+
+    await syncOrgMemberships({
+      organizationId: membersReadonlyOrg.id,
+      admins: [users.owner.id],
+      members: [users.memberReadonly.id],
+      allSeededUserIds,
+    })
+
+    await syncOrgMemberships({
+      organizationId: joinEdgeOrg.id,
+      admins: [users.owner.id],
+      members: [],
+      allSeededUserIds,
+    })
+
+    const joinEdgeInviteCodes = {
+      valid: `${prefix}-join-valid`,
+      expired: `${prefix}-join-expired`,
+      maxed: `${prefix}-join-maxed`,
+    } as const
+
+    await upsertInviteCode({
+      id: joinEdgeInviteCodes.valid,
+      organizationId: joinEdgeOrg.id,
+      role: 'member',
+      createdById: users.owner.id,
+      updatedById: users.owner.id,
+      expiresAt: null,
+      usesMax: 20,
+      usesCurrent: 0,
+    })
+
+    await upsertInviteCode({
+      id: joinEdgeInviteCodes.expired,
+      organizationId: joinEdgeOrg.id,
+      role: 'member',
+      createdById: users.owner.id,
+      updatedById: users.owner.id,
+      expiresAt: new Date(Date.now() - 60 * 60 * 1000),
+      usesMax: 20,
+      usesCurrent: 0,
+    })
+
+    await upsertInviteCode({
+      id: joinEdgeInviteCodes.maxed,
+      organizationId: joinEdgeOrg.id,
+      role: 'member',
+      createdById: users.owner.id,
+      updatedById: users.owner.id,
+      expiresAt: null,
+      usesMax: 1,
+      usesCurrent: 1,
     })
 
     partitions.push({
@@ -277,6 +466,11 @@ async function main() {
       orgs: {
         members: membersOrg.slug,
         invites: invitesOrg.slug,
+        membersReadonly: membersReadonlyOrg.slug,
+        joinEdge: joinEdgeOrg.slug,
+      },
+      inviteCodes: {
+        joinEdge: joinEdgeInviteCodes,
       },
       users,
     })

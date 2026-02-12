@@ -1,11 +1,12 @@
 'use client'
+
 // source: https://originui.com/input
 
+import { useId } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { useId } from 'react'
-import { Button } from './button'
+import type { Button } from './button'
 
 export const InputWithButton = ({
   label,

@@ -1,6 +1,7 @@
 import { DialogProvider } from '@/super-action/dialog/DialogProvider'
 import { TopHeader } from '../TopHeader'
 import { SidebarInset, SidebarProvider } from '../ui/sidebar'
+import { TooltipProvider } from '../ui/tooltip'
 import { Sidebar } from './Sidebar'
 
 export const SidebarLayout = async ({
@@ -13,13 +14,15 @@ export const SidebarLayout = async ({
   const orgSlug = (await params)?.orgSlug
   return (
     <>
-      <SidebarProvider>
-        <Sidebar orgSlug={orgSlug} />
-        <SidebarInset className="group/topheader flex flex-col gap-4 px-4">
-          <TopHeader disableSeparator hideIfSecondTopHeaderExists></TopHeader>
-          {children}
-        </SidebarInset>
-      </SidebarProvider>
+      <TooltipProvider>
+        <SidebarProvider>
+          <Sidebar orgSlug={orgSlug} />
+          <SidebarInset className="group/topheader flex flex-col gap-4 px-4">
+            <TopHeader disableSeparator hideIfSecondTopHeaderExists></TopHeader>
+            {children}
+          </SidebarInset>
+        </SidebarProvider>
+      </TooltipProvider>
 
       <DialogProvider />
     </>

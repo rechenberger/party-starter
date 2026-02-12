@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { useTranslations } from '@/i18n/useTranslations'
 import { Check, Copy } from 'lucide-react'
 import { useState } from 'react'
-import { useToast } from './ui/use-toast'
+import { toast } from 'sonner'
 
 export const CopyToClipboardButton = ({
   textToCopy,
@@ -15,7 +15,6 @@ export const CopyToClipboardButton = ({
   textToDisplay?: string
 } & React.ComponentProps<typeof Button>) => {
   const [isCopied, setIsCopied] = useState(false)
-  const { toast } = useToast()
   const t = useTranslations()
 
   const handleCopy = () => {
@@ -24,9 +23,7 @@ export const CopyToClipboardButton = ({
     setTimeout(() => {
       setIsCopied(false)
     }, 1500)
-    toast({
-      title: t.standardWords.copiedToClipboard,
-    })
+    toast(t.standardWords.copiedToClipboard)
   }
 
   return (

@@ -17,12 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useToast } from '@/components/ui/use-toast'
 import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
 import { SuperActionPromise } from '@/super-action/action/createSuperAction'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { useShowDialog } from '@/super-action/dialog/DialogProvider'
+import { toast } from 'sonner'
 import { z } from 'zod'
 import { organizationRoleDefinitions } from '../organizationRoles'
 import { ExpirationTime, expirationTimesDefinitions } from './expirationTimes'
@@ -54,7 +54,6 @@ export const CreateInviteCodeFormClient = ({
   const t = useTranslations()
 
   const showDialog = useShowDialog()
-  const { toast } = useToast()
   const disabled = isLoading
 
   const form = useCreateInviteCodeForm({
@@ -76,9 +75,7 @@ export const CreateInviteCodeFormClient = ({
             if (result?.url) {
               navigator.clipboard.writeText(result.url)
               showDialog(null)
-              toast({
-                title: t.inviteCodes.createForm.success,
-              })
+              toast(t.inviteCodes.createForm.success)
             }
           })}
           className="flex flex-col gap-4"

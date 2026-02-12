@@ -1,5 +1,5 @@
 import { isDev } from '@/auth/dev'
-import { Toaster } from '@/components/ui/toaster'
+import { Toaster } from '@/components/ui/sonner'
 import { LocaleProvider } from '@/i18n/LocaleContext'
 import { getMyLocale } from '@/i18n/getMyLocale'
 import { Locale } from '@/i18n/locale'

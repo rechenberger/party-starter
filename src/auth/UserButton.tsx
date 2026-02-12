@@ -44,31 +44,36 @@ export const UserButton = async ({
     return (
       <>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="vanilla" variant="vanilla">
-              {showName ? (
-                <>
-                  <span>{user.name ?? user.email ?? t.standardWords.you}</span>
-                  <ChevronDown className="size-4" />
-                </>
-              ) : (
-                <>
-                  <UserAvatar user={user} />
-                  {large && (
-                    <>
-                      <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-medium">
-                          {user.name}
-                        </span>
-                        <span className="truncate text-xs">{user.email}</span>
-                      </div>
-                      <ChevronsUpDown className="ml-auto size-4" />
-                    </>
-                  )}
-                </>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
+          <DropdownMenuTrigger
+            nativeButton
+            render={
+              <Button size="vanilla" variant="vanilla">
+                {showName ? (
+                  <>
+                    <span>
+                      {user.name ?? user.email ?? t.standardWords.you}
+                    </span>
+                    <ChevronDown className="size-4" />
+                  </>
+                ) : (
+                  <>
+                    <UserAvatar user={user} />
+                    {large && (
+                      <>
+                        <div className="grid flex-1 text-left text-sm leading-tight">
+                          <span className="truncate font-medium">
+                            {user.name}
+                          </span>
+                          <span className="truncate text-xs">{user.email}</span>
+                        </div>
+                        <ChevronsUpDown className="ml-auto size-4" />
+                      </>
+                    )}
+                  </>
+                )}
+              </Button>
+            }
+          />
           <DropdownMenuContent side="bottom" align="end">
             <UserMenuDropDownContent user={user} locale={locale} />
           </DropdownMenuContent>

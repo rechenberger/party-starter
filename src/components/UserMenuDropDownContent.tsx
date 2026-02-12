@@ -38,25 +38,27 @@ export const UserMenuDropDownContent = async ({
   const currentLocale = await getMyLocale({ paramsLocale: locale })
   return (
     <>
-      <DropdownMenuLabel className="p-0 font-normal">
-        <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-          <UserAvatar user={user} />
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">{user.name}</span>
-            <span
-              className={cn(
-                'truncate',
-                !!user.name ? 'text-xs font-light' : 'font-medium',
-              )}
-            >
-              {user.email}
-            </span>
+      <DropdownMenuGroup>
+        <DropdownMenuLabel className="p-0 font-normal">
+          <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+            <UserAvatar user={user} />
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium">{user.name}</span>
+              <span
+                className={cn(
+                  'truncate',
+                  !!user.name ? 'text-xs font-light' : 'font-medium',
+                )}
+              >
+                {user.email}
+              </span>
+            </div>
           </div>
-        </div>
-      </DropdownMenuLabel>
+        </DropdownMenuLabel>
+      </DropdownMenuGroup>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild nativeButton>
           <ActionButton
             variant={'ghost'}
             hideIcon
@@ -68,7 +70,7 @@ export const UserMenuDropDownContent = async ({
             {t.userManagement.changeUsernameAction}
           </ActionButton>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild nativeButton>
           <ActionButton
             variant={'ghost'}
             hideIcon
@@ -85,13 +87,13 @@ export const UserMenuDropDownContent = async ({
       <LocaleSwitcher variant="submenu" />
       <ThemeSwitcher variant="submenu" />
       <DropdownMenuSeparator />
-      <DropdownMenuItem asChild>
+      <DropdownMenuItem asChild nativeButton={false}>
         <Link href={LOCALIZATION.isActive ? `/${currentLocale}` : '/'}>
           <House className="size-4" />
           {t.standardWords.homepage}
         </Link>
       </DropdownMenuItem>
-      <DropdownMenuItem asChild>
+      <DropdownMenuItem asChild nativeButton>
         <ActionButton
           variant={'ghost'}
           hideIcon

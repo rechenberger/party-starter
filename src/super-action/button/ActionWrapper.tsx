@@ -2,7 +2,7 @@
 
 import { map } from 'lodash-es'
 import { DOMAttributes, ReactNode, forwardRef } from 'react'
-import { Slot as SlotPrimitive } from 'radix-ui'
+import { Slot as SlotPrimitive } from '@radix-ui/react-slot'
 import { UseSuperActionOptions, useSuperAction } from '../action/useSuperAction'
 import { ActionCommand } from '../command/ActionCommand'
 import { ActionCommandConfig } from '../command/ActionCommandProvider'
@@ -22,7 +22,7 @@ export type ActionWrapperSlotProps = {
 
 const ActionWrapperSlot = forwardRef<HTMLElement, ActionWrapperSlotProps>(
   (props, ref) => {
-    return <SlotPrimitive.Slot {...props} ref={ref} />
+    return <SlotPrimitive {...props} ref={ref} />
   },
 )
 

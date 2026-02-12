@@ -105,15 +105,18 @@ export const SimpleParamSelect = (
   if (props.component === 'dropdown') {
     return (
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            className={cn('text-nowrap', props.className)}
-          >
-            {selected?.label ?? props.label}
-            <ChevronDown className="size-4 ml-2" />
-          </Button>
-        </DropdownMenuTrigger>
+        <DropdownMenuTrigger
+          nativeButton
+          render={
+            <Button
+              variant="outline"
+              className={cn('text-nowrap', props.className)}
+            >
+              {selected?.label ?? props.label}
+              <ChevronDown className="size-4 ml-2" />
+            </Button>
+          }
+        />
         <DropdownMenuContent>
           <ScrollArea
             className="flex flex-col max-h-[40vh]"

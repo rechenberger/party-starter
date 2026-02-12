@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import { Slot as SlotPrimitive } from 'radix-ui'
+import { Slot as SlotPrimitive } from '@radix-ui/react-slot'
 import { ArrowRight, Loader2 } from 'lucide-react'
 import { ReactNode } from 'react'
 
@@ -14,10 +14,10 @@ export const SuperLoadingIcon = ({
 }) => {
   const Icon = isLoading ? <Loader2 /> : icon
   return (
-    <SlotPrimitive.Slot
+    <SlotPrimitive
       className={cn('size-4', isLoading && 'animate-spin', className)}
     >
       {Icon}
-    </SlotPrimitive.Slot>
+    </SlotPrimitive>
   )
 }

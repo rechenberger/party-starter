@@ -85,19 +85,27 @@ export function ThemeSwitcher({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        {variant === 'sidebar' ? (
-          <SidebarMenuButton>
-            {icon}
-            <span>{label}</span>
-          </SidebarMenuButton>
-        ) : (
-          <Button variant="ghost" size="icon">
-            {icon}
-            <span className="sr-only">{label}</span>
-          </Button>
-        )}
-      </DropdownMenuTrigger>
+      {variant === 'sidebar' ? (
+        <DropdownMenuTrigger
+          nativeButton
+          render={
+            <SidebarMenuButton>
+              {icon}
+              <span>{label}</span>
+            </SidebarMenuButton>
+          }
+        />
+      ) : (
+        <DropdownMenuTrigger
+          nativeButton
+          render={
+            <Button variant="ghost" size="icon">
+              {icon}
+              <span className="sr-only">{label}</span>
+            </Button>
+          }
+        />
+      )}
       <DropdownMenuContent align="end">{dropdownMenuItems}</DropdownMenuContent>
     </DropdownMenu>
   )

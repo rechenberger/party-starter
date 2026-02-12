@@ -176,13 +176,16 @@ export const MemberList = ({
                         {isAdmin && (
                           <Select
                             defaultValue={membership.role}
-                            onValueChange={(value: OrganizationRole) =>
-                              trigger({
+                            onValueChange={(value: OrganizationRole | null) => {
+                              if (!value) {
+                                return
+                              }
+                              return trigger({
                                 userId: membership.userId,
                                 role: value,
                                 orgSlug: org.slug,
                               })
-                            }
+                            }}
                             disabled={isChangeRoleLoading}
                             value={membership.role}
                           >

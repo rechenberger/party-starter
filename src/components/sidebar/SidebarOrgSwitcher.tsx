@@ -2,6 +2,7 @@ import { ChevronsUpDown, Plus } from 'lucide-react'
 
 import {
   DropdownMenu,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -35,38 +36,47 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              {selectedMembership?.organization && (
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <OrgAvatar org={selectedMembership.organization} size={28} />
+          <DropdownMenuTrigger
+            nativeButton
+            render={
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              >
+                {selectedMembership?.organization && (
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                    <OrgAvatar
+                      org={selectedMembership.organization}
+                      size={28}
+                    />
+                  </div>
+                )}
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">
+                    {selectedMembership?.organization.name ??
+                      t.org.selectOrganization}
+                  </span>
+                  {/* <span className="truncate text-xs">{'activeTeam.plan'}</span> */}
                 </div>
-              )}
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">
-                  {selectedMembership?.organization.name ??
-                    t.org.selectOrganization}
-                </span>
-                {/* <span className="truncate text-xs">{'activeTeam.plan'}</span> */}
-              </div>
-              <ChevronsUpDown className="ml-auto" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
+                <ChevronsUpDown className="ml-auto" />
+              </SidebarMenuButton>
+            }
+          />
           <ResponsiveDropdownMenuContent
             align="start"
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-(--anchor-width) min-w-56 rounded-lg"
           >
-            <DropdownMenuLabel className="text-muted-foreground text-xs">
-              {t.org.organizations}
-            </DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-muted-foreground text-xs">
+                {t.org.organizations}
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
             {memberships.map((membership) => (
               <DropdownMenuItem
                 key={membership.organization.id}
                 className="gap-2 py-2"
                 asChild
+                nativeButton={false}
               >
                 <Link href={`/org/${membership.organization.slug}`}>
                   <OrgAvatar org={membership.organization} size={32} />
@@ -77,7 +87,11 @@ export const SidebarOrgSwitcher = async ({ orgSlug }: { orgSlug?: string }) => {
             {userCanCreateOrg && (
               <>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="gap-2 p-2" asChild>
+                <DropdownMenuItem
+                  className="gap-2 p-2"
+                  asChild
+                  nativeButton={false}
+                >
                   <Link href="/org/create">
                     <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                       <Plus className="size-4" />

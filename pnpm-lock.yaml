@@ -132,7 +132,7 @@ importers:
         specifier: ^4
         version: 4.6.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       recharts:
-        specifier: ^2.15.4
+        specifier: 2.15.4
         version: 2.15.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       remeda:
         specifier: ^2.33.6

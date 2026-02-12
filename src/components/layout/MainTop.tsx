@@ -1,12 +1,13 @@
-import { Button } from '@/components/ui/button'
-import { Locale } from '@/i18n/locale'
-import { BRAND } from '@/lib/starter.config'
-import { cn } from '@/lib/utils'
-import { Github, MenuIcon } from 'lucide-react'
+import { Github } from 'lucide-react'
 import Link from 'next/link'
 import { Suspense } from 'react'
+import { Button } from '@/components/ui/button'
+import type { Locale } from '@/i18n/locale'
+import { BRAND } from '@/lib/starter.config'
+import { cn } from '@/lib/utils'
 import { Sidebar } from '../sidebar/Sidebar'
 import { SidebarProvider, SidebarTrigger } from '../ui/sidebar'
+import { TooltipProvider } from '../ui/tooltip'
 import { DevBadges } from './DevBadges'
 import { MainDashboardButton } from './MainDashboardButton'
 import { MainTopContent } from './MainTopContent'
@@ -15,51 +16,50 @@ import { MainTopUserSettings } from './MainTopUserSettings'
 export const MainTop = async ({ locale }: { locale?: Locale }) => {
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 bg-background/95 backdrop-blur-sm">
-      <SidebarProvider className="min-h-auto">
-        <div className="container flex items-center gap-2 md:gap-6 py-6">
-          <SidebarTrigger
-            className="md:hidden"
-            icon={<MenuIcon className="size-4" />}
-          />
-          <Link
-            href="/"
-            prefetch={false}
-            className="flex flex-row items-center gap-3"
-          >
-            <div className="text-xl">
-              <BRAND.TextLogo />
-            </div>
-          </Link>
-          <Suspense fallback={<div className="flex-1" />}>
-            <nav
-              className={cn(
-                'hidden md:flex flex-1 flex-wrap items-center gap-4 lg:gap-6',
-              )}
+      <TooltipProvider>
+        <SidebarProvider className="min-h-auto">
+          <div className="container flex items-center gap-2 md:gap-6 py-6">
+            <SidebarTrigger className="md:hidden" />
+            <Link
+              href="/"
+              prefetch={false}
+              className="flex flex-row items-center gap-3"
             >
-              <MainTopContent locale={locale} />
-            </nav>
-          </Suspense>
-          <div className="flex-1 md:hidden" />
-          <div className="flex items-center gap-4">
-            <DevBadges className="max-md:hidden" />
-            <div className="hidden items-center gap-2 text-sm font-medium md:flex">
-              {BRAND.github.active && (
-                <Button variant={'ghost'} size="icon" asChild>
-                  <Link href={BRAND.github.url} target="_blank">
-                    <Github />
-                  </Link>
-                </Button>
-              )}
+              <div className="text-xl">
+                <BRAND.TextLogo />
+              </div>
+            </Link>
+            <Suspense fallback={<div className="flex-1" />}>
+              <nav
+                className={cn(
+                  'hidden md:flex flex-1 flex-wrap items-center gap-4 lg:gap-6',
+                )}
+              >
+                <MainTopContent locale={locale} />
+              </nav>
+            </Suspense>
+            <div className="flex-1 md:hidden" />
+            <div className="flex items-center gap-4">
+              <DevBadges className="max-md:hidden" />
+              <div className="hidden items-center gap-2 text-sm font-medium md:flex">
+                {BRAND.github.active && (
+                  <Button variant={'ghost'} size="icon" asChild>
+                    <Link href={BRAND.github.url} target="_blank">
+                      <Github />
+                    </Link>
+                  </Button>
+                )}
 
-              <MainTopUserSettings locale={locale} />
+                <MainTopUserSettings locale={locale} />
+              </div>
+              <MainDashboardButton />
             </div>
-            <MainDashboardButton />
           </div>
-        </div>
-        <div className="md:hidden">
-          <Sidebar collapsible="icon" isLanding={true} locale={locale} />
-        </div>
-      </SidebarProvider>
+          <div className="md:hidden">
+            <Sidebar collapsible="icon" isLanding={true} locale={locale} />
+          </div>
+        </SidebarProvider>
+      </TooltipProvider>
     </header>
   )
 }

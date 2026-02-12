@@ -54,7 +54,10 @@ test('admin can create a user and toggle admin role on users page', async ({
   await page.goto('/users')
   const main = page.getByRole('main').first()
 
-  await page.getByRole('button', { name: /^create user$/i }).first().click()
+  await page
+    .getByRole('button', { name: /^create user$/i })
+    .first()
+    .click()
   await page.getByTestId('login-email').fill(email)
   await page.getByTestId('login-password').fill(password)
   await page.getByTestId('login-submit').click()

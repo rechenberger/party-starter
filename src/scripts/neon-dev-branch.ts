@@ -92,7 +92,9 @@ function parseArgs(argv: string[]) {
   let optionTokens = argv
 
   if (argv[0] && !argv[0].startsWith('-')) {
-    if (!['create', 'reset', 'sync', 'url', 'env', 'delete'].includes(argv[0])) {
+    if (
+      !['create', 'reset', 'sync', 'url', 'env', 'delete'].includes(argv[0])
+    ) {
       throw new Error(`Unknown command "${argv[0]}"`)
     }
     command = argv[0] as Command
@@ -125,7 +127,8 @@ function parseArgs(argv: string[]) {
     const [rawKey, inlineValue] = token.slice(2).split('=', 2)
     const key = rawKey.trim()
     const next = inlineValue ?? optionTokens[i + 1]
-    const hasNextValue = inlineValue !== undefined || (next && !next.startsWith('--'))
+    const hasNextValue =
+      inlineValue !== undefined || (next && !next.startsWith('--'))
 
     const readValue = () => {
       if (!hasNextValue) throw new Error(`Missing value for --${key}`)
@@ -231,7 +234,11 @@ function neonArgs(baseArgs: string[], options: CliOptions) {
   return args
 }
 
-function runNeon(baseArgs: string[], options: CliOptions, captureOutput = false) {
+function runNeon(
+  baseArgs: string[],
+  options: CliOptions,
+  captureOutput = false,
+) {
   const args = neonArgs(baseArgs, options)
   const result = spawnSync('pnpm', ['exec', 'neonctl', ...args], {
     encoding: 'utf8',
@@ -246,7 +253,11 @@ function runNeon(baseArgs: string[], options: CliOptions, captureOutput = false)
 }
 
 function branchExists(branch: string, options: CliOptions) {
-  const result = runNeon(['branches', 'get', branch, '-o', 'json'], options, true)
+  const result = runNeon(
+    ['branches', 'get', branch, '-o', 'json'],
+    options,
+    true,
+  )
   return result.status === 0
 }
 
@@ -263,7 +274,10 @@ function keyMatches(key: string, candidates: Set<string>) {
   return candidates.has(normalized)
 }
 
-function hasTrueBooleanKey(input: unknown, candidateKeys: Set<string>): boolean {
+function hasTrueBooleanKey(
+  input: unknown,
+  candidateKeys: Set<string>,
+): boolean {
   if (Array.isArray(input)) {
     return input.some((value) => hasTrueBooleanKey(value, candidateKeys))
   }
@@ -287,7 +301,11 @@ function hasTrueBooleanKey(input: unknown, candidateKeys: Set<string>): boolean 
 }
 
 function readBranchSafetyFlags(branch: string, options: CliOptions) {
-  const result = runNeon(['branches', 'get', branch, '-o', 'json'], options, true)
+  const result = runNeon(
+    ['branches', 'get', branch, '-o', 'json'],
+    options,
+    true,
+  )
   if (result.status !== 0) {
     return { exists: false, isDefault: false, isProtected: false }
   }
@@ -357,12 +375,22 @@ function assertDestructiveCommandIsSafe(
 
 function requireSuccess(result: ReturnType<typeof runNeon>, message: string) {
   if (result.status === 0) return
-  const details = [result.stderr, result.stdout].filter(Boolean).join('\n').trim()
+  const details = [result.stderr, result.stdout]
+    .filter(Boolean)
+    .join('\n')
+    .trim()
   throw new Error(details ? `${message}\n${details}` : message)
 }
 
 function createBranch(branch: string, options: CliOptions) {
-  const args = ['branches', 'create', '--name', branch, '--parent', options.parent]
+  const args = [
+    'branches',
+    'create',
+    '--name',
+    branch,
+    '--parent',
+    options.parent,
+  ]
   if (options.schemaOnly) args.push('--schema-only')
   requireSuccess(runNeon(args, options), `Failed to create branch "${branch}"`)
 }

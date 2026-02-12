@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test'
-import { baseURL, loginWithCredentials, setEnglishLocale } from '../support/auth'
+import {
+  baseURL,
+  loginWithCredentials,
+  setEnglishLocale,
+} from '../support/auth'
 import { getPartitionForWorker } from '../support/seed-manifest'
 
 test('credentials login plus username/password update works', async ({

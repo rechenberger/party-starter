@@ -1,8 +1,14 @@
 import { expect, test } from '@playwright/test'
-import { baseURL, loginWithCredentials, setEnglishLocale } from '../support/auth'
+import {
+  baseURL,
+  loginWithCredentials,
+  setEnglishLocale,
+} from '../support/auth'
 import { getPartitionForWorker } from '../support/seed-manifest'
 
-test('root route respects locale cookie for anonymous users', async ({ page }) => {
+test('root route respects locale cookie for anonymous users', async ({
+  page,
+}) => {
   await setEnglishLocale(page)
   await page.goto('/')
   await expect(page).toHaveURL(/\/en$/)

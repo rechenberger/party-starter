@@ -17,7 +17,9 @@ test('cron pages and status endpoint are covered', async ({
 
   await page.goto('/cron')
   await expect(page.getByText(/^test$/i).first()).toBeVisible()
-  await expect(page.getByRole('link', { name: /view runs/i }).first()).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: /view runs/i }).first(),
+  ).toBeVisible()
 
   await page.goto('/cron/Test')
   await expect(page).toHaveURL(/\/cron\/Test/)

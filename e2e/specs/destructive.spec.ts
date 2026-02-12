@@ -36,7 +36,9 @@ test('destructive flows: delete org and delete user', async ({
 
   await page.goto('/users')
   const main = page.getByRole('main').first()
-  await expect(main.getByTestId(`user-card-${deleteTarget.id}`).first()).toBeVisible()
+  await expect(
+    main.getByTestId(`user-card-${deleteTarget.id}`).first(),
+  ).toBeVisible()
   await main.getByTestId(`user-delete-${deleteTarget.id}`).first().click()
   await page.getByTestId('dialog-confirm').click()
   await page.reload()

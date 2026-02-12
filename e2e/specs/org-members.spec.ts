@@ -55,7 +55,9 @@ test('organization members can be managed and last-admin guard is enforced', asy
         .poll(
           async () => {
             await page.reload()
-            const afterText = ((await getRoleTrigger(userId).textContent()) ?? '')
+            const afterText = (
+              (await getRoleTrigger(userId).textContent()) ?? ''
+            )
               .trim()
               .toLowerCase()
             return afterText

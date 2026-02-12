@@ -47,7 +47,9 @@ test('non-admin member has read-only members view, can search, and can leave org
 
   await memberRow.getByTestId(`member-kick-${memberReadonly.id}`).click()
   await page.getByTestId('dialog-confirm').click()
-  await expect(page).not.toHaveURL(new RegExp(`/org/${orgSlug}/settings/members`))
+  await expect(page).not.toHaveURL(
+    new RegExp(`/org/${orgSlug}/settings/members`),
+  )
 
   await page.goto(`/org/${orgSlug}/settings/members`)
   await expect(page.getByRole('heading', { name: '404' })).toBeVisible()

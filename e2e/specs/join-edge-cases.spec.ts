@@ -49,7 +49,9 @@ test('join flow handles expired/maxed/invalid codes, cancel, and already-member 
   ).toHaveCount(0)
 
   await ownerPage.goto(`/join/${orgSlug}/${codes.valid}`)
-  await expect(ownerPage.getByText(/successfully joined/i).first()).toBeVisible()
+  await expect(
+    ownerPage.getByText(/successfully joined/i).first(),
+  ).toBeVisible()
   await expect(ownerPage.getByTestId('join-org-submit')).toHaveCount(0)
   await ownerContext.close()
 })

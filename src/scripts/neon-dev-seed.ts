@@ -35,8 +35,13 @@ function resolveConnectionString(args: string[]) {
   }
 
   if (result.status !== 0) {
-    const details = [result.stderr, result.stdout].filter(Boolean).join('\n').trim()
-    throw new Error(details || 'Failed to resolve Neon branch connection string')
+    const details = [result.stderr, result.stdout]
+      .filter(Boolean)
+      .join('\n')
+      .trim()
+    throw new Error(
+      details || 'Failed to resolve Neon branch connection string',
+    )
   }
 
   return extractConnectionString(result.stdout || '', result.stderr || '')

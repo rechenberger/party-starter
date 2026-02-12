@@ -55,10 +55,7 @@ test('normal invite codes can be deleted and mail invites can be resent and dele
     .locator(`[data-testid="invite-code-row-${createdCodeId}"]`)
     .first()
   await expect(createdCodeRow).toBeVisible()
-  await createdCodeRow
-    .locator('button[title="Delete Code"]')
-    .first()
-    .click()
+  await createdCodeRow.locator('button[title="Delete Code"]').first().click()
   await page.getByTestId('dialog-confirm').first().click()
   await expect(createdCodeRow).toHaveCount(0)
 

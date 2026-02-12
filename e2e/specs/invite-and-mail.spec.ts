@@ -55,9 +55,9 @@ const completeJoinFlow = async ({
 
   if (joinButtonVisible) {
     await joinButton.click()
-    await expect(page).not.toHaveURL(/\/join\//, { timeout: 20_000 }).catch(
-      () => undefined,
-    )
+    await expect(page)
+      .not.toHaveURL(/\/join\//, { timeout: 20_000 })
+      .catch(() => undefined)
   }
 
   await expect(page).not.toHaveURL(/\/auth\/login/)

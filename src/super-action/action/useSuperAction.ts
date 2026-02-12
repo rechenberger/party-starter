@@ -1,9 +1,9 @@
 'use client'
 
-import { toast } from '@/components/ui/use-toast'
 import { useTranslations } from '@/i18n/useTranslations'
 import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
+import { toast } from 'sonner'
 import { useShowDialog } from '../dialog/DialogProvider'
 import { consumeSuperActionResponse } from './consumeSuperActionResponse'
 import { SuperAction, SuperActionDialog } from './createSuperAction'
@@ -58,8 +58,7 @@ export const useSuperAction = <Result = undefined, Input = undefined>(
         const result = await consumeSuperActionResponse({
           response: Promise.resolve(response.superAction),
           onToast: (t) => {
-            toast({
-              title: t.title,
+            toast(t.title ?? '', {
               description: t.description,
             })
           },
@@ -75,10 +74,7 @@ export const useSuperAction = <Result = undefined, Input = undefined>(
           },
           catch: catchToast
             ? (e) => {
-                toast({
-                  variant: 'destructive',
-                  title: e.message,
-                })
+                toast.error(e.message ?? 'Something went wrong')
               }
             : undefined,
         })

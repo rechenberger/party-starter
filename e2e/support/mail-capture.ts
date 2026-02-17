@@ -1,27 +1,8 @@
-import fs from 'node:fs/promises'
-import path from 'node:path'
-
-type CapturedMail = {
-  template: string
-  to: string
-  subject: string
-  html: string
-  text: string
-  createdAt: string
-  runId: string | null
-}
+import { db } from '@/db/db'
+import { schema } from '@/db/schema-export'
+import { and, desc, eq, gte, ilike, inArray, type SQL } from 'drizzle-orm'
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
-const getMailCaptureDir = () => {
-  const dir = process.env.E2E_MAIL_CAPTURE_DIR
-  if (!dir) {
-    throw new Error(
-      'E2E_MAIL_CAPTURE_DIR is not set. Enable capture by setting this environment variable.',
-    )
-  }
-  return path.resolve(process.cwd(), dir)
-}
 
 export const waitForCapturedMail = async ({
   to,
@@ -34,49 +15,35 @@ export const waitForCapturedMail = async ({
   timeoutMs?: number
   createdAfterMs?: number
 }) => {
-  const dir = getMailCaptureDir()
   const deadline = Date.now() + timeoutMs
+  const createdAfterDate = new Date(createdAfterMs || 0)
+  const runId = process.env.E2E_RUN_ID?.trim() || null
 
   while (Date.now() < deadline) {
-    const fileNames = await fs.readdir(dir).catch(() => [])
-    let latestMatch: CapturedMail | undefined
-    let latestMatchCreatedAt = 0
+    const conditions: SQL<unknown>[] = [
+      eq(schema.emailLog.template, template),
+      ilike(schema.emailLog.toEmail, to),
+      gte(schema.emailLog.createdAt, createdAfterDate),
+      inArray(schema.emailLog.status, ['queued', 'sent', 'skipped']),
+      ...(runId ? [eq(schema.emailLog.runId, runId)] : []),
+    ]
 
-    for (const fileName of fileNames) {
-      if (!fileName.endsWith('.json')) {
-        continue
-      }
+    const [match] = await db
+      .select({
+        template: schema.emailLog.template,
+        to: schema.emailLog.toEmail,
+        subject: schema.emailLog.subject,
+        html: schema.emailLog.html,
+        text: schema.emailLog.text,
+        createdAt: schema.emailLog.createdAt,
+        runId: schema.emailLog.runId,
+      })
+      .from(schema.emailLog)
+      .where(and(...conditions))
+      .orderBy(desc(schema.emailLog.createdAt))
+      .limit(1)
 
-      const fullPath = path.join(dir, fileName)
-      const raw = await fs.readFile(fullPath, 'utf8').catch(() => null)
-      if (!raw) {
-        continue
-      }
-
-      let parsed: CapturedMail
-      try {
-        parsed = JSON.parse(raw) as CapturedMail
-      } catch {
-        continue
-      }
-      const createdAtMs = Number.isNaN(Date.parse(parsed.createdAt))
-        ? 0
-        : Date.parse(parsed.createdAt)
-      if (
-        parsed.template === template &&
-        parsed.to.toLowerCase() === to.toLowerCase() &&
-        createdAtMs >= createdAfterMs
-      ) {
-        if (!latestMatch || createdAtMs >= latestMatchCreatedAt) {
-          latestMatch = parsed
-          latestMatchCreatedAt = createdAtMs
-        }
-      }
-    }
-
-    if (latestMatch) {
-      return latestMatch
-    }
+    if (match) return match
 
     await sleep(500)
   }

@@ -1,6 +1,7 @@
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { verifyEmailEmail } from '@/emails/VerifyEmail'
+import { getEmailFromAddress, getEmailServerConfig } from '@/lib/email-delivery'
 import { superCache } from '@/lib/superCache'
 import Nodemailer from '@auth/core/providers/nodemailer'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
@@ -9,8 +10,6 @@ import NextAuth from 'next-auth'
 import Discord from 'next-auth/providers/discord'
 import { CredentialsProvider } from './CredentialsProvider'
 import { ImpersonateProvider } from './ImpersonateProvider'
-
-const hasEmailEnvVars = !!process.env.EMAIL_FROM && !!process.env.SMTP_URL
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: {
@@ -52,21 +51,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   providers: [
     Discord,
-    ...((hasEmailEnvVars
-      ? [
-          Nodemailer({
-            from: process.env.EMAIL_FROM,
-            server: process.env.SMTP_URL,
+    Nodemailer({
+      from: getEmailFromAddress(),
+      server: getEmailServerConfig(),
 
-            sendVerificationRequest: async (params) => {
-              await verifyEmailEmail.send({
-                props: { verifyUrl: params.url },
-                to: params.identifier,
-              })
-            },
-          }),
-        ]
-      : []) as any), // TODO: FIXME: looks like a type bug in next-auth
+      sendVerificationRequest: async (params) => {
+        await verifyEmailEmail.send({
+          props: { verifyUrl: params.url },
+          to: params.identifier,
+        })
+      },
+    }) as any, // TODO: FIXME: looks like a type bug in next-auth
     CredentialsProvider,
     ImpersonateProvider,
   ],

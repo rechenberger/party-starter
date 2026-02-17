@@ -247,7 +247,7 @@ function createDevEnv() {
 function withAuthMailDefaults(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   return {
     ...env,
-    ACTUALLY_SEND_EMAILS: 'false',
+    EMAIL_DELIVERY_ENABLED: 'false',
     EMAIL_FROM: env.EMAIL_FROM?.trim() || DEFAULT_EMAIL_FROM,
     SMTP_URL: env.SMTP_URL?.trim() || DEFAULT_SMTP_URL,
   }

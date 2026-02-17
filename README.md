@@ -35,7 +35,7 @@
   - `https://your-app.com/api/auth/callback/discord`
 - Email
   - Configure outbound delivery + logging
-  - `ACTUALLY_SEND_EMAILS`=`false` (set to `true` only in production)
+  - `EMAIL_DELIVERY_ENABLED`=`false` (set to `true` only in production)
   - `EMAIL_FROM`="moin@party-starter.de"
   - `SMTP_URL`="smtp://[user]:[password]@sandbox.smtp.mailtrap.io:[port]"
 - `pnpm db:push` to push schema to DB
@@ -133,7 +133,7 @@ This template has a dual-mode Playwright setup:
   - `E2E_RUN_ID`
   - `E2E_WORKERS`
   - `E2E_SEED_MANIFEST`
-  - `ACTUALLY_SEND_EMAILS` (forced to `false` by the E2E runner)
+  - `EMAIL_DELIVERY_ENABLED` (forced to `false` by the E2E runner)
 
 ### Mail Capture
 

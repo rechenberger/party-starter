@@ -13,7 +13,7 @@ const isTruthy = (value?: string) => {
 }
 
 export const shouldActuallySendEmails = () => {
-  return isTruthy(process.env.ACTUALLY_SEND_EMAILS)
+  return isTruthy(process.env.EMAIL_DELIVERY_ENABLED)
 }
 
 export const getEmailFromAddress = () => {

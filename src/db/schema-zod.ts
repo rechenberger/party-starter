@@ -47,3 +47,12 @@ export const CronRunInsert = createInsertSchema(schema.cronRun, {
   status: schema.CronStatus,
 })
 export type CronRunInsert = z.infer<typeof CronRunInsert>
+
+export const EmailLog = createSelectSchema(schema.emailLog, {
+  status: schema.EmailLogStatus,
+})
+export type EmailLog = z.infer<typeof EmailLog>
+export const EmailLogInsert = createInsertSchema(schema.emailLog, {
+  status: schema.EmailLogStatus,
+})
+export type EmailLogInsert = z.infer<typeof EmailLogInsert>

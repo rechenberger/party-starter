@@ -1,7 +1,6 @@
 import 'dotenv-flow/config'
 
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
-import fs from 'node:fs'
 import path from 'node:path'
 import {
   extractConnectionString,
@@ -200,14 +199,12 @@ async function waitForServer(baseUrl: string) {
 function createCiEnv({
   runId,
   artifactsDir,
-  mailCaptureDir,
   manifestPath,
   databaseUrl,
   workerCount,
 }: {
   runId: string
   artifactsDir: string
-  mailCaptureDir: string
   manifestPath: string
   databaseUrl: string
   workerCount: number
@@ -222,7 +219,6 @@ function createCiEnv({
     E2E_RUN_ID: runId,
     E2E_WORKERS: String(workerCount),
     E2E_ARTIFACTS_DIR: artifactsDir,
-    E2E_MAIL_CAPTURE_DIR: mailCaptureDir,
     E2E_SEED_MANIFEST: manifestPath,
   })
 }
@@ -231,13 +227,9 @@ function createDevEnv() {
   const runId = sanitizeRunId(process.env.E2E_RUN_ID ?? 'dev')
   const workerCount = getWorkerCount()
   const artifactsDir = path.resolve(process.cwd(), '.e2e-artifacts', runId)
-  const mailCaptureDir =
-    process.env.E2E_MAIL_CAPTURE_DIR ?? path.join(artifactsDir, 'mails')
   const manifestPath =
     process.env.E2E_SEED_MANIFEST ??
     path.join(artifactsDir, 'seed-manifest.json')
-
-  fs.mkdirSync(mailCaptureDir, { recursive: true })
 
   const baseUrl = process.env.BASE_URL ?? DEFAULT_BASE_URL
   return withAuthMailDefaults({
@@ -248,7 +240,6 @@ function createDevEnv() {
     E2E_RUN_ID: runId,
     E2E_WORKERS: String(workerCount),
     E2E_ARTIFACTS_DIR: artifactsDir,
-    E2E_MAIL_CAPTURE_DIR: mailCaptureDir,
     E2E_SEED_MANIFEST: manifestPath,
   })
 }
@@ -256,6 +247,7 @@ function createDevEnv() {
 function withAuthMailDefaults(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   return {
     ...env,
+    ACTUALLY_SEND_EMAILS: 'false',
     EMAIL_FROM: env.EMAIL_FROM?.trim() || DEFAULT_EMAIL_FROM,
     SMTP_URL: env.SMTP_URL?.trim() || DEFAULT_SMTP_URL,
   }
@@ -281,10 +273,7 @@ async function runCi(playwrightArgs: string[]) {
   ).toISOString()
 
   const artifactsDir = path.resolve(process.cwd(), '.e2e-artifacts', runId)
-  const mailCaptureDir = path.join(artifactsDir, 'mails')
   const manifestPath = path.join(artifactsDir, 'seed-manifest.json')
-
-  fs.mkdirSync(mailCaptureDir, { recursive: true })
 
   const baseEnv = {
     ...process.env,
@@ -326,7 +315,6 @@ async function runCi(playwrightArgs: string[]) {
     const ciEnv = createCiEnv({
       runId,
       artifactsDir,
-      mailCaptureDir,
       manifestPath,
       databaseUrl,
       workerCount,

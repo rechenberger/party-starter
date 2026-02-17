@@ -1,12 +1,14 @@
+import { db } from '@/db/db'
+import { schema } from '@/db/schema-export'
 import { getMyLocale } from '@/i18n/getMyLocale'
 import { getTranslations } from '@/i18n/getTranslations'
 import { DEFAULT_LOCALE, Locale } from '@/i18n/locale'
 import { TranslationsServerAndClient } from '@/i18n/translations/translations.server.en'
 import { render } from '@react-email/components'
-import fs from 'node:fs/promises'
-import path from 'node:path'
+import { eq } from 'drizzle-orm'
 import { ReactNode } from 'react'
 import { ZodType, z } from 'zod'
+import { getEmailFromAddress, shouldActuallySendEmails } from './email-delivery'
 import { getMailTransporter } from './getMailTransporter'
 import { typedParse } from './typedParse'
 
@@ -28,6 +30,8 @@ export const createEmailTemplate = <Schema extends ZodType>(template: {
     locale?: Locale
     props: z.input<Schema>
   }) => {
+    let emailLogId: string | undefined
+
     try {
       const locale = params.locale ?? (await getMyLocale())
       const t = await getTranslations({ locale })
@@ -46,43 +50,73 @@ export const createEmailTemplate = <Schema extends ZodType>(template: {
 
       const subject = await template.subject(renderProps)
 
-      const mailCaptureDir = process.env.E2E_MAIL_CAPTURE_DIR
-      if (mailCaptureDir) {
-        const resolvedDir = path.resolve(process.cwd(), mailCaptureDir)
-        await fs.mkdir(resolvedDir, { recursive: true })
+      const fromEmail = getEmailFromAddress()
+      const runId = process.env.E2E_RUN_ID ?? null
 
-        const fileName = `${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2, 8)}-${template.name}.json`
+      const [emailLog] = await db
+        .insert(schema.emailLog)
+        .values({
+          template: template.name,
+          provider: 'smtp',
+          fromEmail,
+          toEmail: params.to,
+          subject,
+          html,
+          text,
+          locale,
+          status: 'queued',
+          runId,
+        })
+        .returning({
+          id: schema.emailLog.id,
+        })
 
-        await fs.writeFile(
-          path.join(resolvedDir, fileName),
-          JSON.stringify(
-            {
-              template: template.name,
-              to: params.to,
-              subject,
-              html,
-              text,
-              createdAt: new Date().toISOString(),
-              runId: process.env.E2E_RUN_ID ?? null,
-            },
-            null,
-            2,
-          ),
-          'utf8',
-        )
+      emailLogId = emailLog?.id
+
+      if (!shouldActuallySendEmails()) {
+        if (emailLogId) {
+          await db
+            .update(schema.emailLog)
+            .set({
+              status: 'skipped',
+            })
+            .where(eq(schema.emailLog.id, emailLogId))
+        }
         return
       }
 
       const transporter = getMailTransporter()
       await transporter.sendMail({
+        from: fromEmail,
         to: params.to,
         subject,
         html,
         text,
       })
+
+      if (emailLogId) {
+        await db
+          .update(schema.emailLog)
+          .set({
+            status: 'sent',
+            sentAt: new Date(),
+          })
+          .where(eq(schema.emailLog.id, emailLogId))
+      }
     } catch (error) {
+      if (emailLogId) {
+        await db
+          .update(schema.emailLog)
+          .set({
+            status: 'failed',
+            errorText:
+              error instanceof Error
+                ? `${error.name}: ${error.message}`
+                : `${error}`,
+          })
+          .where(eq(schema.emailLog.id, emailLogId))
+          .catch(() => undefined)
+      }
       console.error('Error sending email', error)
       throw error
     }

@@ -1,5 +1,4 @@
-import fs from 'node:fs/promises'
-import path from 'node:path'
+import { neon } from '@neondatabase/serverless'
 
 type CapturedMail = {
   template: string
@@ -11,16 +10,24 @@ type CapturedMail = {
   runId: string | null
 }
 
+type CapturedMailRow = {
+  template: string
+  to: string
+  subject: string
+  html: string
+  text: string
+  createdAt: string
+  runId: string | null
+}
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const getMailCaptureDir = () => {
-  const dir = process.env.E2E_MAIL_CAPTURE_DIR
-  if (!dir) {
-    throw new Error(
-      'E2E_MAIL_CAPTURE_DIR is not set. Enable capture by setting this environment variable.',
-    )
+const getMailQueryClient = () => {
+  const databaseUrl = process.env.DATABASE_URL
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is required for DB-backed mail capture.')
   }
-  return path.resolve(process.cwd(), dir)
+  return neon(databaseUrl)
 }
 
 export const waitForCapturedMail = async ({
@@ -34,49 +41,52 @@ export const waitForCapturedMail = async ({
   timeoutMs?: number
   createdAfterMs?: number
 }) => {
-  const dir = getMailCaptureDir()
+  const sql = getMailQueryClient()
   const deadline = Date.now() + timeoutMs
+  const createdAfterDate = new Date(createdAfterMs || 0)
+  const runId = process.env.E2E_RUN_ID?.trim() || null
 
   while (Date.now() < deadline) {
-    const fileNames = await fs.readdir(dir).catch(() => [])
-    let latestMatch: CapturedMail | undefined
-    let latestMatchCreatedAt = 0
+    const rows =
+      runId !== null
+        ? ((await sql`
+            select
+              template,
+              to_email as "to",
+              subject,
+              html,
+              text,
+              "createdAt" as "createdAt",
+              run_id as "runId"
+            from email_log
+            where template = ${template}
+              and lower(to_email) = lower(${to})
+              and "createdAt" >= ${createdAfterDate}
+              and run_id = ${runId}
+              and status in ('queued', 'sent', 'skipped')
+            order by "createdAt" desc
+            limit 1
+          `) as CapturedMailRow[])
+        : ((await sql`
+            select
+              template,
+              to_email as "to",
+              subject,
+              html,
+              text,
+              "createdAt" as "createdAt",
+              run_id as "runId"
+            from email_log
+            where template = ${template}
+              and lower(to_email) = lower(${to})
+              and "createdAt" >= ${createdAfterDate}
+              and status in ('queued', 'sent', 'skipped')
+            order by "createdAt" desc
+            limit 1
+          `) as CapturedMailRow[])
 
-    for (const fileName of fileNames) {
-      if (!fileName.endsWith('.json')) {
-        continue
-      }
-
-      const fullPath = path.join(dir, fileName)
-      const raw = await fs.readFile(fullPath, 'utf8').catch(() => null)
-      if (!raw) {
-        continue
-      }
-
-      let parsed: CapturedMail
-      try {
-        parsed = JSON.parse(raw) as CapturedMail
-      } catch {
-        continue
-      }
-      const createdAtMs = Number.isNaN(Date.parse(parsed.createdAt))
-        ? 0
-        : Date.parse(parsed.createdAt)
-      if (
-        parsed.template === template &&
-        parsed.to.toLowerCase() === to.toLowerCase() &&
-        createdAtMs >= createdAfterMs
-      ) {
-        if (!latestMatch || createdAtMs >= latestMatchCreatedAt) {
-          latestMatch = parsed
-          latestMatchCreatedAt = createdAtMs
-        }
-      }
-    }
-
-    if (latestMatch) {
-      return latestMatch
-    }
+    const latestMatch = rows[0]
+    if (latestMatch) return latestMatch as CapturedMail
 
     await sleep(500)
   }

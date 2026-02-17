@@ -34,7 +34,8 @@
   - `http://localhost:3000/api/auth/callback/discord`
   - `https://your-app.com/api/auth/callback/discord`
 - Email
-  - Specify an SMTP server
+  - Configure outbound delivery + logging
+  - `ACTUALLY_SEND_EMAILS`=`false` (set to `true` only in production)
   - `EMAIL_FROM`="moin@party-starter.de"
   - `SMTP_URL`="smtp://[user]:[password]@sandbox.smtp.mailtrap.io:[port]"
 - `pnpm db:push` to push schema to DB
@@ -132,12 +133,13 @@ This template has a dual-mode Playwright setup:
   - `E2E_RUN_ID`
   - `E2E_WORKERS`
   - `E2E_SEED_MANIFEST`
-  - `E2E_MAIL_CAPTURE_DIR`
+  - `ACTUALLY_SEND_EMAILS` (forced to `false` by the E2E runner)
 
 ### Mail Capture
 
-- If `E2E_MAIL_CAPTURE_DIR` is set, mails are rendered and written as JSON artifacts instead of being sent via SMTP.
-- This is used by E2E tests to validate invite email content and links without external delivery.
+- All generated mails are persisted in the `email_log` table.
+- E2E tests poll `email_log` directly to validate invite/auth email content and links.
+- You can inspect mails in the admin UI at `/admin/emails`.
 
 ## Run
 

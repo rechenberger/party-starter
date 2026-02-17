@@ -19,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
@@ -184,7 +185,7 @@ export default async function AdminEmailsPage({
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className={selectedEmail ? 'grid gap-4 xl:grid-cols-2' : ''}>
         <Card>
           <CardHeader>
             <CardTitle>{t.emailsLog.title}</CardTitle>
@@ -198,7 +199,6 @@ export default async function AdminEmailsPage({
                   <TableHead>{t.emailsLog.table.to}</TableHead>
                   <TableHead>{t.emailsLog.table.subject}</TableHead>
                   <TableHead>{t.emailsLog.table.status}</TableHead>
-                  <TableHead>{t.emailsLog.table.actions}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -213,24 +213,55 @@ export default async function AdminEmailsPage({
                   </TableRow>
                 ) : (
                   emails.map((email) => (
-                    <TableRow key={email.id}>
+                    <TableRow
+                      key={email.id}
+                      className="cursor-pointer"
+                      data-state={selectedId === email.id ? 'selected' : undefined}
+                    >
                       <TableCell className="text-nowrap">
-                        <DateFnsFormat date={email.createdAt} format="Ppp" />
+                        <Link
+                          href={queryWithSelection(email.id)}
+                          className="block"
+                        >
+                          <DateFnsFormat
+                            date={email.createdAt}
+                            format="Ppp"
+                          />
+                        </Link>
                       </TableCell>
-                      <TableCell>{email.template}</TableCell>
-                      <TableCell>{email.toEmail}</TableCell>
-                      <TableCell>{email.subject}</TableCell>
                       <TableCell>
-                        <Badge variant={getStatusVariant(email.status)}>
-                          {t.emailsLog.status[email.status]}
-                        </Badge>
+                        <Link
+                          href={queryWithSelection(email.id)}
+                          className="block"
+                        >
+                          {email.template}
+                        </Link>
                       </TableCell>
                       <TableCell>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={queryWithSelection(email.id)}>
-                            {t.emailsLog.table.open}
-                          </Link>
-                        </Button>
+                        <Link
+                          href={queryWithSelection(email.id)}
+                          className="block"
+                        >
+                          {email.toEmail}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          href={queryWithSelection(email.id)}
+                          className="block"
+                        >
+                          {email.subject}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          href={queryWithSelection(email.id)}
+                          className="block"
+                        >
+                          <Badge variant={getStatusVariant(email.status)}>
+                            {t.emailsLog.status[email.status]}
+                          </Badge>
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))
@@ -240,23 +271,20 @@ export default async function AdminEmailsPage({
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t.emailsLog.detail.title}</CardTitle>
-            <CardDescription>{t.emailsLog.detail.description}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {!selectedId && (
-              <p className="text-sm text-muted-foreground">
-                {t.emailsLog.detail.noSelection}
-              </p>
-            )}
-
-            {!!selectedId && !selectedEmail && (
-              <p className="text-sm text-muted-foreground">
-                {t.emailsLog.detail.notFound}
-              </p>
-            )}
+        {!!selectedId && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{t.emailsLog.detail.title}</CardTitle>
+              <CardDescription>
+                {t.emailsLog.detail.description}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {!selectedEmail && (
+                <p className="text-sm text-muted-foreground">
+                  {t.emailsLog.detail.notFound}
+                </p>
+              )}
 
             {!!selectedEmail && (
               <>
@@ -305,43 +333,46 @@ export default async function AdminEmailsPage({
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">
-                    {t.emailsLog.detail.text}
-                  </div>
-                  <Textarea
-                    readOnly
-                    value={selectedEmail.text}
-                    className="min-h-44 font-mono"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">
-                    {t.emailsLog.detail.html}
-                  </div>
-                  <Textarea
-                    readOnly
-                    value={selectedEmail.html}
-                    className="min-h-44 font-mono"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">
-                    {t.emailsLog.detail.htmlPreview}
-                  </div>
-                  <iframe
-                    title={t.emailsLog.detail.htmlPreview}
-                    srcDoc={selectedEmail.html}
-                    sandbox=""
-                    className="w-full min-h-80 rounded-md border"
-                  />
-                </div>
+                <Tabs defaultValue="preview">
+                  <TabsList>
+                    <TabsTrigger value="preview">
+                      {t.emailsLog.detail.htmlPreview}
+                    </TabsTrigger>
+                    <TabsTrigger value="text">
+                      {t.emailsLog.detail.text}
+                    </TabsTrigger>
+                    <TabsTrigger value="html">
+                      {t.emailsLog.detail.html}
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="preview">
+                    <iframe
+                      title={t.emailsLog.detail.htmlPreview}
+                      srcDoc={selectedEmail.html}
+                      sandbox=""
+                      className="w-full min-h-[40rem] rounded-md border"
+                    />
+                  </TabsContent>
+                  <TabsContent value="text">
+                    <Textarea
+                      readOnly
+                      value={selectedEmail.text}
+                      className="min-h-44 font-mono"
+                    />
+                  </TabsContent>
+                  <TabsContent value="html">
+                    <Textarea
+                      readOnly
+                      value={selectedEmail.html}
+                      className="min-h-44 font-mono"
+                    />
+                  </TabsContent>
+                </Tabs>
               </>
             )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </>
   )

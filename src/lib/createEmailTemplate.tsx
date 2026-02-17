@@ -8,6 +8,7 @@ import { render } from '@react-email/components'
 import { eq } from 'drizzle-orm'
 import { ReactNode } from 'react'
 import { ZodType, z } from 'zod'
+import { isEmailAllowlisted } from './email-allowlist'
 import { getEmailFromAddress, shouldActuallySendEmails } from './email-delivery'
 import { getMailTransporter } from './getMailTransporter'
 import { typedParse } from './typedParse'
@@ -74,15 +75,18 @@ export const createEmailTemplate = <Schema extends ZodType>(template: {
       emailLogId = emailLog?.id
 
       if (!shouldActuallySendEmails()) {
-        if (emailLogId) {
-          await db
-            .update(schema.emailLog)
-            .set({
-              status: 'skipped',
-            })
-            .where(eq(schema.emailLog.id, emailLogId))
+        const allowlisted = await isEmailAllowlisted(params.to)
+        if (!allowlisted) {
+          if (emailLogId) {
+            await db
+              .update(schema.emailLog)
+              .set({
+                status: 'skipped',
+              })
+              .where(eq(schema.emailLog.id, emailLogId))
+          }
+          return
         }
-        return
       }
 
       const transporter = getMailTransporter()

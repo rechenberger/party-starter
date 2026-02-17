@@ -38,6 +38,7 @@
   - `EMAIL_DELIVERY_ENABLED`=`false` (set to `true` only in production)
   - `EMAIL_FROM`="moin@party-starter.de"
   - `SMTP_URL`="smtp://[user]:[password]@sandbox.smtp.mailtrap.io:[port]"
+  - **Allowlist**: When `EMAIL_DELIVERY_ENABLED` is `false`, you can still deliver emails to specific recipients by adding patterns to the allowlist at `/admin/emails/settings`. Use `*` as wildcard (e.g. `*@example.com`, `dev@company.de`).
 - `pnpm db:push` to push schema to DB
 - Cron Jobs
   - Add cron jobs to [crons.ts](src/super-cron/crons.ts)

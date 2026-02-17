@@ -27,6 +27,7 @@ import type { EmailLogStatus } from '@/db/schema-email-log'
 import { getTranslations } from '@/i18n/getTranslations'
 import { and, desc, eq, ilike, type SQL } from 'drizzle-orm'
 import type { Metadata } from 'next'
+import { Settings } from 'lucide-react'
 import Link from 'next/link'
 import { EmailDeliveryBadge } from './EmailDeliveryBadge'
 
@@ -109,8 +110,14 @@ export default async function AdminEmailsPage({
     <>
       <TopHeader>
         <CardTitle>{t.emailsLog.title}</CardTitle>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
           <EmailDeliveryBadge />
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin/emails/settings">
+              <Settings className="h-4 w-4" />
+              {t.emailsLog.settings.title}
+            </Link>
+          </Button>
         </div>
       </TopHeader>
 

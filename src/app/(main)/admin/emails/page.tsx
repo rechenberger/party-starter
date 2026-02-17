@@ -28,6 +28,7 @@ import { getTranslations } from '@/i18n/getTranslations'
 import { and, desc, eq, ilike, type SQL } from 'drizzle-orm'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { EmailDeliveryBadge } from './EmailDeliveryBadge'
 
 export const generateMetadata = async () => {
   const t = await getTranslations()
@@ -108,6 +109,9 @@ export default async function AdminEmailsPage({
     <>
       <TopHeader>
         <CardTitle>{t.emailsLog.title}</CardTitle>
+        <div className="ml-auto">
+          <EmailDeliveryBadge />
+        </div>
       </TopHeader>
 
       <Card>

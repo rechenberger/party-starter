@@ -344,6 +344,38 @@ export const t = {
     unknown: 'Unknown',
     notSentYet: 'Not sent yet',
     noError: 'No error',
+    delivery: {
+      enabled: 'Delivery enabled',
+      disabled: 'Delivery disabled',
+      partiallyEnabled: 'Partially enabled',
+    },
+    settings: {
+      title: 'Email Settings',
+      statusTitle: 'Delivery Status',
+      statusEnabled:
+        'All outbound emails are being delivered. Every email will be sent to its recipient.',
+      statusDisabled:
+        'Email delivery is disabled. No emails will be sent to any recipient.',
+      statusPartiallyEnabled:
+        'Email delivery is disabled globally, but emails matching the allowlist patterns below will still be delivered.',
+      envVarHint: 'Change via the EMAIL_DELIVERY_ENABLED environment variable.',
+      allowlist: {
+        title: 'Delivery Allowlist',
+        description:
+          'Add email patterns to allow delivery even when global delivery is disabled. Use * as wildcard (e.g. *@example.com).',
+        pattern: 'Pattern',
+        patternPlaceholder: '*@example.com',
+        add: 'Add',
+        noEntries: 'No allowlist entries yet.',
+        delete: 'Delete',
+        deleteConfirmation: {
+          title: 'Delete pattern?',
+          content: (pattern: string) =>
+            `Remove "${pattern}" from the allowlist?`,
+          confirm: 'Delete',
+        },
+      },
+    },
   },
   cron: {
     schedule: 'Schedule:',

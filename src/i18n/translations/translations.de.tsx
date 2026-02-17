@@ -354,6 +354,39 @@ export const t = {
     unknown: 'Unbekannt',
     notSentYet: 'Noch nicht gesendet',
     noError: 'Kein Fehler',
+    delivery: {
+      enabled: 'Zustellung aktiv',
+      disabled: 'Zustellung deaktiviert',
+      partiallyEnabled: 'Teilweise aktiv',
+    },
+    settings: {
+      title: 'E-Mail Einstellungen',
+      statusTitle: 'Zustellungsstatus',
+      statusEnabled:
+        'Alle ausgehenden E-Mails werden zugestellt. Jede E-Mail wird an den Empfänger gesendet.',
+      statusDisabled:
+        'Die E-Mail-Zustellung ist deaktiviert. Es werden keine E-Mails an Empfänger gesendet.',
+      statusPartiallyEnabled:
+        'Die E-Mail-Zustellung ist global deaktiviert, aber E-Mails, die den Allowlist-Mustern unten entsprechen, werden trotzdem zugestellt.',
+      envVarHint:
+        'Ändern Sie dies über die Umgebungsvariable EMAIL_DELIVERY_ENABLED.',
+      allowlist: {
+        title: 'Zustellungs-Allowlist',
+        description:
+          'Fügen Sie E-Mail-Muster hinzu, um die Zustellung auch bei deaktivierter globaler Zustellung zu ermöglichen. Verwenden Sie * als Platzhalter (z.B. *@example.com).',
+        pattern: 'Muster',
+        patternPlaceholder: '*@example.com',
+        add: 'Hinzufügen',
+        noEntries: 'Noch keine Allowlist-Einträge.',
+        delete: 'Löschen',
+        deleteConfirmation: {
+          title: 'Muster löschen?',
+          content: (pattern: string) =>
+            `"${pattern}" aus der Allowlist entfernen?`,
+          confirm: 'Löschen',
+        },
+      },
+    },
   },
   cron: {
     schedule: 'Zeitplan:',

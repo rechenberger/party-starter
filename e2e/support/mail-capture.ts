@@ -1,24 +1,8 @@
-import { neon } from '@neondatabase/serverless'
-
-type CapturedMail = {
-  template: string
-  to: string
-  subject: string
-  html: string
-  text: string
-  createdAt: string
-  runId: string | null
-}
+import { db } from '@/db/db'
+import { schema } from '@/db/schema-export'
+import { and, desc, eq, gte, ilike, inArray, type SQL } from 'drizzle-orm'
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
-const getMailQueryClient = () => {
-  const databaseUrl = process.env.DATABASE_URL
-  if (!databaseUrl) {
-    throw new Error('DATABASE_URL is required for DB-backed mail capture.')
-  }
-  return neon(databaseUrl)
-}
 
 export const waitForCapturedMail = async ({
   to,
@@ -31,33 +15,35 @@ export const waitForCapturedMail = async ({
   timeoutMs?: number
   createdAfterMs?: number
 }) => {
-  const sql = getMailQueryClient()
   const deadline = Date.now() + timeoutMs
   const createdAfterDate = new Date(createdAfterMs || 0)
   const runId = process.env.E2E_RUN_ID?.trim() || null
 
   while (Date.now() < deadline) {
-    const rows = (await sql`
-      select
-        template,
-        to_email as "to",
-        subject,
-        html,
-        text,
-        "createdAt" as "createdAt",
-        run_id as "runId"
-      from email_log
-      where template = ${template}
-        and lower(to_email) = lower(${to})
-        and "createdAt" >= ${createdAfterDate}
-        and (${runId}::text is null or run_id = ${runId})
-        and status in ('queued', 'sent', 'skipped')
-      order by "createdAt" desc
-      limit 1
-    `) as CapturedMail[]
+    const conditions: SQL<unknown>[] = [
+      eq(schema.emailLog.template, template),
+      ilike(schema.emailLog.toEmail, to),
+      gte(schema.emailLog.createdAt, createdAfterDate),
+      inArray(schema.emailLog.status, ['queued', 'sent', 'skipped']),
+      ...(runId ? [eq(schema.emailLog.runId, runId)] : []),
+    ]
 
-    const latestMatch = rows[0]
-    if (latestMatch) return latestMatch
+    const [match] = await db
+      .select({
+        template: schema.emailLog.template,
+        to: schema.emailLog.toEmail,
+        subject: schema.emailLog.subject,
+        html: schema.emailLog.html,
+        text: schema.emailLog.text,
+        createdAt: schema.emailLog.createdAt,
+        runId: schema.emailLog.runId,
+      })
+      .from(schema.emailLog)
+      .where(and(...conditions))
+      .orderBy(desc(schema.emailLog.createdAt))
+      .limit(1)
+
+    if (match) return match
 
     await sleep(500)
   }

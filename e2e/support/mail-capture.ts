@@ -10,16 +10,6 @@ type CapturedMail = {
   runId: string | null
 }
 
-type CapturedMailRow = {
-  template: string
-  to: string
-  subject: string
-  html: string
-  text: string
-  createdAt: string
-  runId: string | null
-}
-
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const getMailQueryClient = () => {
@@ -47,46 +37,27 @@ export const waitForCapturedMail = async ({
   const runId = process.env.E2E_RUN_ID?.trim() || null
 
   while (Date.now() < deadline) {
-    const rows =
-      runId !== null
-        ? ((await sql`
-            select
-              template,
-              to_email as "to",
-              subject,
-              html,
-              text,
-              "createdAt" as "createdAt",
-              run_id as "runId"
-            from email_log
-            where template = ${template}
-              and lower(to_email) = lower(${to})
-              and "createdAt" >= ${createdAfterDate}
-              and run_id = ${runId}
-              and status in ('queued', 'sent', 'skipped')
-            order by "createdAt" desc
-            limit 1
-          `) as CapturedMailRow[])
-        : ((await sql`
-            select
-              template,
-              to_email as "to",
-              subject,
-              html,
-              text,
-              "createdAt" as "createdAt",
-              run_id as "runId"
-            from email_log
-            where template = ${template}
-              and lower(to_email) = lower(${to})
-              and "createdAt" >= ${createdAfterDate}
-              and status in ('queued', 'sent', 'skipped')
-            order by "createdAt" desc
-            limit 1
-          `) as CapturedMailRow[])
+    const rows = (await sql`
+      select
+        template,
+        to_email as "to",
+        subject,
+        html,
+        text,
+        "createdAt" as "createdAt",
+        run_id as "runId"
+      from email_log
+      where template = ${template}
+        and lower(to_email) = lower(${to})
+        and "createdAt" >= ${createdAfterDate}
+        and (${runId}::text is null or run_id = ${runId})
+        and status in ('queued', 'sent', 'skipped')
+      order by "createdAt" desc
+      limit 1
+    `) as CapturedMail[]
 
     const latestMatch = rows[0]
-    if (latestMatch) return latestMatch as CapturedMail
+    if (latestMatch) return latestMatch
 
     await sleep(500)
   }

@@ -99,9 +99,7 @@ export default async function EmailSettingsPage() {
               placeholder={t.emailsLog.settings.allowlist.patternPlaceholder}
               required
             />
-            <Button type="submit">
-              {t.emailsLog.settings.allowlist.add}
-            </Button>
+            <Button type="submit">{t.emailsLog.settings.allowlist.add}</Button>
           </form>
 
           <Table>
@@ -131,27 +129,27 @@ export default async function EmailSettingsPage() {
                       <ActionButton
                         variant="ghost"
                         size="sm"
-                        askForConfirmation={{
-                          title:
-                            t.emailsLog.settings.allowlist.deleteConfirmation
-                              .title,
-                          description:
-                            t.emailsLog.settings.allowlist.deleteConfirmation.content(
-                              entry.pattern,
-                            ),
-                          confirm:
-                            t.emailsLog.settings.allowlist.deleteConfirmation
-                              .confirm,
-                        } satisfies SuperActionDialog}
+                        askForConfirmation={
+                          {
+                            title:
+                              t.emailsLog.settings.allowlist.deleteConfirmation
+                                .title,
+                            description:
+                              t.emailsLog.settings.allowlist.deleteConfirmation.content(
+                                entry.pattern,
+                              ),
+                            confirm:
+                              t.emailsLog.settings.allowlist.deleteConfirmation
+                                .confirm,
+                          } satisfies SuperActionDialog
+                        }
                         catchToast
                         action={async () => {
                           'use server'
                           return superAction(async () => {
                             await db
                               .delete(schema.emailAllowlist)
-                              .where(
-                                eq(schema.emailAllowlist.id, entry.id),
-                              )
+                              .where(eq(schema.emailAllowlist.id, entry.id))
                             revalidatePath('/admin/emails/settings')
                           })
                         }}

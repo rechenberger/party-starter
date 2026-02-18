@@ -50,6 +50,8 @@
 
 ## Neon Branches (Dev)
 
+These commands are intended for human local development.
+
 - `pnpm neon:dev:use`: create-or-reset your `dev/<username>` branch from `production` and update `DATABASE_URL`
 - `pnpm neon:dev:env`: only update `DATABASE_URL` for your branch (no create/reset)
 - `pnpm neon:prod:env`: set `DATABASE_URL` to the `production` branch
@@ -76,6 +78,12 @@ This template has a dual-mode Playwright setup:
 
 - CI mode (`next build` + `next start`) with a dedicated schema-only Neon branch per run
 - Dev mode (`next dev`) for fast local iteration without forced branch lifecycle
+
+### Policy (AI agents vs humans)
+
+- AI agents should run E2E checks with `pnpm e2e:ci`.
+- `pnpm e2e:dev` is intended for humans doing interactive local debugging.
+- `pnpm neon:dev:*` commands are human workflows and should not be required for agent E2E verification.
 
 ### Setup
 
@@ -109,8 +117,12 @@ This template has a dual-mode Playwright setup:
   - `pnpm db:push`
   - `pnpm e2e:seed`
   - `next build` + `next start`
+  - pick an available localhost port for the run (override with `E2E_PORT`)
   - Playwright run (`playwright.ci.config.ts`)
   - branch cleanup (delete, plus expiration fallback)
+- Small/targeted CI runs (useful for agents):
+  - `E2E_WORKERS=1 pnpm e2e:ci -- e2e/specs/org-members.spec.ts`
+  - `E2E_WORKERS=1 pnpm e2e:ci -- --grep "impersonate"`
 
 ### Dev Mode (local changes)
 

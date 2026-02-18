@@ -1,6 +1,7 @@
 import 'dotenv-flow/config'
 
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process'
+import net from 'node:net'
 import path from 'node:path'
 import {
   extractConnectionString,
@@ -26,7 +27,8 @@ Direct:
 `
 
 const DEFAULT_PARENT_BRANCH = 'production'
-const DEFAULT_BASE_URL = 'http://127.0.0.1:3000'
+const DEFAULT_DEV_BASE_URL = 'http://127.0.0.1:3000'
+const DEFAULT_CI_HOST = '127.0.0.1'
 const DEFAULT_BRANCH_TTL_HOURS = 24
 const DEFAULT_EMAIL_FROM = 'e2e@example.com'
 const DEFAULT_SMTP_URL = 'smtp://e2e:e2e@127.0.0.1:2525'
@@ -202,19 +204,23 @@ function createCiEnv({
   manifestPath,
   databaseUrl,
   workerCount,
+  baseUrl,
+  port,
 }: {
   runId: string
   artifactsDir: string
   manifestPath: string
   databaseUrl: string
   workerCount: number
+  baseUrl: string
+  port: number
 }) {
-  const baseUrl = process.env.BASE_URL ?? DEFAULT_BASE_URL
   return withAuthMailDefaults({
     ...process.env,
     DATABASE_URL: databaseUrl,
     BASE_URL: baseUrl,
-    AUTH_URL: process.env.AUTH_URL ?? baseUrl,
+    AUTH_URL: baseUrl,
+    PORT: String(port),
     E2E_MODE: 'ci',
     E2E_RUN_ID: runId,
     E2E_WORKERS: String(workerCount),
@@ -231,7 +237,7 @@ function createDevEnv() {
     process.env.E2E_SEED_MANIFEST ??
     path.join(artifactsDir, 'seed-manifest.json')
 
-  const baseUrl = process.env.BASE_URL ?? DEFAULT_BASE_URL
+  const baseUrl = process.env.BASE_URL ?? DEFAULT_DEV_BASE_URL
   return withAuthMailDefaults({
     ...process.env,
     BASE_URL: baseUrl,
@@ -251,6 +257,50 @@ function withAuthMailDefaults(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
     EMAIL_FROM: env.EMAIL_FROM?.trim() || DEFAULT_EMAIL_FROM,
     SMTP_URL: env.SMTP_URL?.trim() || DEFAULT_SMTP_URL,
   }
+}
+
+function parsePort(value: string, sourceName: string) {
+  const parsed = Number(value)
+  if (Number.isInteger(parsed) && parsed > 0 && parsed <= 65_535) {
+    return parsed
+  }
+  throw new Error(`${sourceName} must be an integer between 1 and 65535`)
+}
+
+async function findAvailablePort(host: string) {
+  return new Promise<number>((resolve, reject) => {
+    const server = net.createServer()
+
+    server.on('error', reject)
+    server.listen(0, host, () => {
+      const address = server.address()
+      if (!address || typeof address === 'string') {
+        server.close()
+        reject(new Error('Failed to determine free TCP port'))
+        return
+      }
+
+      const { port } = address
+      server.close((error) => {
+        if (error) {
+          reject(error)
+          return
+        }
+        resolve(port)
+      })
+    })
+  })
+}
+
+async function resolveCiServerTarget() {
+  const host = DEFAULT_CI_HOST
+  const explicitPort = process.env.E2E_PORT?.trim()
+  const port = explicitPort
+    ? parsePort(explicitPort, 'E2E_PORT')
+    : await findAvailablePort(host)
+  const baseUrl = `http://${host}:${port}`
+
+  return { port, baseUrl }
 }
 
 async function runCi(playwrightArgs: string[]) {
@@ -274,6 +324,9 @@ async function runCi(playwrightArgs: string[]) {
 
   const artifactsDir = path.resolve(process.cwd(), '.e2e-artifacts', runId)
   const manifestPath = path.join(artifactsDir, 'seed-manifest.json')
+  const serverTarget = await resolveCiServerTarget()
+
+  console.log(`Running E2E CI server on ${serverTarget.baseUrl}`)
 
   const baseEnv = {
     ...process.env,
@@ -318,18 +371,24 @@ async function runCi(playwrightArgs: string[]) {
       manifestPath,
       databaseUrl,
       workerCount,
+      baseUrl: serverTarget.baseUrl,
+      port: serverTarget.port,
     })
 
     await spawnAndWait('pnpm', ['db:push'], ciEnv)
     await spawnAndWait('pnpm', ['e2e:seed'], ciEnv)
     await spawnAndWait('pnpm', ['e2e:build'], ciEnv)
 
-    serverProcess = spawn('pnpm', ['e2e:start'], {
-      env: ciEnv,
-      stdio: 'inherit',
-    })
+    serverProcess = spawn(
+      'pnpm',
+      ['exec', 'next', 'start', '-p', String(serverTarget.port)],
+      {
+        env: ciEnv,
+        stdio: 'inherit',
+      },
+    )
 
-    await waitForServer(ciEnv.BASE_URL ?? DEFAULT_BASE_URL)
+    await waitForServer(serverTarget.baseUrl)
 
     await spawnAndWait(
       'pnpm',

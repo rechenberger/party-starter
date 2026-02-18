@@ -175,9 +175,15 @@ export default async function Page({
   return (
     <>
       <TopHeader>
-        <div className="flex w-full flex-wrap gap-2 items-center">
+        <div className="flex w-full gap-2 items-center">
           <CardTitle className="mr-auto">{t.users.title}</CardTitle>
-          <div className="flex flex-wrap md:flex-row gap-2 items-center">
+          <CreateUserButton />
+        </div>
+      </TopHeader>
+
+      <Card>
+        <CardContent className="space-y-4 pt-4">
+          <div className="flex flex-wrap gap-2 items-center">
             <SimpleParamSelect
               paramKey="filter"
               component="tabs"
@@ -189,7 +195,7 @@ export default async function Page({
             <form
               action="/users"
               method="GET"
-              className="flex flex-wrap md:flex-row gap-2 items-center"
+              className="flex flex-1 flex-wrap gap-2 items-center"
             >
               {!!filter && <input type="hidden" name="filter" value={filter} />}
               <label htmlFor="users-search" className="sr-only">
@@ -202,7 +208,7 @@ export default async function Page({
                 data-testid="users-search-input"
                 defaultValue={query}
                 placeholder={t.users.searchPlaceholder}
-                className="w-[220px]"
+                className="flex-1 min-w-[180px]"
               />
               <Button type="submit" size="sm" data-testid="users-search-submit">
                 {t.users.search}
@@ -219,12 +225,6 @@ export default async function Page({
               )}
             </form>
           </div>
-          <CreateUserButton />
-        </div>
-      </TopHeader>
-
-      <Card>
-        <CardContent className="space-y-4 pt-0">
           <Table>
             <TableHeader>
               <TableRow>

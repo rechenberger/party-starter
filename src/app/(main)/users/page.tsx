@@ -417,7 +417,7 @@ export default async function Page({
           </Table>
 
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground whitespace-nowrap">
               {totalUsers === 0
                 ? t.users.table.noUsersFound
                 : t.users.pagination.summary(

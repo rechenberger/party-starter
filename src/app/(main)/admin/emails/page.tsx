@@ -227,17 +227,16 @@ export default async function AdminEmailsPage({
                     <TableRow
                       key={email.id}
                       className="cursor-pointer"
-                      data-state={selectedId === email.id ? 'selected' : undefined}
+                      data-state={
+                        selectedId === email.id ? 'selected' : undefined
+                      }
                     >
                       <TableCell className="text-nowrap">
                         <Link
                           href={queryWithSelection(email.id)}
                           className="block"
                         >
-                          <DateFnsFormat
-                            date={email.createdAt}
-                            format="Ppp"
-                          />
+                          <DateFnsFormat date={email.createdAt} format="Ppp" />
                         </Link>
                       </TableCell>
                       <TableCell>
@@ -297,90 +296,93 @@ export default async function AdminEmailsPage({
                 </p>
               )}
 
-            {!!selectedEmail && (
-              <>
-                <div className="grid gap-2 text-sm">
-                  <div>
-                    <strong>{t.emailsLog.detail.template}:</strong>{' '}
-                    {selectedEmail.template}
+              {!!selectedEmail && (
+                <>
+                  <div className="grid gap-2 text-sm">
+                    <div>
+                      <strong>{t.emailsLog.detail.template}:</strong>{' '}
+                      {selectedEmail.template}
+                    </div>
+                    <div>
+                      <strong>{t.emailsLog.detail.status}:</strong>{' '}
+                      <Badge variant={getStatusVariant(selectedEmail.status)}>
+                        {t.emailsLog.status[selectedEmail.status]}
+                      </Badge>
+                    </div>
+                    <div>
+                      <strong>{t.emailsLog.detail.from}:</strong>{' '}
+                      {selectedEmail.fromEmail}
+                    </div>
+                    <div>
+                      <strong>{t.emailsLog.detail.to}:</strong>{' '}
+                      {selectedEmail.toEmail}
+                    </div>
+                    <div>
+                      <strong>{t.emailsLog.detail.provider}:</strong>{' '}
+                      {selectedEmail.provider}
+                    </div>
+                    <div>
+                      <strong>{t.emailsLog.detail.locale}:</strong>{' '}
+                      {selectedEmail.locale}
+                    </div>
+                    <div>
+                      <strong>{t.emailsLog.detail.runId}:</strong>{' '}
+                      {selectedEmail.runId ?? t.emailsLog.unknown}
+                    </div>
+                    <div>
+                      <strong>{t.emailsLog.detail.sentAt}:</strong>{' '}
+                      {selectedEmail.sentAt ? (
+                        <DateFnsFormat
+                          date={selectedEmail.sentAt}
+                          format="Ppp"
+                        />
+                      ) : (
+                        t.emailsLog.notSentYet
+                      )}
+                    </div>
+                    <div>
+                      <strong>{t.emailsLog.detail.error}:</strong>{' '}
+                      {selectedEmail.errorText ?? t.emailsLog.noError}
+                    </div>
                   </div>
-                  <div>
-                    <strong>{t.emailsLog.detail.status}:</strong>{' '}
-                    <Badge variant={getStatusVariant(selectedEmail.status)}>
-                      {t.emailsLog.status[selectedEmail.status]}
-                    </Badge>
-                  </div>
-                  <div>
-                    <strong>{t.emailsLog.detail.from}:</strong>{' '}
-                    {selectedEmail.fromEmail}
-                  </div>
-                  <div>
-                    <strong>{t.emailsLog.detail.to}:</strong>{' '}
-                    {selectedEmail.toEmail}
-                  </div>
-                  <div>
-                    <strong>{t.emailsLog.detail.provider}:</strong>{' '}
-                    {selectedEmail.provider}
-                  </div>
-                  <div>
-                    <strong>{t.emailsLog.detail.locale}:</strong>{' '}
-                    {selectedEmail.locale}
-                  </div>
-                  <div>
-                    <strong>{t.emailsLog.detail.runId}:</strong>{' '}
-                    {selectedEmail.runId ?? t.emailsLog.unknown}
-                  </div>
-                  <div>
-                    <strong>{t.emailsLog.detail.sentAt}:</strong>{' '}
-                    {selectedEmail.sentAt ? (
-                      <DateFnsFormat date={selectedEmail.sentAt} format="Ppp" />
-                    ) : (
-                      t.emailsLog.notSentYet
-                    )}
-                  </div>
-                  <div>
-                    <strong>{t.emailsLog.detail.error}:</strong>{' '}
-                    {selectedEmail.errorText ?? t.emailsLog.noError}
-                  </div>
-                </div>
 
-                <Tabs defaultValue="preview">
-                  <TabsList>
-                    <TabsTrigger value="preview">
-                      {t.emailsLog.detail.htmlPreview}
-                    </TabsTrigger>
-                    <TabsTrigger value="text">
-                      {t.emailsLog.detail.text}
-                    </TabsTrigger>
-                    <TabsTrigger value="html">
-                      {t.emailsLog.detail.html}
-                    </TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="preview">
-                    <iframe
-                      title={t.emailsLog.detail.htmlPreview}
-                      srcDoc={selectedEmail.html}
-                      sandbox=""
-                      className="w-full min-h-[40rem] rounded-md border"
-                    />
-                  </TabsContent>
-                  <TabsContent value="text">
-                    <Textarea
-                      readOnly
-                      value={selectedEmail.text}
-                      className="min-h-44 font-mono"
-                    />
-                  </TabsContent>
-                  <TabsContent value="html">
-                    <Textarea
-                      readOnly
-                      value={selectedEmail.html}
-                      className="min-h-44 font-mono"
-                    />
-                  </TabsContent>
-                </Tabs>
-              </>
-            )}
+                  <Tabs defaultValue="preview">
+                    <TabsList>
+                      <TabsTrigger value="preview">
+                        {t.emailsLog.detail.htmlPreview}
+                      </TabsTrigger>
+                      <TabsTrigger value="text">
+                        {t.emailsLog.detail.text}
+                      </TabsTrigger>
+                      <TabsTrigger value="html">
+                        {t.emailsLog.detail.html}
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="preview">
+                      <iframe
+                        title={t.emailsLog.detail.htmlPreview}
+                        srcDoc={selectedEmail.html}
+                        sandbox=""
+                        className="w-full min-h-[40rem] rounded-md border"
+                      />
+                    </TabsContent>
+                    <TabsContent value="text">
+                      <Textarea
+                        readOnly
+                        value={selectedEmail.text}
+                        className="min-h-44 font-mono"
+                      />
+                    </TabsContent>
+                    <TabsContent value="html">
+                      <Textarea
+                        readOnly
+                        value={selectedEmail.html}
+                        className="min-h-44 font-mono"
+                      />
+                    </TabsContent>
+                  </Tabs>
+                </>
+              )}
             </CardContent>
           </Card>
         )}

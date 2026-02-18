@@ -10,7 +10,6 @@
     "start": "next start",
     "e2e:install": "playwright install --with-deps chromium",
     "e2e:build": "next build",
-    "e2e:start": "next start -p 3000",
     "e2e:seed": "tsx src/scripts/e2e-seed.ts",
     "e2e:test": "playwright test",
     "e2e:ci": "tsx src/scripts/e2e-run.ts --mode ci",

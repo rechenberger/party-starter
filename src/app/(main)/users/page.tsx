@@ -224,7 +224,7 @@ export default async function Page({
       </TopHeader>
 
       <Card>
-        <CardContent className="space-y-4 pt-6">
+        <CardContent className="space-y-4 pt-0">
           <Table>
             <TableHeader>
               <TableRow>

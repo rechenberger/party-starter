@@ -61,13 +61,15 @@ test('admin can create a user and toggle admin role on users page', async ({
   await page.getByTestId('login-email').fill(email)
   await page.getByTestId('login-password').fill(password)
   await page.getByTestId('login-submit').click()
+  await page.getByTestId('users-search-input').fill(email)
+  await page.getByTestId('users-search-submit').click()
 
   await expect
     .poll(
       async () => {
         await page.reload()
         return main
-          .locator('[data-testid^="user-card-"]')
+          .locator('[data-testid^="user-row-"]')
           .filter({ hasText: email })
           .count()
       },
@@ -75,11 +77,11 @@ test('admin can create a user and toggle admin role on users page', async ({
     )
     .toBe(1)
 
-  const createdUserCard = main
-    .locator('[data-testid^="user-card-"]')
+  const createdUserRow = main
+    .locator('[data-testid^="user-row-"]')
     .filter({ hasText: email })
     .first()
-  const adminSwitch = createdUserCard.locator('[data-slot="switch"]').first()
+  const adminSwitch = createdUserRow.locator('[data-slot="switch"]').first()
 
   await expect(adminSwitch).toHaveAttribute('data-state', 'unchecked')
   await adminSwitch.click()
@@ -90,7 +92,7 @@ test('admin can create a user and toggle admin role on users page', async ({
       async () => {
         await page.reload()
         return (
-          (await createdUserCard
+          (await createdUserRow
             .locator('[data-slot="switch"]')
             .first()
             .getAttribute('data-state')) ?? ''
@@ -99,6 +101,9 @@ test('admin can create a user and toggle admin role on users page', async ({
       { timeout: 20_000 },
     )
     .toBe('checked')
+
+  await page.getByTestId('users-search-clear').first().click()
+  await expect(page).not.toHaveURL(/[?&]q=/)
 })
 
 test('permission guards enforce org admin access and mode-aware admin pages', async ({

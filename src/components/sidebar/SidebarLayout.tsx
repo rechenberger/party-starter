@@ -15,7 +15,7 @@ export const SidebarLayout = async ({
     <>
       <SidebarProvider>
         <Sidebar orgSlug={orgSlug} />
-        <SidebarInset className="group/topheader flex flex-col gap-4 px-4">
+        <SidebarInset className="group/topheader flex min-w-0 flex-col gap-4 px-4">
           <TopHeader disableSeparator hideIfSecondTopHeaderExists></TopHeader>
           {children}
         </SidebarInset>

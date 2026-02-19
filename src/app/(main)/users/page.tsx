@@ -17,7 +17,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
-import { Switch } from '@/components/ui/switch'
 import {
   Table,
   TableBody,
@@ -36,11 +35,11 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { ActionWrapper } from '@/super-action/button/ActionWrapper'
 import { and, asc, count, eq, ilike, or } from 'drizzle-orm'
 import { Trash2 } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
+import { AdminToggleSwitch } from './AdminToggleSwitch'
 import { CreateUserButton } from './CreateUserButton'
 import { ImpersonateButton } from './ImpersonateButton'
 
@@ -257,6 +256,9 @@ export default async function Page({
                   tags.push(account.provider)
                 }
                 const isCurrentUser = myUserId === user.id
+                const deleteUserLabel = t.userManagement.deleteUser.title(
+                  user.name ?? user.email,
+                )
 
                 return (
                   <TableRow
@@ -295,7 +297,7 @@ export default async function Page({
                     </TableCell>
                     <TableCell className="max-w-[260px] whitespace-normal">
                       {tags.length > 0 ? (
-                        <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-col items-start gap-1">
                           {tags.map((tag) => (
                             <Badge key={tag} variant="outline">
                               {tag}
@@ -311,13 +313,13 @@ export default async function Page({
                     <TableCell>
                       <div className="text-muted-foreground text-sm">
                         {user.emailVerified ? (
-                          <>
-                            {t.users.emailVerified}{' '}
+                          <div className="flex flex-col gap-0.5">
+                            <span>{t.users.emailVerified}</span>
                             <DateFnsFormat
                               date={user.emailVerified}
                               format="Ppp"
                             />
-                          </>
+                          </div>
                         ) : (
                           <>{t.users.emailNotVerified}</>
                         )}
@@ -325,49 +327,22 @@ export default async function Page({
                     </TableCell>
                     <TableCell>
                       <div className="flex justify-center">
-                        <ActionWrapper
-                          askForConfirmation={{
-                            title: isAdmin
-                              ? t.users.removeAdmin(user.name ?? user.email)
-                              : t.users.makeAdmin(user.name ?? user.email),
-                          }}
-                          action={async () => {
-                            'use server'
-                            return superAction(async () => {
-                              const t = await getTranslations()
-                              await db
-                                .update(usersTable)
-                                .set({ isAdmin: !isAdmin })
-                                .where(eq(usersTable.id, user.id))
-
-                              superCache.user({ id: user.id }).update()
-
-                              streamToast({
-                                title: isAdmin
-                                  ? t.users.removedAdmin
-                                  : t.users.madeAdmin,
-                                description: isAdmin
-                                  ? t.users.removeAdminDescription(user.email)
-                                  : t.users.makeAdminDescription(user.email),
-                              })
-                            })
-                          }}
-                          command={{
-                            label: `${isAdmin ? t.users.removeAdmin : t.users.makeAdmin}: ${
-                              user.email
-                            }`,
-                          }}
-                        >
-                          <Switch checked={isAdmin} />
-                        </ActionWrapper>
+                        <AdminToggleSwitch
+                          userId={user.id}
+                          userEmail={user.email}
+                          userDisplay={user.name ?? user.email}
+                          isAdmin={isAdmin}
+                        />
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex justify-end items-center gap-2 min-w-[260px]">
+                      <div className="flex items-center justify-end gap-2 min-w-[88px]">
                         <ActionButton
                           data-testid={`user-delete-${user.id}`}
-                          size="sm"
+                          size="icon-sm"
                           variant="outline"
+                          title={deleteUserLabel}
+                          aria-label={deleteUserLabel}
                           askForConfirmation={{
                             title:
                               t.userManagement.deleteUser.confirmation.title,
@@ -400,12 +375,12 @@ export default async function Page({
                             })
                           }}
                           command={{
-                            label: t.userManagement.deleteUser.title(
-                              user.name ?? user.email,
-                            ),
+                            label: deleteUserLabel,
                           }}
                         >
-                          {t.userManagement.deleteUser.delete}
+                          <span className="sr-only">
+                            {t.userManagement.deleteUser.delete}
+                          </span>
                         </ActionButton>
                         <ImpersonateButton userId={user.id} />
                       </div>

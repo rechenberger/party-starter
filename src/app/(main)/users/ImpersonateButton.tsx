@@ -14,6 +14,9 @@ export const ImpersonateButton = ({ userId }: { userId: string }) => {
   const router = useRouter()
   const isCurrentUser = session?.user?.id === userId
   const t = useTranslations()
+  const buttonLabel = isCurrentUser
+    ? t.userManagement.currentUser
+    : t.userManagement.loginAs
   const { trigger, isLoading } = useSuperAction({
     action: impersonateAction,
     catchToast: true,
@@ -22,9 +25,10 @@ export const ImpersonateButton = ({ userId }: { userId: string }) => {
     <>
       <Button
         data-testid={`impersonate-button-${userId}`}
-        size="sm"
+        size="icon-sm"
         variant={'outline'}
-        className="flex-1"
+        title={buttonLabel}
+        aria-label={buttonLabel}
         disabled={isCurrentUser}
         onClick={async () => {
           if (isCurrentUser) return
@@ -34,9 +38,7 @@ export const ImpersonateButton = ({ userId }: { userId: string }) => {
           router.refresh() // Force Reload page and layout
         }}
       >
-        {isCurrentUser
-          ? t.userManagement.currentUser
-          : t.userManagement.loginAs}
+        <span className="sr-only">{buttonLabel}</span>
         <SuperLoadingIcon
           icon={isCurrentUser ? <Check /> : <VenetianMask />}
           isLoading={isLoading}

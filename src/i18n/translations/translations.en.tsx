@@ -112,6 +112,22 @@ export const t = {
     makeAdminDescription: (email: string) => `User ${email} is now an admin`,
     allUsers: 'All Users',
     admins: 'Admins',
+    search: 'Search',
+    searchPlaceholder: 'Search by name, email or ID',
+    clearSearch: 'Clear',
+    table: {
+      user: 'User',
+      signInMethods: 'Sign In',
+      verified: 'Verification',
+      admin: 'Admin',
+      actions: 'Actions',
+      noUsersFound: 'No users found.',
+      noSignInMethods: 'No sign-in methods',
+    },
+    pagination: {
+      summary: (from: number, to: number, total: number) =>
+        `Showing ${from}-${to} of ${total} users`,
+    },
   },
   org: {
     organization: 'Organization',

@@ -118,6 +118,22 @@ export const t = {
       `Benutzer ${email} ist jetzt ein Admin`,
     allUsers: 'Alle Benutzer',
     admins: 'Admins',
+    search: 'Suchen',
+    searchPlaceholder: 'Nach Name, E-Mail oder ID suchen',
+    clearSearch: 'Zurücksetzen',
+    table: {
+      user: 'Benutzer',
+      signInMethods: 'Anmeldung',
+      verified: 'Verifizierung',
+      admin: 'Admin',
+      actions: 'Aktionen',
+      noUsersFound: 'Keine Benutzer gefunden.',
+      noSignInMethods: 'Keine Anmeldemethoden',
+    },
+    pagination: {
+      summary: (from: number, to: number, total: number) =>
+        `Zeige ${from}-${to} von ${total} Benutzern`,
+    },
   },
   org: {
     organization: 'Organisation',

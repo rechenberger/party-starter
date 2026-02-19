@@ -36,11 +36,20 @@ test('destructive flows: delete org and delete user', async ({
 
   await page.goto('/users')
   const main = page.getByRole('main').first()
+  await page.getByTestId('users-search-input').fill(deleteTarget.email)
+  await page.getByTestId('users-search-submit').click()
   await expect(
-    main.getByTestId(`user-card-${deleteTarget.id}`).first(),
+    main.getByTestId(`user-row-${deleteTarget.id}`).first(),
   ).toBeVisible()
   await main.getByTestId(`user-delete-${deleteTarget.id}`).first().click()
   await page.getByTestId('dialog-confirm').click()
-  await page.reload()
-  await expect(main.getByTestId(`user-card-${deleteTarget.id}`)).toHaveCount(0)
+  await expect
+    .poll(
+      async () => {
+        await page.reload()
+        return main.getByTestId(`user-row-${deleteTarget.id}`).count()
+      },
+      { timeout: 20_000 },
+    )
+    .toBe(0)
 })

@@ -27,6 +27,7 @@ Direct:
 `
 
 const DEFAULT_PARENT_BRANCH = 'production'
+const DEFAULT_SCHEMA_ROOT_BRANCH = 'schema/root'
 const DEFAULT_DEV_BASE_URL = 'http://127.0.0.1:3000'
 const DEFAULT_CI_HOST = '127.0.0.1'
 const DEFAULT_BRANCH_TTL_HOURS = 24
@@ -150,6 +151,102 @@ function requireSuccess(result: ReturnType<typeof runNeon>, message: string) {
     .join('\n')
     .trim()
   throw new Error(details ? `${message}\n${details}` : message)
+}
+
+function commandOutput(result: ReturnType<typeof runNeon>) {
+  return [result.stderr, result.stdout].filter(Boolean).join('\n').trim()
+}
+
+function isBranchNotFoundOutput(output: string) {
+  return /not found|does not exist|unknown branch|404/i.test(output)
+}
+
+function isBranchAlreadyExistsOutput(output: string) {
+  return /already exists|duplicate/i.test(output)
+}
+
+function branchExists({
+  branch,
+  projectId,
+  env,
+}: {
+  branch: string
+  projectId: string
+  env: NodeJS.ProcessEnv
+}) {
+  const args = neonArgs(['branches', 'get', branch, '-o', 'json'], projectId)
+  const result = runNeon(args, env, true)
+
+  if (result.status === 0) {
+    return true
+  }
+
+  const output = commandOutput(result)
+  if (isBranchNotFoundOutput(output)) {
+    return false
+  }
+
+  throw new Error(
+    output
+      ? `Failed to check whether branch "${branch}" exists\n${output}`
+      : `Failed to check whether branch "${branch}" exists`,
+  )
+}
+
+function ensureSchemaRootBranch({
+  projectId,
+  env,
+  schemaRootBranch,
+  parentBranch,
+}: {
+  projectId: string
+  env: NodeJS.ProcessEnv
+  schemaRootBranch: string
+  parentBranch: string
+}) {
+  if (
+    schemaRootBranch.trim().toLowerCase() === parentBranch.trim().toLowerCase()
+  ) {
+    throw new Error(
+      `E2E schema root branch "${schemaRootBranch}" must differ from parent branch "${parentBranch}"`,
+    )
+  }
+
+  if (branchExists({ branch: schemaRootBranch, projectId, env })) {
+    return
+  }
+
+  const createArgs = neonArgs(
+    [
+      'branches',
+      'create',
+      '--name',
+      schemaRootBranch,
+      '--parent',
+      parentBranch,
+      '--schema-only',
+    ],
+    projectId,
+  )
+  const result = runNeon(createArgs, env, true)
+
+  if (result.status === 0) {
+    console.log(
+      `Created schema root branch "${schemaRootBranch}" from "${parentBranch}"`,
+    )
+    return
+  }
+
+  const output = commandOutput(result)
+  if (isBranchAlreadyExistsOutput(output)) {
+    return
+  }
+
+  throw new Error(
+    output
+      ? `Failed to create schema root branch "${schemaRootBranch}"\n${output}`
+      : `Failed to create schema root branch "${schemaRootBranch}"`,
+  )
 }
 
 function getConnectionString({
@@ -315,6 +412,10 @@ async function runCi(playwrightArgs: string[]) {
 
   const parentBranch =
     process.env.E2E_NEON_PARENT_BRANCH?.trim() || DEFAULT_PARENT_BRANCH
+  const schemaRootBranch =
+    process.env.E2E_NEON_SCHEMA_ROOT_BRANCH?.trim() ||
+    process.env.NEON_SCHEMA_ROOT_BRANCH?.trim() ||
+    DEFAULT_SCHEMA_ROOT_BRANCH
 
   const runId = sanitizeRunId(createRunId())
   const branch = `e2e/${runId}`
@@ -336,6 +437,13 @@ async function runCi(playwrightArgs: string[]) {
   let branchCreated = false
 
   try {
+    ensureSchemaRootBranch({
+      projectId,
+      env: baseEnv,
+      schemaRootBranch,
+      parentBranch,
+    })
+
     const createArgs = neonArgs(
       [
         'branches',
@@ -343,8 +451,7 @@ async function runCi(playwrightArgs: string[]) {
         '--name',
         branch,
         '--parent',
-        parentBranch,
-        '--schema-only',
+        schemaRootBranch,
         '--expires-at',
         expiresAt,
       ],

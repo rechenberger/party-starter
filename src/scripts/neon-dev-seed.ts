@@ -12,7 +12,7 @@ Usage:
 
 This command runs:
   1) delete target branch (if it exists)
-  2) create target branch with --schema-only and update DATABASE_URL
+  2) ensure schema-root exists, create target branch from it, update DATABASE_URL
   3) pnpm db:push
   4) pnpm e2e:seed
 

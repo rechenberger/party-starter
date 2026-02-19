@@ -12,6 +12,7 @@ type CliOptions = {
   branch?: string
   username?: string
   parent: string
+  schemaRoot: string
   protectedBranches: string[]
   projectId?: string
   databaseName?: string
@@ -24,6 +25,7 @@ type CliOptions = {
 }
 
 const DEFAULT_BRANCH = 'production'
+const DEFAULT_SCHEMA_ROOT_BRANCH = 'schema/root'
 const DEFAULT_PROTECTED_BRANCHES = [DEFAULT_BRANCH]
 const DESTRUCTIVE_COMMANDS = new Set<Command>(['sync', 'reset', 'delete'])
 
@@ -52,11 +54,13 @@ Options:
   --username <name>       Username used for default branch name (dev/<username>)
   --branch <name>         Explicit branch name (overrides --username)
   --parent <branch>       Parent branch (default: ${DEFAULT_BRANCH})
+  --schema-root <branch>  Schema root branch used when --schema-only is set
+                          (default: ${DEFAULT_SCHEMA_ROOT_BRANCH})
   --protected-branches    Comma-separated protected branch names (default: production)
   --project-id <id>       Neon project id (defaults to NEON_PROJECT_ID from dotenv-flow)
   --database-name <name>  Optional database name for connection string
   --role-name <name>      Optional role name for connection string
-  --schema-only           Use schema-only branch creation (create/sync only)
+  --schema-only           Create/reset via schema root (create/sync/reset)
   --unsafe-allow-protected
                           Bypass protection checks for destructive commands
   --no-pooled             Get direct connection string (default: pooled)
@@ -103,6 +107,8 @@ function parseArgs(argv: string[]) {
 
   const options: CliOptions = {
     parent: process.env.NEON_PARENT_BRANCH ?? DEFAULT_BRANCH,
+    schemaRoot:
+      process.env.NEON_SCHEMA_ROOT_BRANCH ?? DEFAULT_SCHEMA_ROOT_BRANCH,
     protectedBranches: resolveProtectedBranches(
       parseProtectedBranches(process.env.NEON_PROTECTED_BRANCHES),
     ),
@@ -186,6 +192,10 @@ function parseArgs(argv: string[]) {
       )
       continue
     }
+    if (key === 'schema-root') {
+      options.schemaRoot = readValue()
+      continue
+    }
     if (key === 'project-id') {
       options.projectId = readValue()
       continue
@@ -258,7 +268,108 @@ function branchExists(branch: string, options: CliOptions) {
     options,
     true,
   )
-  return result.status === 0
+  if (result.status === 0) {
+    return true
+  }
+
+  const output = commandOutput(result)
+  if (isBranchNotFoundOutput(output)) {
+    return false
+  }
+
+  throw new Error(
+    output
+      ? `Failed to check whether branch "${branch}" exists\n${output}`
+      : `Failed to check whether branch "${branch}" exists`,
+  )
+}
+
+function commandOutput(result: ReturnType<typeof runNeon>) {
+  return [result.stderr, result.stdout].filter(Boolean).join('\n').trim()
+}
+
+function isBranchNotFoundOutput(output: string) {
+  return /not found|does not exist|unknown branch|404/i.test(output)
+}
+
+function isBranchAlreadyExistsOutput(output: string) {
+  return /already exists|duplicate/i.test(output)
+}
+
+function resolveSchemaRootName(options: CliOptions) {
+  return options.schemaRoot.trim()
+}
+
+function getBranchParentForSchemaMode(options: CliOptions) {
+  if (!options.schemaOnly) {
+    return options.parent
+  }
+  return ensureSchemaRootBranch(options)
+}
+
+function ensureSchemaRootBranch(options: CliOptions) {
+  const schemaRoot = resolveSchemaRootName(options)
+
+  if (!schemaRoot) {
+    throw new Error(
+      'Schema root branch is empty. Set NEON_SCHEMA_ROOT_BRANCH or pass --schema-root <branch>.',
+    )
+  }
+
+  if (normalizeBranchName(schemaRoot) === normalizeBranchName(options.parent)) {
+    throw new Error(
+      `Schema root branch "${schemaRoot}" must differ from parent branch "${options.parent}"`,
+    )
+  }
+
+  const getResult = runNeon(
+    ['branches', 'get', schemaRoot, '-o', 'json'],
+    options,
+    true,
+  )
+
+  if (getResult.status === 0) {
+    return schemaRoot
+  }
+
+  const lookupOutput = commandOutput(getResult)
+  if (!isBranchNotFoundOutput(lookupOutput)) {
+    throw new Error(
+      lookupOutput
+        ? `Failed to check schema root branch "${schemaRoot}"\n${lookupOutput}`
+        : `Failed to check schema root branch "${schemaRoot}"`,
+    )
+  }
+
+  const createResult = runNeon(
+    [
+      'branches',
+      'create',
+      '--name',
+      schemaRoot,
+      '--parent',
+      options.parent,
+      '--schema-only',
+    ],
+    options,
+    true,
+  )
+
+  if (createResult.status === 0) {
+    console.log(`Created schema root branch: ${schemaRoot}`)
+    return schemaRoot
+  }
+
+  const createOutput = commandOutput(createResult)
+  if (isBranchAlreadyExistsOutput(createOutput)) {
+    return schemaRoot
+  }
+
+  throw new Error(
+    createOutput
+      ? `Failed to create schema root branch "${schemaRoot}"\n${createOutput}`
+      : `Failed to create schema root branch "${schemaRoot}"`,
+  )
 }
 
 function parseJson(text: string) {
@@ -348,6 +459,9 @@ function assertDestructiveCommandIsSafe(
     options.protectedBranches.map((value) => normalizeBranchName(value)),
   )
   protectedNames.add(normalizeBranchName(options.parent))
+  if (options.schemaOnly) {
+    protectedNames.add(normalizeBranchName(resolveSchemaRootName(options)))
+  }
 
   if (protectedNames.has(normalizedBranch)) {
     throw new Error(
@@ -382,22 +496,14 @@ function requireSuccess(result: ReturnType<typeof runNeon>, message: string) {
   throw new Error(details ? `${message}\n${details}` : message)
 }
 
-function createBranch(branch: string, options: CliOptions) {
-  const args = [
-    'branches',
-    'create',
-    '--name',
-    branch,
-    '--parent',
-    options.parent,
-  ]
-  if (options.schemaOnly) args.push('--schema-only')
+function createBranch(branch: string, parent: string, options: CliOptions) {
+  const args = ['branches', 'create', '--name', branch, '--parent', parent]
   requireSuccess(runNeon(args, options), `Failed to create branch "${branch}"`)
 }
 
-function resetBranch(branch: string, options: CliOptions) {
+function resetBranch(branch: string, parent: string, options: CliOptions) {
   requireSuccess(
-    runNeon(['branches', 'reset', branch, '--parent'], options),
+    runNeon(['branches', 'reset', branch, '--parent', parent], options),
     `Failed to reset branch "${branch}"`,
   )
 }
@@ -473,15 +579,20 @@ function main() {
     return
   }
 
+  const parentForBranch =
+    command === 'create' || command === 'reset' || command === 'sync'
+      ? getBranchParentForSchemaMode(options)
+      : options.parent
+
   if (command === 'create') {
-    createBranch(branch, options)
+    createBranch(branch, parentForBranch, options)
   } else if (command === 'reset') {
-    resetBranch(branch, options)
+    resetBranch(branch, parentForBranch, options)
   } else if (command === 'sync') {
     if (branchExists(branch, options)) {
-      resetBranch(branch, options)
+      resetBranch(branch, parentForBranch, options)
     } else {
-      createBranch(branch, options)
+      createBranch(branch, parentForBranch, options)
     }
   }
 

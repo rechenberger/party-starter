@@ -24,7 +24,7 @@
   - add `NEON_PROJECT_ID` to [.env.local](.env.local)
   - run `pnpm neon:auth` once
   - run `pnpm neon:dev:use` to create/reset your `dev/<username>` branch and set `DATABASE_URL`
-  - run `pnpm neon:dev:seed` for a fresh schema-only branch + seeded local data
+  - run `pnpm neon:dev:seed` for a fresh seeded branch (auto-derived from schema root)
 - Connect OAuth
   - [Create Discord Developer App](https://discord.com/developers/applications)
   - Goto OAuth2
@@ -56,8 +56,9 @@ These commands are intended for human local development.
 - `pnpm neon:dev:env`: only update `DATABASE_URL` for your branch (no create/reset)
 - `pnpm neon:prod:env`: set `DATABASE_URL` to the `production` branch
 - `pnpm neon:dev:create` / `pnpm neon:dev:reset` / `pnpm neon:dev:delete`: explicit branch actions
-- `pnpm neon:dev:seed`: delete `dev/<username>`, recreate schema-only, set `DATABASE_URL`, run `pnpm db:push`, then `pnpm e2e:seed`
+- `pnpm neon:dev:seed`: delete `dev/<username>`, ensure schema root exists, recreate from schema root, set `DATABASE_URL`, run `pnpm db:push`, then `pnpm e2e:seed`
 - override target with `--username <name>` or `--branch <branch-name>`
+- override schema root with `NEON_SCHEMA_ROOT_BRANCH` or `--schema-root <branch-name>`
 - destructive commands (`sync`, `reset`, `delete`) now refuse protected/default branches by name and Neon metadata checks
 - add extra protected branch names with `NEON_PROTECTED_BRANCHES="production,main"`
 - emergency bypass exists via `--unsafe-allow-protected` (not recommended)
@@ -76,7 +77,7 @@ These commands are intended for human local development.
 
 This template has a dual-mode Playwright setup:
 
-- CI mode (`next build` + `next start`) with a dedicated schema-only Neon branch per run
+- CI mode (`next build` + `next start`) with one persistent schema-root and a dedicated child Neon branch per run
 - Dev mode (`next dev`) for fast local iteration without forced branch lifecycle
 
 ### Policy (AI agents vs humans)
@@ -113,7 +114,8 @@ This template has a dual-mode Playwright setup:
 - Run full orchestration:
   - `pnpm e2e:ci`
 - This does:
-  - create unique Neon test branch (`e2e/<run-id>`, schema-only)
+  - ensure schema-root branch exists (`schema/root`, configurable via `E2E_NEON_SCHEMA_ROOT_BRANCH` or `NEON_SCHEMA_ROOT_BRANCH`)
+  - create unique Neon test branch (`e2e/<run-id>`) as child of schema-root
   - `pnpm db:push`
   - `pnpm e2e:seed`
   - `next build` + `next start`

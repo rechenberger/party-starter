@@ -1,2 +1,3 @@
-import { handlers } from '@/auth/auth'
-export const { GET, POST } = handlers
+import { convexNext } from '@/auth/convex-next'
+
+export const { GET, POST } = convexNext.handler

@@ -15,10 +15,9 @@ import { Input } from '@/components/ui/input'
 import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
 import { cn } from '@/lib/utils'
-import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
-import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ArrowLeft } from 'lucide-react'
-import { ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
+import { ReactNode, useState } from 'react'
 import { z } from 'zod'
 
 const LoginData = z
@@ -47,22 +46,16 @@ const LoginData = z
     }),
   ])
   .superRefine((data, ctx) => {
-    if (data.type === 'register') {
-      if (data.password !== data.confirmPassword) {
-        ctx.addIssue({
-          path: ['confirmPassword'],
-          code: 'custom',
-          params: {
-            i18n: {
-              key: 'auth.confirmPasswordMismatch',
-              // values: {
-              //   password: 'lol',
-              // },
-            },
+    if (data.type === 'register' && data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        path: ['confirmPassword'],
+        code: 'custom',
+        params: {
+          i18n: {
+            key: 'auth.confirmPasswordMismatch',
           },
-          // message: t.auth.confirmPasswordMismatch,
-        })
-      }
+        },
+      })
     }
   })
 
@@ -70,23 +63,20 @@ type LoginData = z.infer<typeof LoginData>
 type LoginType = LoginData['type']
 
 export const LoginFormClient = ({
-  action,
+  authClient,
+  redirectUrl,
   alternatives,
   showAlternativesOnRegister = false,
 }: {
-  action: SuperActionWithInput<LoginData>
+  authClient: any
+  redirectUrl?: string
   alternatives?: ReactNode
   showAlternativesOnRegister?: boolean
 }) => {
   const t = useTranslations()
-
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
   const [useLoginForm] = createZodForm(LoginData)
-  const { trigger, isLoading } = useSuperAction({
-    action,
-    catchToast: true,
-  })
-
-  const disabled = isLoading
 
   const form = useLoginForm({
     defaultValues: {
@@ -94,15 +84,12 @@ export const LoginFormClient = ({
       email: process.env.NEXT_PUBLIC_AUTH_DEFAULT_EMAIL ?? '',
       password: process.env.NEXT_PUBLIC_AUTH_DEFAULT_PASSWORD ?? '',
     },
-    disabled,
+    disabled: isLoading,
   })
 
   const type = form.watch('type')
   const registering = type === 'register'
-
-  const setType = (t: LoginType) => {
-    form.setValue('type', t)
-  }
+  const setType = (nextType: LoginType) => form.setValue('type', nextType)
 
   const mainLabel =
     type === 'forgotPassword'
@@ -111,180 +98,235 @@ export const LoginFormClient = ({
         ? t.auth.registerTitle
         : t.auth.loginTitle
 
+  const socialButton =
+    type === 'login' || (type === 'register' && showAlternativesOnRegister) ? (
+      <Button
+        variant="outline"
+        type="button"
+        onClick={async () => {
+          await authClient.signIn.social({
+            provider: 'discord',
+            callbackURL: redirectUrl ?? '/app',
+          })
+        }}
+      >
+        {t.auth.continueWithDiscord}
+      </Button>
+    ) : null
+
   return (
-    <>
-      <Card className="self-center w-full max-w-md flex flex-col gap-4">
-        <CardHeader>
-          <div className="flex flex-row gap-4 items-center">
-            {type !== 'login' && (
-              <>
-                <Button
-                  variant={'ghost'}
-                  size="icon"
-                  className="-m-2.5"
-                  onClick={() => setType('login')}
-                >
-                  <ArrowLeft className="size-4" />
-                </Button>
-              </>
-            )}
-            <CardTitle>{mainLabel}</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(async (values) => {
-                await trigger(values)
-              })}
-              className="flex flex-col gap-4"
+    <Card className="self-center w-full max-w-md flex flex-col gap-4">
+      <CardHeader>
+        <div className="flex flex-row gap-4 items-center">
+          {type !== 'login' && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="-m-2.5"
+              onClick={() => setType('login')}
             >
+              <ArrowLeft className="size-4" />
+            </Button>
+          )}
+          <CardTitle>{mainLabel}</CardTitle>
+        </div>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(async (values) => {
+              setIsLoading(true)
+              try {
+                if (values.type === 'login') {
+                  const result = await authClient.signIn.email({
+                    email: values.email,
+                    password: values.password,
+                  })
+                  if (result.error) {
+                    throw new Error(
+                      result.error.message || t.auth.invalidCredentials,
+                    )
+                  }
+                  router.push(redirectUrl ?? '/app')
+                  router.refresh()
+                  return
+                }
+
+                if (values.type === 'register') {
+                  const result = await authClient.signUp.email({
+                    email: values.email,
+                    password: values.password,
+                    name: values.email.split('@')[0],
+                  })
+                  if (result.error) {
+                    throw new Error(
+                      result.error.message || t.auth.emailAlreadyTaken,
+                    )
+                  }
+                  router.push('/auth/check-mail')
+                  router.refresh()
+                  return
+                }
+
+                let passwordRedirectUrl = '/auth/change-password'
+                if (redirectUrl) {
+                  passwordRedirectUrl += `?redirect=${encodeURIComponent(redirectUrl)}`
+                }
+                const result = await authClient.forgetPassword({
+                  email: values.email,
+                  redirectTo: passwordRedirectUrl,
+                })
+                if (result.error) {
+                  throw new Error(
+                    result.error.message || t.auth.invalidCredentials,
+                  )
+                }
+                router.push('/auth/check-mail')
+                router.refresh()
+              } finally {
+                setIsLoading(false)
+              }
+            })}
+            className="flex flex-col gap-4"
+          >
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t.standardWords.email}</FormLabel>
+                  <FormControl>
+                    <Input
+                      data-testid="login-email"
+                      type="text"
+                      autoComplete="username email"
+                      {...field}
+                      value={field.value ?? ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {type !== 'forgotPassword' && (
               <FormField
                 control={form.control}
-                name="email"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t.standardWords.email}</FormLabel>
+                    <div className="flex flex-row gap-4 items-end">
+                      <FormLabel className="flex-1">
+                        {t.standardWords.password}
+                      </FormLabel>
+                      {type === 'login' && (
+                        <Button
+                          type="button"
+                          tabIndex={1}
+                          size="sm"
+                          variant="link"
+                          className="-m-2.5 -mb-3"
+                          onClick={() => setType('forgotPassword')}
+                        >
+                          {t.auth.forgotPassword}
+                        </Button>
+                      )}
+                    </div>
                     <FormControl>
                       <Input
-                        data-testid="login-email"
-                        type="text"
-                        autoComplete="username email"
+                        data-testid="login-password"
+                        type="password"
+                        autoComplete={
+                          type === 'login' ? 'current-password' : 'new-password'
+                        }
                         {...field}
-                        value={field.value ?? ''}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {type !== 'forgotPassword' && (
+            )}
+
+            {registering && (
+              <>
                 <FormField
                   control={form.control}
-                  name="password"
+                  name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex flex-row gap-4 items-end">
-                        <FormLabel className="flex-1">
-                          {t.standardWords.password}
-                        </FormLabel>
-                        {type === 'login' && (
-                          <Button
-                            type="button"
-                            tabIndex={1}
-                            size="sm"
-                            variant={'link'}
-                            className="-m-2.5 -mb-3"
-                            onClick={() => {
-                              setType('forgotPassword')
-                            }}
-                          >
-                            {t.auth.forgotPassword}
-                          </Button>
-                        )}
-                      </div>
+                      <FormLabel>{t.standardWords.confirmPassword}</FormLabel>
                       <FormControl>
                         <Input
-                          data-testid="login-password"
+                          data-testid="register-confirm-password"
                           type="password"
-                          autoComplete={
-                            type === 'login'
-                              ? 'current-password'
-                              : 'new-password'
-                          }
+                          autoComplete="new-password"
                           {...field}
+                          value={field.value ?? ''}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              )}
-              {registering && (
-                <>
-                  <FormField
-                    control={form.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t.standardWords.confirmPassword}</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="acceptTerms"
+                  defaultValue={false}
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col gap-2">
+                      <div className="flex flex-row items-center gap-2 space-y-0">
                         <FormControl>
-                          <Input
-                            data-testid="register-confirm-password"
-                            type="password"
-                            autoComplete="new-password"
-                            {...field}
-                            value={field.value ?? ''}
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
                           />
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="acceptTerms"
-                    defaultValue={false}
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col gap-2">
-                        <div className="flex flex-row items-center gap-2 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormLabel className="flex-1 m-0">
-                            {t.auth.acceptTerms}
-                          </FormLabel>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </>
-              )}
-              <div className="flex flex-row gap-2 mt-4 justify-end">
-                <Button
-                  data-testid="login-toggle-mode"
-                  variant={'outline'}
-                  type="button"
-                  className={cn('flex-1')}
-                  onClick={() => {
-                    setType(type === 'login' ? 'register' : 'login')
-                  }}
-                  disabled={disabled}
-                >
-                  {type === 'login'
-                    ? t.auth.registerAction
-                    : t.auth.backToLogin}
-                </Button>
-                <Button
-                  data-testid="login-submit"
-                  type="submit"
-                  className="flex-1"
-                  disabled={disabled}
-                >
-                  {mainLabel}
-                </Button>
-              </div>
-            </form>
-          </Form>
-
-          {alternatives &&
-            (type === 'login' ||
-              (type === 'register' && showAlternativesOnRegister)) && (
-              <>
-                <div className="flex flex-row items-center my-2">
-                  <hr className="flex-1" />
-                  <span className="mx-4 text-border">{t.standardWords.or}</span>
-                  <hr className="flex-1" />
-                </div>
-                {alternatives}
+                        <FormLabel className="flex-1 m-0">
+                          {t.auth.acceptTerms}
+                        </FormLabel>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </>
             )}
-        </CardContent>
-      </Card>
-    </>
+
+            <div className="flex flex-row gap-2 mt-4 justify-end">
+              <Button
+                data-testid="login-toggle-mode"
+                variant="outline"
+                type="button"
+                className={cn('flex-1')}
+                onClick={() => setType(type === 'login' ? 'register' : 'login')}
+                disabled={isLoading}
+              >
+                {type === 'login' ? t.auth.registerAction : t.auth.backToLogin}
+              </Button>
+              <Button
+                data-testid="login-submit"
+                type="submit"
+                className="flex-1"
+                disabled={isLoading}
+              >
+                {mainLabel}
+              </Button>
+            </div>
+          </form>
+        </Form>
+
+        {(alternatives ?? socialButton) && (
+          <>
+            <div className="flex flex-row items-center my-2">
+              <hr className="flex-1" />
+              <span className="mx-4 text-border">{t.standardWords.or}</span>
+              <hr className="flex-1" />
+            </div>
+            {alternatives ?? socialButton}
+          </>
+        )}
+      </CardContent>
+    </Card>
   )
 }

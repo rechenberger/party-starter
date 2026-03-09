@@ -1,52 +1,41 @@
-import { getMyUserId } from '@/auth/getMyUser'
-import { db } from '@/db/db'
-import { schema } from '@/db/schema-export'
+import { convexApi, convexNext } from '@/auth/convex-next'
 import { getTranslations } from '@/i18n/getTranslations'
 import { neverNullish, throwError } from '@/lib/neverNullish'
-import { superCache } from '@/lib/superCache'
-import { and, eq, inArray } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { OrganizationRole } from './organizationRoles'
 
 export const getMembership = async ({
   allowedRoles,
   orgSlug,
-  userId,
 }: {
   allowedRoles?: OrganizationRole[]
   orgSlug: string
-  userId: string
+  userId?: string
 }) => {
-  'use cache'
-  const org = await db.query.organizations.findFirst({
-    where: eq(schema.organizations.slug, orgSlug),
-    with: {
-      memberships: {
-        where: and(
-          eq(schema.organizationMemberships.userId, userId),
-          allowedRoles
-            ? inArray(schema.organizationMemberships.role, allowedRoles)
-            : undefined,
-        ),
-      },
-    },
-  })
+  const result = (await convexNext.fetchAuthQuery(
+    convexApi.organizations.myMembershipBySlug,
+    { orgSlug },
+  )) as {
+    org: {
+      id: string
+      name: string
+      slug: string
+      createdAt: number
+    }
+    membership: {
+      id: string
+      userId: string
+      role: OrganizationRole
+      createdAt: number
+    }
+  } | null
 
-  if (!org) {
-    superCache.orgs().tag()
+  if (!result) return null
+  if (allowedRoles && !allowedRoles.includes(result.membership.role)) {
     return null
   }
 
-  superCache.org({ id: org.id }).tag()
-  superCache.orgMembers({ orgId: org.id }).tag()
-  superCache.userOrgMemberships({ userId }).tag()
-
-  const membership = org?.memberships.at(0)
-  if (!membership) {
-    return null
-  }
-
-  return { org, membership }
+  return result
 }
 
 export const getMyMembership = async ({
@@ -56,16 +45,7 @@ export const getMyMembership = async ({
   allowedRoles?: OrganizationRole[]
   orgSlug: string
 }) => {
-  const userId = await getMyUserId()
-
-  if (!userId || !orgSlug) {
-    return null
-  }
-  return await getMembership({
-    allowedRoles,
-    orgSlug,
-    userId,
-  })
+  return getMembership({ allowedRoles, orgSlug })
 }
 
 export const getMyMembershipOrThrow = neverNullish(
@@ -75,4 +55,5 @@ export const getMyMembershipOrThrow = neverNullish(
     return throwError(t.org.membershipNotFound)()
   },
 )
+
 export const getMyMembershipOrNotFound = neverNullish(getMyMembership, notFound)

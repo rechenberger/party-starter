@@ -1,14 +1,10 @@
-import { db } from '@/db/db'
-import { users } from '@/db/schema-auth'
-import { superCache } from '@/lib/superCache'
-import { eq } from 'drizzle-orm'
 import { omit } from 'lodash-es'
-import { auth } from './auth'
+import { convexApi, convexNext } from './convex-next'
 import { loginWithRedirect } from './loginWithRedirect'
 
 export const getMyUserId = async () => {
-  const session = await auth()
-  return session?.user?.id
+  const user = await getMyUser()
+  return user?.id
 }
 
 export const getMyUserIdOrThrow = async () => {
@@ -25,22 +21,17 @@ export const getIsLoggedIn = async () => {
 }
 
 export const getUserById = async (id: string) => {
-  'use cache'
-  superCache.user({ id }).tag()
-
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, id),
-  })
+  const users = await convexNext.fetchAuthQuery(convexApi.users.list, {})
+  const user = users.find((entry: any) => entry.id === id)
   if (!user) {
     return undefined
   }
-  return omit(user, ['passwordHash'])
+  return omit(user, ['passwordHash', 'providers'])
 }
 
 export const getMyUser = async () => {
-  const userId = await getMyUserId()
-  if (!userId) return undefined
-  return getUserById(userId)
+  const user = await convexNext.fetchAuthQuery(convexApi.auth.currentUser, {})
+  return user ?? undefined
 }
 
 export const getMyUserOrThrow = async () => {

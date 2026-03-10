@@ -1,16 +1,16 @@
 'use client'
 
 import { impersonateAction } from '@/auth/impersonate.action'
+import { authClient } from '@/auth/auth-client'
 import { Button } from '@/components/ui/button'
 import { useTranslations } from '@/i18n/useTranslations'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { SuperLoadingIcon } from '@/super-action/button/SuperLoadingIcon'
 import { Check, VenetianMask } from 'lucide-react'
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 export const ImpersonateButton = ({ userId }: { userId: string }) => {
-  const { data: session, update } = useSession()
+  const { data: session } = authClient.useSession()
   const router = useRouter()
   const isCurrentUser = session?.user?.id === userId
   const t = useTranslations()
@@ -34,8 +34,7 @@ export const ImpersonateButton = ({ userId }: { userId: string }) => {
           if (isCurrentUser) return
 
           await trigger({ userId })
-          update() // Force update session
-          router.refresh() // Force Reload page and layout
+          router.refresh()
         }}
       >
         <span className="sr-only">{buttonLabel}</span>

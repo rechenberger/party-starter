@@ -36,7 +36,7 @@ import { useTranslations } from '@/i18n/useTranslations'
 import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
 import { LogOut, Search, Trash2, X } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { authClient } from '@/auth/auth-client'
 import { useMemo, useState } from 'react'
 import {
   OrganizationRole,
@@ -60,7 +60,7 @@ export const MemberList = ({
   }
   isAdmin: boolean
 }) => {
-  const { data: session } = useSession()
+  const { data: session } = authClient.useSession()
   const myUserId = session?.user?.id
 
   const { trigger, isLoading: isChangeRoleLoading } = useSuperAction({

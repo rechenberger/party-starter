@@ -71,6 +71,7 @@ async function upsertUser({
   isAdmin: boolean
 }) {
   const passwordHash = await hashPassword({ password })
+  const role = isAdmin ? 'admin' : 'user'
 
   const existingUsers = await db
     .select({ id: schema.users.id })
@@ -88,32 +89,54 @@ async function upsertUser({
     await db.delete(schema.users).where(inArray(schema.users.id, duplicateIds))
   }
 
+  let resolvedId: string
+
   if (primaryExisting) {
-    const resolvedId = primaryExisting.id
+    resolvedId = primaryExisting.id
 
     await db
       .update(schema.users)
       .set({
         name,
-        isAdmin,
-        emailVerified: new Date(),
-        passwordHash,
+        role,
+        emailVerified: true,
       })
       .where(eq(schema.users.id, resolvedId))
+  } else {
+    resolvedId = id
 
-    return { id: resolvedId, email, password }
+    await db.insert(schema.users).values({
+      id,
+      email,
+      name,
+      role,
+      emailVerified: true,
+    })
   }
 
-  await db.insert(schema.users).values({
-    id,
-    email,
-    name,
-    isAdmin,
-    emailVerified: new Date(),
-    passwordHash,
+  // Upsert credential account for password-based login
+  const existingAccount = await db.query.accounts.findFirst({
+    where: and(
+      eq(schema.accounts.userId, resolvedId),
+      eq(schema.accounts.providerId, 'credential'),
+    ),
   })
 
-  return { id, email, password }
+  if (existingAccount) {
+    await db
+      .update(schema.accounts)
+      .set({ password: passwordHash })
+      .where(eq(schema.accounts.id, existingAccount.id))
+  } else {
+    await db.insert(schema.accounts).values({
+      userId: resolvedId,
+      providerId: 'credential',
+      accountId: resolvedId,
+      password: passwordHash,
+    })
+  }
+
+  return { id: resolvedId, email, password }
 }
 
 async function upsertOrg({ slug, name }: { slug: string; name: string }) {

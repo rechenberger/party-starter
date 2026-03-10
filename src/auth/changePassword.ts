@@ -1,6 +1,6 @@
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { hashPassword } from './password'
 
 export const changePassword = async ({
@@ -12,10 +12,15 @@ export const changePassword = async ({
 }) => {
   const passwordHash = await hashPassword({ password })
   await db
-    .update(schema.users)
+    .update(schema.accounts)
     .set({
-      passwordHash,
+      password: passwordHash,
     })
-    .where(eq(schema.users.id, userId))
+    .where(
+      and(
+        eq(schema.accounts.userId, userId),
+        eq(schema.accounts.providerId, 'credential'),
+      ),
+    )
     .execute()
 }

@@ -1,10 +1,7 @@
-import type { AdapterAccount } from '@auth/core/adapters'
 import { relations } from 'drizzle-orm'
 import {
   boolean,
-  integer,
   pgTable,
-  primaryKey,
   text,
   timestamp,
 } from 'drizzle-orm/pg-core'
@@ -16,41 +13,40 @@ export const users = pgTable('user', {
   id: idColumn(),
   ...createdUpdatedAtColumns(),
 
-  name: text('name'),
-  email: text('email').notNull(),
-  emailVerified: timestamp('emailVerified', { mode: 'date' }),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  emailVerified: boolean('emailVerified').notNull().default(false),
   image: text('image'),
-  isAdmin: boolean('isAdmin').notNull().default(false),
-  passwordHash: text('passwordHash'),
+
+  // better-auth admin plugin fields
+  role: text('role').default('user'),
+  banned: boolean('banned').default(false),
+  banReason: text('banReason'),
+  banExpires: timestamp('banExpires', { mode: 'date' }),
 })
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  sessions: many(sessions),
 }))
 
-export const accounts = pgTable(
-  'account',
-  {
-    userId: text('userId')
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    type: text('type').$type<AdapterAccount['type']>().notNull(),
-    provider: text('provider').notNull(),
-    providerAccountId: text('providerAccountId').notNull(),
-    refresh_token: text('refresh_token'),
-    access_token: text('access_token'),
-    expires_at: integer('expires_at'),
-    token_type: text('token_type'),
-    scope: text('scope'),
-    id_token: text('id_token'),
-    session_state: text('session_state'),
-  },
-  (account) => [
-    primaryKey({
-      columns: [account.provider, account.providerAccountId],
-    }),
-  ],
-)
+export const accounts = pgTable('account', {
+  id: idColumn(),
+  ...createdUpdatedAtColumns(),
+
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  accountId: text('accountId').notNull(),
+  providerId: text('providerId').notNull(),
+  accessToken: text('accessToken'),
+  refreshToken: text('refreshToken'),
+  accessTokenExpiresAt: timestamp('accessTokenExpiresAt', { mode: 'date' }),
+  refreshTokenExpiresAt: timestamp('refreshTokenExpiresAt', { mode: 'date' }),
+  scope: text('scope'),
+  idToken: text('idToken'),
+  password: text('password'),
+})
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, {
@@ -60,19 +56,33 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 }))
 
 export const sessions = pgTable('session', {
-  sessionToken: text('sessionToken').notNull().primaryKey(),
+  id: idColumn(),
+  ...createdUpdatedAtColumns(),
+
   userId: text('userId')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  expires: timestamp('expires', { mode: 'date' }).notNull(),
+  token: text('token').notNull().unique(),
+  expiresAt: timestamp('expiresAt', { mode: 'date' }).notNull(),
+  ipAddress: text('ipAddress'),
+  userAgent: text('userAgent'),
+
+  // better-auth admin plugin field
+  impersonatedBy: text('impersonatedBy'),
 })
 
-export const verificationTokens = pgTable(
-  'verificationToken',
-  {
-    identifier: text('identifier').notNull(),
-    token: text('token').notNull(),
-    expires: timestamp('expires', { mode: 'date' }).notNull(),
-  },
-  (vt) => [primaryKey({ columns: [vt.identifier, vt.token] })],
-)
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
+  }),
+}))
+
+export const verifications = pgTable('verification', {
+  id: idColumn(),
+  ...createdUpdatedAtColumns(),
+
+  identifier: text('identifier').notNull(),
+  value: text('value').notNull(),
+  expiresAt: timestamp('expiresAt', { mode: 'date' }).notNull(),
+})

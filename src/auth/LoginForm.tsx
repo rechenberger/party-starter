@@ -4,10 +4,10 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { CredentialsSignin } from 'next-auth'
-import { EmailNotVerifiedAuthorizeError } from './CredentialsProvider'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { LoginFormClient } from './LoginFormClient'
-import { signIn } from './auth'
+import { auth } from './auth'
 import { registerUser } from './registerUser'
 
 export const LoginForm = async ({ redirectUrl }: { redirectUrl?: string }) => {
@@ -22,38 +22,51 @@ export const LoginForm = async ({ redirectUrl }: { redirectUrl?: string }) => {
             if (data.type === 'login') {
               // LOGIN
               try {
-                await signIn('credentials', data)
-              } catch (error) {
-                if (error instanceof CredentialsSignin) {
-                  throw new Error(t.auth.invalidCredentials)
-                } else if (error instanceof EmailNotVerifiedAuthorizeError) {
+                await auth.api.signInEmail({
+                  body: {
+                    email: data.email,
+                    password: data.password,
+                  },
+                  headers: await headers(),
+                })
+              } catch (error: any) {
+                const message = error?.message || error?.body?.message || ''
+                if (
+                  message.includes('email is not verified') ||
+                  message.includes('Email is not verified')
+                ) {
                   streamDialog({
                     title: t.auth.emailNotVerifiedTitle,
                     content: t.auth.resendVerifyMailDescription(data.email),
                   })
-                  await signIn('nodemailer', {
-                    email: data.email,
-                    redirect: false,
+                  await auth.api.sendVerificationEmail({
+                    body: {
+                      email: data.email,
+                      callbackURL: redirectUrl || '/app',
+                    },
                   })
                 } else {
-                  throw error
+                  throw new Error(t.auth.invalidCredentials)
                 }
               }
               return
             } else if (data.type === 'register') {
               // REGISTER
               await registerUser(data)
-              await signIn('nodemailer', data)
+              redirect('/auth/check-mail')
             } else if (data.type === 'forgotPassword') {
-              // CHANGE PASSWORD
-              let redirectTo = '/auth/change-password'
+              // FORGOT PASSWORD
+              let callbackURL = '/auth/change-password'
               if (redirectUrl) {
-                redirectTo += `?redirect=${encodeURIComponent(redirectUrl)}`
+                callbackURL += `?redirect=${encodeURIComponent(redirectUrl)}`
               }
-              await signIn('nodemailer', {
-                email: data.email,
-                redirectTo,
+              await auth.api.requestPasswordReset({
+                body: {
+                  email: data.email,
+                  redirectTo: callbackURL,
+                },
               })
+              redirect('/auth/check-mail')
             } else {
               const exhaustiveCheck: never = data
             }
@@ -65,7 +78,17 @@ export const LoginForm = async ({ redirectUrl }: { redirectUrl?: string }) => {
               variant={'outline'}
               action={async () => {
                 'use server'
-                await signIn('discord')
+                const result = await auth.api.signInSocial({
+                  body: {
+                    provider: 'discord',
+                    callbackURL: redirectUrl || '/app',
+                  },
+                  headers: await headers(),
+                })
+                if (result?.url) {
+                  const { redirect } = await import('next/navigation')
+                  redirect(result.url)
+                }
               }}
             >
               {t.auth.continueWithDiscord}

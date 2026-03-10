@@ -8,7 +8,7 @@ type IsAdminOptions = {
 
 export const getIsAdmin = async (options: IsAdminOptions = {}) => {
   const user = await getMyUser()
-  if (!!user?.isAdmin) {
+  if (user?.role === 'admin') {
     return true
   }
   if (options.allowDev && isDev()) {

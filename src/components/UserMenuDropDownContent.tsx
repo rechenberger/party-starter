@@ -1,6 +1,6 @@
 import { House, KeyRound, LogOut, UserRound } from 'lucide-react'
 
-import { signOut } from '@/auth/auth'
+import { auth } from '@/auth/auth'
 import {
   changePasswordWithRedirect,
   changeUsernameWithRedirect,
@@ -99,15 +99,9 @@ export const UserMenuDropDownContent = async ({
           size={'sm'}
           action={async () => {
             'use server'
-            const signOutResponse = await signOut({ redirect: false })
-            // This only works if we dont have any loading.tsx (because sites always return status code 200 when loading):
-            // const url = signOutResponse.redirect
-            // const response = await fetch(url)
-            // if (response.ok) {
-            //   redirect(url)
-            // } else {
-            //   redirect('/')
-            // }
+            await auth.api.signOut({
+              headers: await (await import('next/headers')).headers(),
+            })
             redirect('/')
           }}
         >

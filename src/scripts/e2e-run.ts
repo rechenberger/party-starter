@@ -273,7 +273,7 @@ function getConnectionString({
 }
 
 async function waitForServer(baseUrl: string) {
-  const statusUrl = new URL('/api/auth/session', baseUrl).toString()
+  const statusUrl = new URL('/api/auth/ok', baseUrl).toString()
   const deadline = Date.now() + 120_000
 
   while (Date.now() < deadline) {
@@ -482,7 +482,9 @@ async function runCi(playwrightArgs: string[]) {
       port: serverTarget.port,
     })
 
-    await spawnAndWait('pnpm', ['db:push'], ciEnv)
+    // CI runs on a disposable Neon branch, so destructive auth-schema churn
+    // should not block the push with interactive rename prompts.
+    await spawnAndWait('pnpm', ['db:push', '--force'], ciEnv)
     await spawnAndWait('pnpm', ['e2e:seed'], ciEnv)
     await spawnAndWait('pnpm', ['e2e:build'], ciEnv)
 

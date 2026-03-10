@@ -20,6 +20,7 @@ import { z } from 'zod'
 
 const ChangePasswordSchema = z
   .object({
+    currentPassword: z.string().optional(),
     password: z.string().min(1),
     confirmPassword: z.string().min(1),
   })
@@ -45,10 +46,12 @@ export const ChangePasswordFormClient = ({
   action,
   email,
   redirectUrl,
+  requiresCurrentPassword = false,
 }: {
   action: SuperActionWithInput<ChangePasswordSchema>
   email?: string
   redirectUrl?: string
+  requiresCurrentPassword?: boolean
 }) => {
   const { trigger, isLoading } = useSuperAction({
     action,
@@ -59,6 +62,7 @@ export const ChangePasswordFormClient = ({
 
   const form = useLoginForm({
     defaultValues: {
+      currentPassword: '',
       password: '',
       confirmPassword: '',
     },
@@ -93,6 +97,28 @@ export const ChangePasswordFormClient = ({
               </FormControl>
               <FormMessage />
             </FormItem>
+          )}
+
+          {requiresCurrentPassword && (
+            <FormField
+              control={form.control}
+              name="currentPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t.auth.currentPassword}</FormLabel>
+                  <FormControl>
+                    <Input
+                      data-testid="change-password-current"
+                      type="password"
+                      autoComplete="current-password"
+                      {...field}
+                      value={field.value ?? ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           )}
 
           <FormField

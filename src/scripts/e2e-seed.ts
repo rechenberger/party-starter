@@ -71,6 +71,7 @@ async function upsertUser({
   isAdmin: boolean
 }) {
   const passwordHash = await hashPassword({ password })
+  const role = isAdmin ? 'admin' : 'user'
 
   const existingUsers = await db
     .select({ id: schema.users.id })
@@ -96,10 +97,30 @@ async function upsertUser({
       .set({
         name,
         isAdmin,
-        emailVerified: new Date(),
-        passwordHash,
+        role,
+        banned: false,
+        banReason: null,
+        banExpires: null,
+        emailVerifiedAt: new Date(),
+        emailVerified: true,
       })
       .where(eq(schema.users.id, resolvedId))
+
+    await db
+      .insert(schema.accounts)
+      .values({
+        accountId: resolvedId,
+        providerId: 'credential',
+        userId: resolvedId,
+        password: passwordHash,
+      })
+      .onConflictDoUpdate({
+        target: [schema.accounts.providerId, schema.accounts.accountId],
+        set: {
+          userId: resolvedId,
+          password: passwordHash,
+        },
+      })
 
     return { id: resolvedId, email, password }
   }
@@ -109,8 +130,16 @@ async function upsertUser({
     email,
     name,
     isAdmin,
-    emailVerified: new Date(),
-    passwordHash,
+    role,
+    emailVerifiedAt: new Date(),
+    emailVerified: true,
+  })
+
+  await db.insert(schema.accounts).values({
+    accountId: id,
+    providerId: 'credential',
+    userId: id,
+    password: passwordHash,
   })
 
   return { id, email, password }

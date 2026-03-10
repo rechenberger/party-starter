@@ -91,7 +91,11 @@ export default async function Page({
       <TopHeader>{t.org.orgMembers}</TopHeader>
       {orgWithInviteCodes && (
         <>
-          <MemberList org={orgWithMemberships} isAdmin={isAdmin} />
+          <MemberList
+            org={orgWithMemberships}
+            isAdmin={isAdmin}
+            myUserId={myMembership.userId}
+          />
           {isAdmin && (
             <InvitationCodesList
               {...org}

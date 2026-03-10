@@ -35,8 +35,6 @@
     "neon:dev:help": "tsx src/scripts/neon-dev-branch.ts --help"
   },
   "dependencies": {
-    "@auth/core": "^0.41.1",
-    "@auth/drizzle-adapter": "^1.11.1",
     "@base-ui/react": "^1.1.0",
     "@formatjs/intl-localematcher": "^0.8.1",
     "@hookform/resolvers": "^5.2.2",
@@ -45,6 +43,7 @@
     "@react-email/components": "1.0.7",
     "@sodefa/next-server-context": "^0.0.3",
     "@tailwindcss/postcss": "^4.1.18",
+    "better-auth": "^1.5.4",
     "boring-avatars": "^2.0.4",
     "change-case": "^5.4.4",
     "class-variance-authority": "^0.7.1",
@@ -64,7 +63,6 @@
     "nanoid": "^5.1.6",
     "negotiator": "^1.0.0",
     "next": "16.1.6",
-    "next-auth": "5.0.0-beta.30",
     "next-themes": "^0.4.6",
     "nodemailer": "^7.0.13",
     "postcss": "8.5.6",
@@ -106,10 +104,5 @@
     "prettier": "^3.8.1",
     "react-email": "5.2.8",
     "tsx": "^4.21.0"
-  },
-  "pnpm": {
-    "overrides": {
-      "@auth/core": "0.41.1"
-    }
   }
 }

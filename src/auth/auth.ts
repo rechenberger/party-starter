@@ -1,102 +1,130 @@
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { verifyEmailEmail } from '@/emails/VerifyEmail'
-import { getEmailFromAddress, getEmailServerConfig } from '@/lib/email-delivery'
+import { BASE_URL } from '@/lib/config'
 import { superCache } from '@/lib/superCache'
-import Nodemailer from '@auth/core/providers/nodemailer'
-import { DrizzleAdapter } from '@auth/drizzle-adapter'
-import { and, eq, lt } from 'drizzle-orm'
-import NextAuth from 'next-auth'
-import Discord from 'next-auth/providers/discord'
-import { CredentialsProvider } from './CredentialsProvider'
-import { ImpersonateProvider } from './ImpersonateProvider'
+import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { nextCookies } from 'better-auth/next-js'
+import { admin } from 'better-auth/plugins/admin'
+import { betterAuth } from 'better-auth'
+import { toNextJsHandler } from 'better-auth/next-js'
+import { comparePasswords, hashPassword } from './password'
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: {
-    ...DrizzleAdapter(db),
-    useVerificationToken: async (params) => {
-      const { identifier, token } = params
+const authSchema = {
+  user: schema.users,
+  account: schema.accounts,
+  session: schema.sessions,
+  verification: schema.verifications,
+}
 
-      // Cleanup - delete all expired tokens first
-      await db
-        .delete(schema.verificationTokens)
-        .where(lt(schema.verificationTokens.expires, new Date()))
+const getOriginFromUrl = (value?: string | null) => {
+  if (!value) return undefined
+  try {
+    return new URL(value).origin
+  } catch {
+    return undefined
+  }
+}
 
-      const [verificationToken] = await db
-        .select()
-        .from(schema.verificationTokens)
-        .where(
-          and(
-            eq(schema.verificationTokens.identifier, identifier),
-            eq(schema.verificationTokens.token, token),
-          ),
-        )
-        .limit(1)
+const revalidateUserCache = (userId?: string | null) => {
+  if (userId) {
+    superCache.user({ id: userId }).revalidate()
+  }
+  superCache.users().revalidate()
+}
 
-      if (!verificationToken) {
-        return null
-      }
-
-      return {
-        token: verificationToken.token,
-        identifier: verificationToken.identifier,
-        expires: verificationToken.expires,
-      }
+export const auth = betterAuth({
+  baseURL: BASE_URL,
+  secret: process.env.AUTH_SECRET,
+  database: drizzleAdapter(db, {
+    provider: 'pg',
+    schema: authSchema,
+  }),
+  trustedOrigins: async (request) => {
+    return [
+      BASE_URL,
+      'http://127.0.0.1:3000',
+      'http://localhost:3000',
+      request?.headers.get('origin'),
+      getOriginFromUrl(request?.headers.get('referer')),
+    ].filter((value): value is string => !!value)
+  },
+  emailAndPassword: {
+    enabled: true,
+    autoSignIn: false,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      await verifyEmailEmail.send({
+        props: { verifyUrl: url },
+        to: user.email,
+      })
+    },
+    password: {
+      hash: async (password) => hashPassword({ password }),
+      verify: async ({ hash, password }) =>
+        comparePasswords({ hash, password }),
     },
   },
-
-  pages: {
-    signIn: `/auth/login`,
-    verifyRequest: `/auth/check-mail`,
+  emailVerification: {
+    sendOnSignUp: true,
+    sendOnSignIn: false,
+    autoSignInAfterVerification: false,
+    sendVerificationEmail: async ({ user, url }) => {
+      await verifyEmailEmail.send({
+        props: { verifyUrl: url },
+        to: user.email,
+      })
+    },
+    afterEmailVerification: async (user) => {
+      revalidateUserCache(user.id)
+    },
   },
-  providers: [
-    Discord,
-    Nodemailer({
-      from: getEmailFromAddress(),
-      server: getEmailServerConfig(),
-
-      sendVerificationRequest: async (params) => {
-        await verifyEmailEmail.send({
-          props: { verifyUrl: params.url },
-          to: params.identifier,
-        })
+  socialProviders:
+    process.env.AUTH_DISCORD_ID && process.env.AUTH_DISCORD_SECRET
+      ? {
+          discord: {
+            clientId: process.env.AUTH_DISCORD_ID,
+            clientSecret: process.env.AUTH_DISCORD_SECRET,
+          },
+        }
+      : undefined,
+  user: {
+    additionalFields: {
+      isAdmin: {
+        type: 'boolean',
+        defaultValue: false,
+        input: false,
+        fieldName: 'isAdmin',
       },
-    }) as any, // TODO: FIXME: looks like a type bug in next-auth
-    CredentialsProvider,
-    ImpersonateProvider,
+    },
+  },
+  plugins: [
+    nextCookies(),
+    admin({
+      allowImpersonatingAdmins: true,
+      defaultRole: 'user',
+      adminRoles: ['admin'],
+    }),
   ],
-  session: {
-    strategy: 'jwt',
-  },
-  callbacks: {
-    session({ session, token }) {
-      if (session?.user) {
-        session.user.id = token.sub as string
-      }
-      return session
-    },
-  },
-  events: {
-    createUser: ({ user }) => {
-      if (user.id) {
-        superCache.user({ id: user.id }).revalidate()
-      } else {
-        superCache.users().revalidate()
-      }
-    },
-    linkAccount: ({ user }) => {
-      if (user.id) {
-        superCache.user({ id: user.id }).revalidate()
-      } else {
-        superCache.users().revalidate()
-      }
-    },
-    updateUser: ({ user }) => {
-      if (user.id) {
-        superCache.user({ id: user.id }).revalidate()
-      } else {
-        superCache.users().revalidate()
-      }
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          revalidateUserCache(user.id as string | undefined)
+        },
+      },
+      update: {
+        after: async (user) => {
+          revalidateUserCache(user.id as string | undefined)
+        },
+      },
+      delete: {
+        after: async (user) => {
+          revalidateUserCache(user.id as string | undefined)
+        },
+      },
     },
   },
 })
+
+export const handlers = toNextJsHandler(auth)

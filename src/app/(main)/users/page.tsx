@@ -2,7 +2,6 @@ import { notFoundIfNotAdmin, throwIfNotAdmin } from '@/auth/getIsAdmin'
 import { getMyUserId } from '@/auth/getMyUser'
 import { TopHeader } from '@/components/TopHeader'
 import { UserAvatar } from '@/components/UserAvatar'
-import { DateFnsFormat } from '@/components/date-fns-client/DateFnsFormat'
 import { SimpleParamSelect } from '@/components/simple/SimpleParamSelect'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -250,10 +249,13 @@ export default async function Page({
 
               {users.map((user) => {
                 const isAdmin = !!user.isAdmin
-                const tags: string[] = []
-                if (user.passwordHash) tags.push('password')
+                const tags = new Set<string>()
                 for (const account of user.accounts) {
-                  tags.push(account.provider)
+                  if (account.password) {
+                    tags.add('password')
+                    continue
+                  }
+                  tags.add(account.providerId)
                 }
                 const isCurrentUser = myUserId === user.id
                 const deleteUserLabel = t.userManagement.deleteUser.title(
@@ -296,9 +298,9 @@ export default async function Page({
                       </div>
                     </TableCell>
                     <TableCell className="max-w-[260px] whitespace-normal">
-                      {tags.length > 0 ? (
+                      {tags.size > 0 ? (
                         <div className="flex flex-col items-start gap-1">
-                          {tags.map((tag) => (
+                          {[...tags].map((tag) => (
                             <Badge key={tag} variant="outline">
                               {tag}
                             </Badge>
@@ -313,13 +315,7 @@ export default async function Page({
                     <TableCell>
                       <div className="text-muted-foreground text-sm">
                         {user.emailVerified ? (
-                          <div className="flex flex-col gap-0.5">
-                            <span>{t.users.emailVerified}</span>
-                            <DateFnsFormat
-                              date={user.emailVerified}
-                              format="Ppp"
-                            />
-                          </div>
+                          <span>{t.users.emailVerified}</span>
                         ) : (
                           <>{t.users.emailNotVerified}</>
                         )}
@@ -382,7 +378,10 @@ export default async function Page({
                             {t.userManagement.deleteUser.delete}
                           </span>
                         </ActionButton>
-                        <ImpersonateButton userId={user.id} />
+                        <ImpersonateButton
+                          currentUserId={myUserId}
+                          userId={user.id}
+                        />
                       </div>
                     </TableCell>
                   </TableRow>

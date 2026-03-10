@@ -27,7 +27,10 @@ export const toggleUserAdminAction = async ({
 
     await db
       .update(usersTable)
-      .set({ isAdmin: nextIsAdmin })
+      .set({
+        isAdmin: nextIsAdmin,
+        role: nextIsAdmin ? 'admin' : 'user',
+      })
       .where(eq(usersTable.id, userId))
 
     superCache.user({ id: userId }).update()

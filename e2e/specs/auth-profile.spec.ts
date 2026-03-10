@@ -29,6 +29,7 @@ test('credentials login plus username/password update works', async ({
   const nextPassword = `${user.password}-next`
 
   await page.goto('/auth/change-password')
+  await page.getByTestId('change-password-current').fill(user.password)
   await page.getByTestId('change-password-input').fill(nextPassword)
   await page.getByTestId('change-password-confirm').fill(nextPassword)
   await page.getByTestId('change-password-submit').click()

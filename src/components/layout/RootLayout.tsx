@@ -7,7 +7,6 @@ import { BASE_URL } from '@/lib/config'
 import { BRAND } from '@/lib/starter.config'
 import { ActionCommandProvider } from '@/super-action/command/ActionCommandProvider'
 import type { Metadata } from 'next'
-import { SessionProvider } from 'next-auth/react'
 import { ThemeProvider } from 'next-themes'
 import '../../app/globals.css'
 
@@ -36,7 +35,7 @@ export async function RootLayout({
       <body className="bg-background min-h-[100svh] flex flex-col">
         <LocaleProvider value={localeResolved}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <SessionProvider>{children}</SessionProvider>
+            {children}
             <ActionCommandProvider />
             <Toaster />
             {/* <DialogProvider /> This has to be inside deeper layouts in order to receive the current locale from ParamsWrapper */}

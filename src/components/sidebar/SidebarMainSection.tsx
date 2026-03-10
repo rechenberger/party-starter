@@ -25,11 +25,10 @@ export const SidebarMainSection = async ({
   isLanding?: boolean
   locale?: Locale
 }) => {
-  const [isLoggedIn, memberships, userCanCreateOrg] = await Promise.all([
-    getIsLoggedIn(),
-    getMyMemberships(),
-    canUserCreateOrg(),
-  ])
+  const isLoggedIn = await getIsLoggedIn()
+  const [memberships, userCanCreateOrg] = isLoggedIn
+    ? await Promise.all([getMyMemberships(), canUserCreateOrg()])
+    : [[], false]
   const t = await getTranslations({ locale })
 
   let entries = await getNavEntries({

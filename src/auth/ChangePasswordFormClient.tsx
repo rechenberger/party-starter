@@ -13,10 +13,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
-import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
-import { useSuperAction } from '@/super-action/action/useSuperAction'
+import { api } from '../../convex/_generated/api'
+import { useMutation } from 'convex/react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { z } from 'zod'
+import { authClient } from './auth-client'
 
 const ChangePasswordSchema = z
   .object({
@@ -42,29 +44,24 @@ type ChangePasswordSchema = z.infer<typeof ChangePasswordSchema>
 const [useLoginForm] = createZodForm(ChangePasswordSchema)
 
 export const ChangePasswordFormClient = ({
-  action,
   email,
   redirectUrl,
 }: {
-  action: SuperActionWithInput<ChangePasswordSchema>
   email?: string
   redirectUrl?: string
 }) => {
-  const { trigger, isLoading } = useSuperAction({
-    action,
-    catchToast: true,
-  })
-
-  const disabled = isLoading
+  const router = useRouter()
+  const t = useTranslations()
+  const session = authClient.useSession()
+  const setPassword = useMutation(api.users.setOwnPassword)
 
   const form = useLoginForm({
     defaultValues: {
       password: '',
       confirmPassword: '',
     },
-    disabled,
+    disabled: session.isPending,
   })
-  const t = useTranslations()
 
   return (
     <>
@@ -74,7 +71,9 @@ export const ChangePasswordFormClient = ({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(async (values) => {
-            await trigger(values)
+            await setPassword({ newPassword: values.password })
+            router.push(redirectUrl ?? '/app')
+            router.refresh()
           })}
           className="flex flex-col gap-4"
         >
@@ -132,10 +131,15 @@ export const ChangePasswordFormClient = ({
               </FormItem>
             )}
           />
+
           <div className="flex flex-row gap-2 mt-4 justify-end">
             {!!redirectUrl && (
               <Link href={redirectUrl} passHref>
-                <Button variant={'outline'} type="button" disabled={disabled}>
+                <Button
+                  variant="outline"
+                  type="button"
+                  disabled={session.isPending}
+                >
                   {t.standardWords.skip}
                 </Button>
               </Link>
@@ -143,7 +147,7 @@ export const ChangePasswordFormClient = ({
             <Button
               data-testid="change-password-submit"
               type="submit"
-              disabled={disabled}
+              disabled={session.isPending}
             >
               {t.userManagement.changePasswordAction}
             </Button>

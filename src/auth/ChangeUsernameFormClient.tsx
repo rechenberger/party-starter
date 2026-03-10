@@ -13,9 +13,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { useTranslations } from '@/i18n/useTranslations'
 import { createZodForm } from '@/lib/useZodForm'
-import { SuperActionWithInput } from '@/super-action/action/createSuperAction'
-import { useSuperAction } from '@/super-action/action/useSuperAction'
+import { useRouter } from 'next/navigation'
 import { z } from 'zod'
+import { authClient } from './auth-client'
 
 const ChangeUsernameSchema = z.object({
   username: z.string().min(1),
@@ -26,26 +26,22 @@ type ChangeUsernameSchema = z.infer<typeof ChangeUsernameSchema>
 const [useLoginForm] = createZodForm(ChangeUsernameSchema)
 
 export const ChangeUsernameFormClient = ({
-  action,
   username,
+  redirectUrl,
 }: {
-  action: SuperActionWithInput<ChangeUsernameSchema>
   username?: string
+  redirectUrl?: string
 }) => {
-  const { trigger, isLoading } = useSuperAction({
-    action,
-    catchToast: true,
-  })
-
-  const disabled = isLoading
+  const router = useRouter()
+  const t = useTranslations()
+  const session = authClient.useSession()
 
   const form = useLoginForm({
     defaultValues: {
       username: username ?? '',
     },
-    disabled,
+    disabled: session.isPending,
   })
-  const t = useTranslations()
 
   return (
     <>
@@ -55,7 +51,16 @@ export const ChangeUsernameFormClient = ({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(async (values) => {
-            await trigger(values)
+            const result = await authClient.updateUser({
+              name: values.username,
+            })
+            if (result.error) {
+              throw new Error(
+                result.error.message || 'Failed to update username',
+              )
+            }
+            router.push(redirectUrl ?? '/app')
+            router.refresh()
           })}
           className="flex flex-col gap-4"
         >
@@ -76,7 +81,7 @@ export const ChangeUsernameFormClient = ({
             <Button
               data-testid="change-username-submit"
               type="submit"
-              disabled={disabled}
+              disabled={session.isPending}
             >
               {t.userManagement.changeUsernameAction}
             </Button>

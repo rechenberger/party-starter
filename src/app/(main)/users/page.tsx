@@ -2,7 +2,7 @@ import { notFoundIfNotAdmin, throwIfNotAdmin } from '@/auth/getIsAdmin'
 import { getMyUserId } from '@/auth/getMyUser'
 import { TopHeader } from '@/components/TopHeader'
 import { UserAvatar } from '@/components/UserAvatar'
-import { DateFnsFormat } from '@/components/date-fns-client/DateFnsFormat'
+
 import { SimpleParamSelect } from '@/components/simple/SimpleParamSelect'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -108,7 +108,7 @@ const getUsers = async ({
   superCache.users().tag()
 
   const whereClause = and(
-    filter === 'admins' ? eq(usersTable.isAdmin, true) : undefined,
+    filter === 'admins' ? eq(usersTable.role, 'admin') : undefined,
     query
       ? or(
           ilike(usersTable.name, `%${query}%`),
@@ -249,11 +249,11 @@ export default async function Page({
               )}
 
               {users.map((user) => {
-                const isAdmin = !!user.isAdmin
+                const isAdmin = user.role === 'admin'
                 const tags: string[] = []
-                if (user.passwordHash) tags.push('password')
                 for (const account of user.accounts) {
-                  tags.push(account.provider)
+                  if (account.password) tags.push('password')
+                  else tags.push(account.providerId)
                 }
                 const isCurrentUser = myUserId === user.id
                 const deleteUserLabel = t.userManagement.deleteUser.title(
@@ -313,13 +313,7 @@ export default async function Page({
                     <TableCell>
                       <div className="text-muted-foreground text-sm">
                         {user.emailVerified ? (
-                          <div className="flex flex-col gap-0.5">
-                            <span>{t.users.emailVerified}</span>
-                            <DateFnsFormat
-                              date={user.emailVerified}
-                              format="Ppp"
-                            />
-                          </div>
+                          <span>{t.users.emailVerified}</span>
                         ) : (
                           <>{t.users.emailNotVerified}</>
                         )}

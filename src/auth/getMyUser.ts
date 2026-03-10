@@ -3,11 +3,14 @@ import { users } from '@/db/schema-auth'
 import { superCache } from '@/lib/superCache'
 import { eq } from 'drizzle-orm'
 import { omit } from 'lodash-es'
+import { headers } from 'next/headers'
 import { auth } from './auth'
 import { loginWithRedirect } from './loginWithRedirect'
 
 export const getMyUserId = async () => {
-  const session = await auth()
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
   return session?.user?.id
 }
 
@@ -34,7 +37,7 @@ export const getUserById = async (id: string) => {
   if (!user) {
     return undefined
   }
-  return omit(user, ['passwordHash'])
+  return user
 }
 
 export const getMyUser = async () => {

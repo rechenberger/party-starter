@@ -1,102 +1,99 @@
 import { db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { verifyEmailEmail } from '@/emails/VerifyEmail'
-import { getEmailFromAddress, getEmailServerConfig } from '@/lib/email-delivery'
 import { superCache } from '@/lib/superCache'
-import Nodemailer from '@auth/core/providers/nodemailer'
-import { DrizzleAdapter } from '@auth/drizzle-adapter'
-import { and, eq, lt } from 'drizzle-orm'
-import NextAuth from 'next-auth'
-import Discord from 'next-auth/providers/discord'
-import { CredentialsProvider } from './CredentialsProvider'
-import { ImpersonateProvider } from './ImpersonateProvider'
+import { betterAuth } from 'better-auth'
+import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { nextCookies } from 'better-auth/next-js'
+import { admin, magicLink } from 'better-auth/plugins'
+import { hashPassword, comparePasswords } from './password'
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: {
-    ...DrizzleAdapter(db),
-    useVerificationToken: async (params) => {
-      const { identifier, token } = params
+export const auth = betterAuth({
+  secret: process.env.AUTH_SECRET,
 
-      // Cleanup - delete all expired tokens first
-      await db
-        .delete(schema.verificationTokens)
-        .where(lt(schema.verificationTokens.expires, new Date()))
+  database: drizzleAdapter(db, {
+    provider: 'pg',
+    schema,
+    usePlural: true,
+  }),
 
-      const [verificationToken] = await db
-        .select()
-        .from(schema.verificationTokens)
-        .where(
-          and(
-            eq(schema.verificationTokens.identifier, identifier),
-            eq(schema.verificationTokens.token, token),
-          ),
-        )
-        .limit(1)
-
-      if (!verificationToken) {
-        return null
-      }
-
-      return {
-        token: verificationToken.token,
-        identifier: verificationToken.identifier,
-        expires: verificationToken.expires,
-      }
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+    password: {
+      hash: (password) => hashPassword({ password }),
+      verify: ({ password, hash }) => comparePasswords({ password, hash }),
+    },
+    sendResetPassword: async ({ user, url }) => {
+      await verifyEmailEmail.send({
+        props: { verifyUrl: url },
+        to: user.email,
+      })
     },
   },
 
-  pages: {
-    signIn: `/auth/login`,
-    verifyRequest: `/auth/check-mail`,
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      await verifyEmailEmail.send({
+        props: { verifyUrl: url },
+        to: user.email,
+      })
+    },
+    sendOnSignUp: true,
   },
-  providers: [
-    Discord,
-    Nodemailer({
-      from: getEmailFromAddress(),
-      server: getEmailServerConfig(),
 
-      sendVerificationRequest: async (params) => {
+  socialProviders: {
+    discord: {
+      clientId: process.env.AUTH_DISCORD_ID!,
+      clientSecret: process.env.AUTH_DISCORD_SECRET!,
+    },
+  },
+
+  plugins: [
+    admin(),
+    magicLink({
+      sendMagicLink: async ({ email, url }) => {
         await verifyEmailEmail.send({
-          props: { verifyUrl: params.url },
-          to: params.identifier,
+          props: { verifyUrl: url },
+          to: email,
         })
       },
-    }) as any, // TODO: FIXME: looks like a type bug in next-auth
-    CredentialsProvider,
-    ImpersonateProvider,
+    }),
+    nextCookies(),
   ],
+
   session: {
-    strategy: 'jwt',
-  },
-  callbacks: {
-    session({ session, token }) {
-      if (session?.user) {
-        session.user.id = token.sub as string
-      }
-      return session
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
     },
   },
-  events: {
-    createUser: ({ user }) => {
-      if (user.id) {
-        superCache.user({ id: user.id }).revalidate()
-      } else {
-        superCache.users().revalidate()
-      }
+
+  user: {
+    changeEmail: {
+      enabled: false,
     },
-    linkAccount: ({ user }) => {
-      if (user.id) {
-        superCache.user({ id: user.id }).revalidate()
-      } else {
-        superCache.users().revalidate()
-      }
+  },
+
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          superCache.user({ id: user.id }).revalidate()
+        },
+      },
+      update: {
+        after: async (user) => {
+          superCache.user({ id: user.id }).revalidate()
+        },
+      },
     },
-    updateUser: ({ user }) => {
-      if (user.id) {
-        superCache.user({ id: user.id }).revalidate()
-      } else {
-        superCache.users().revalidate()
-      }
+    account: {
+      create: {
+        after: async (account) => {
+          superCache.user({ id: account.userId }).revalidate()
+        },
+      },
     },
   },
 })

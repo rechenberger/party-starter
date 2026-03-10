@@ -82,6 +82,9 @@ export const extractVerifyUrl = (input: string) => {
   const verifyUrl = urls?.find((url) => {
     const lower = url.toLowerCase()
     return (
+      lower.includes('/api/auth/verify-email') ||
+      lower.includes('/api/auth/magic-link/verify') ||
+      lower.includes('/api/auth/reset-password') ||
       lower.includes('/api/auth/callback/nodemailer') ||
       lower.includes('/auth/verify-email')
     )

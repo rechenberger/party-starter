@@ -3,5 +3,5 @@ import { ORGS } from '@/lib/starter.config'
 
 export const canUserCreateOrg = async () => {
   const user = await getMyUser()
-  return ORGS.onlyAdminsCanCreateOrgs ? user?.isAdmin : !!user
+  return ORGS.onlyAdminsCanCreateOrgs ? user?.role === 'admin' : !!user
 }

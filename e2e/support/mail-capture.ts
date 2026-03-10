@@ -1,4 +1,4 @@
-import { createServerConvexClient } from '@/lib/convex'
+import { createServerConvexClient } from '@/lib/convex-server'
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 

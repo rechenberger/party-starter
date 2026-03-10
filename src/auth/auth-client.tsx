@@ -6,10 +6,18 @@ import { adminClient } from 'better-auth/client/plugins'
 import { createAuthClient } from 'better-auth/react'
 import { ConvexProvider } from 'convex/react'
 import { useState } from 'react'
-import { createBrowserConvexClient } from '@/lib/convex'
+import { createBrowserConvexClient } from '@/lib/convex-client'
+
+const authBaseUrl =
+  typeof window !== 'undefined'
+    ? window.location.origin
+    : (process.env.NEXT_PUBLIC_SITE_URL?.trim() ??
+      process.env.SITE_URL?.trim() ??
+      process.env.BASE_URL?.trim() ??
+      'http://localhost:3000')
 
 export const authClient = createAuthClient({
-  baseURL: '/api/auth',
+  baseURL: authBaseUrl,
   plugins: [convexClient(), adminClient()],
 })
 

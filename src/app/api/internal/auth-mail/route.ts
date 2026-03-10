@@ -4,7 +4,7 @@ import {
   getEmailFromAddress,
   shouldActuallySendEmails,
 } from '@/lib/email-delivery'
-import { createServerConvexClient } from '@/lib/convex'
+import { createServerConvexClient } from '@/lib/convex-server'
 import { getMailTransporter } from '@/lib/getMailTransporter'
 import { render } from '@react-email/components'
 import { NextResponse } from 'next/server'

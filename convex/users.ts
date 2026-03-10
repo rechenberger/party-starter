@@ -1,4 +1,4 @@
-import { ConvexError } from 'convex/values'
+import { ConvexError, v } from 'convex/values'
 import { mutation, query } from './_generated/server'
 import {
   createAuth,
@@ -41,8 +41,8 @@ export const list = query({
 
 export const setRole = mutation({
   args: {
-    userId: null as any,
-    role: null as any,
+    userId: v.string(),
+    role: v.union(v.literal('admin'), v.literal('user')),
   },
   handler: async (ctx, args) => {
     await requireAdminViewer(ctx)
@@ -63,7 +63,7 @@ export const setRole = mutation({
 
 export const impersonate = mutation({
   args: {
-    userId: null as any,
+    userId: v.string(),
   },
   handler: async (ctx, args) => {
     await requireAdminViewer(ctx)
@@ -91,7 +91,7 @@ export const stopImpersonation = mutation({
 
 export const setOwnPassword = mutation({
   args: {
-    newPassword: null as any,
+    newPassword: v.string(),
   },
   handler: async (ctx, args) => {
     await requireViewer(ctx)

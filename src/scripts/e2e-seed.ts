@@ -1,6 +1,6 @@
 import 'dotenv-flow/config'
 
-import { createServerConvexClient } from '@/lib/convex'
+import { createServerConvexClient } from '@/lib/convex-server'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { getWorkerCount } from './e2e-shared'

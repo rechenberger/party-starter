@@ -1,4 +1,4 @@
-import { ConvexError } from 'convex/values'
+import { ConvexError, v } from 'convex/values'
 import { mutation, query } from './_generated/server'
 import { requireViewer } from './auth'
 
@@ -33,7 +33,7 @@ const getMembership = async (
 
 export const create = mutation({
   args: {
-    name: null as any,
+    name: v.string(),
   },
   handler: async (ctx, args) => {
     const viewer = await requireViewer(ctx)
@@ -107,7 +107,7 @@ export const myMemberships = query({
 
 export const myMembershipBySlug = query({
   args: {
-    orgSlug: null as any,
+    orgSlug: v.string(),
   },
   handler: async (ctx, args) => {
     const viewer = await requireViewer(ctx)

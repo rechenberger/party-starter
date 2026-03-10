@@ -38,7 +38,7 @@ const sendAuthEmail = async ({
 }
 
 export const authConfig = {
-  providers: [getAuthConfigProvider({ jwks: process.env.JWKS })],
+  providers: [getAuthConfigProvider()],
 }
 
 const buildSocialProviders = () => {
@@ -57,50 +57,53 @@ const buildSocialProviders = () => {
   }
 }
 
-export const createAuthOptions = (ctx: any): any => ({
-  database: authComponent.adapter(ctx),
-  baseURL: getAppUrl(),
-  basePath: '/api/auth',
-  trustedOrigins: [getAppUrl()],
-  secret: process.env.AUTH_SECRET,
-  emailAndPassword: {
-    enabled: true,
-    requireEmailVerification: true,
-    async sendResetPassword({ user, url }: any) {
-      await sendAuthEmail({
-        template: 'reset-password',
-        to: user.email,
-        url,
-      })
-    },
-  },
-  emailVerification: {
-    sendOnSignUp: true,
-    autoSignInAfterVerification: true,
-    async sendVerificationEmail({ user, url }: any) {
-      await sendAuthEmail({
-        template: 'verify-email',
-        to: user.email,
-        url,
-      })
-    },
-  },
-  socialProviders: buildSocialProviders(),
-  plugins: [
-    admin({
-      defaultRole: 'user',
-      adminRoles: ['admin'],
-      impersonationSessionDuration: 60 * 60,
-    }),
-    convexPlugin({
-      authConfig,
-      jwks: process.env.JWKS,
-      options: {
-        basePath: '/api/auth',
+export const createAuthOptions = (ctx: any): any => {
+  const database = ctx?.db ? authComponent.adapter(ctx) : undefined
+
+  return {
+    ...(database ? { database } : {}),
+    baseURL: getAppUrl(),
+    basePath: '/api/auth',
+    trustedOrigins: [getAppUrl()],
+    secret: process.env.AUTH_SECRET,
+    emailAndPassword: {
+      enabled: true,
+      requireEmailVerification: true,
+      async sendResetPassword({ user, url }: any) {
+        await sendAuthEmail({
+          template: 'reset-password',
+          to: user.email,
+          url,
+        })
       },
-    }),
-  ],
-})
+    },
+    emailVerification: {
+      sendOnSignUp: true,
+      autoSignInAfterVerification: true,
+      async sendVerificationEmail({ user, url }: any) {
+        await sendAuthEmail({
+          template: 'verify-email',
+          to: user.email,
+          url,
+        })
+      },
+    },
+    socialProviders: buildSocialProviders(),
+    plugins: [
+      admin({
+        defaultRole: 'user',
+        adminRoles: ['admin'],
+        impersonationSessionDuration: 60 * 60,
+      }),
+      convexPlugin({
+        authConfig,
+        options: {
+          basePath: '/api/auth',
+        },
+      }),
+    ],
+  }
+}
 
 export const authApi: any = createApi(schema, createAuthOptions)
 

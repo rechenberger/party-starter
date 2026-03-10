@@ -1,19 +1,27 @@
+import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
 import { requireAdminViewer } from './auth'
 
+const emailStatus = v.union(
+  v.literal('queued'),
+  v.literal('sent'),
+  v.literal('skipped'),
+  v.literal('failed'),
+)
+
 export const capture = mutation({
   args: {
-    template: null as any,
-    provider: null as any,
-    fromEmail: null as any,
-    toEmail: null as any,
-    subject: null as any,
-    html: null as any,
-    text: null as any,
-    locale: null as any,
-    status: null as any,
-    errorText: null as any,
-    runId: null as any,
+    template: v.string(),
+    provider: v.string(),
+    fromEmail: v.string(),
+    toEmail: v.string(),
+    subject: v.string(),
+    html: v.string(),
+    text: v.string(),
+    locale: v.string(),
+    status: emailStatus,
+    errorText: v.optional(v.union(v.null(), v.string())),
+    runId: v.optional(v.union(v.null(), v.string())),
   },
   handler: async (ctx, args) => {
     const timestamp = Date.now()
@@ -48,10 +56,10 @@ export const list = query({
 
 export const findCapturedMail = query({
   args: {
-    to: null as any,
-    template: null as any,
-    createdAfterMs: null as any,
-    runId: null as any,
+    to: v.string(),
+    template: v.string(),
+    createdAfterMs: v.optional(v.number()),
+    runId: v.optional(v.union(v.null(), v.string())),
   },
   handler: async (ctx, args) => {
     const createdAfterMs = Number(args.createdAfterMs ?? 0)

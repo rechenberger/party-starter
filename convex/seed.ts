@@ -1,3 +1,4 @@
+import { v } from 'convex/values'
 import { authApi, createAuth } from './auth'
 import { action } from './_generated/server'
 
@@ -42,8 +43,8 @@ const buildPassword = (name: SeedName, index: number) => {
 
 export const run = action({
   args: {
-    runId: null as any,
-    workers: null as any,
+    runId: v.string(),
+    workers: v.number(),
   },
   handler: async (ctx, args) => {
     const auth = createAuth(ctx)

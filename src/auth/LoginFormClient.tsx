@@ -19,6 +19,7 @@ import { ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ReactNode, useState } from 'react'
 import { z } from 'zod'
+import { authClient } from './auth-client'
 
 const LoginData = z
   .discriminatedUnion('type', [
@@ -63,12 +64,10 @@ type LoginData = z.infer<typeof LoginData>
 type LoginType = LoginData['type']
 
 export const LoginFormClient = ({
-  authClient,
   redirectUrl,
   alternatives,
   showAlternativesOnRegister = false,
 }: {
-  authClient: any
   redirectUrl?: string
   alternatives?: ReactNode
   showAlternativesOnRegister?: boolean

@@ -1,6 +1,3 @@
-import { ConvexHttpClient } from 'convex/browser'
-import { ConvexReactClient } from 'convex/react'
-
 const getConvexUrl = () => {
   const url =
     process.env.NEXT_PUBLIC_CONVEX_URL?.trim() ?? process.env.CONVEX_URL?.trim()
@@ -13,7 +10,3 @@ const getConvexUrl = () => {
 }
 
 export const convexUrl = getConvexUrl()
-
-export const createBrowserConvexClient = () => new ConvexReactClient(convexUrl)
-
-export const createServerConvexClient = () => new ConvexHttpClient(convexUrl)

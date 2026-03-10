@@ -1,13 +1,13 @@
 import { db } from '@/db/db'
-import { schema } from '@/db/schema-export'
 import { getTranslations } from '@/i18n/getTranslations'
 import { superCache } from '@/lib/superCache'
 import {
   streamToast,
   superAction,
 } from '@/super-action/action/createSuperAction'
-import { eq } from 'drizzle-orm'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { auth } from './auth'
 import { ChangeUsernameFormClient } from './ChangeUsernameFormClient'
 import { getMyUser, getMyUserIdOrThrow } from './getMyUser'
 
@@ -24,12 +24,12 @@ export const ChangeUsernameForm = async ({
           'use server'
           return superAction(async () => {
             const userId = await getMyUserIdOrThrow()
-            await db
-              .update(schema.users)
-              .set({
+            await auth.api.updateUser({
+              body: {
                 name: data.username,
-              })
-              .where(eq(schema.users.id, userId))
+              },
+              headers: await headers(),
+            })
 
             superCache.user({ id: userId }).update()
 

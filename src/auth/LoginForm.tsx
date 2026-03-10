@@ -4,10 +4,11 @@ import {
   superAction,
 } from '@/super-action/action/createSuperAction'
 import { ActionButton } from '@/super-action/button/ActionButton'
-import { CredentialsSignin } from 'next-auth'
-import { EmailNotVerifiedAuthorizeError } from './CredentialsProvider'
+import { APIError } from 'better-auth/api'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { LoginFormClient } from './LoginFormClient'
-import { signIn } from './auth'
+import { auth } from './auth'
 import { registerUser } from './registerUser'
 
 export const LoginForm = async ({ redirectUrl }: { redirectUrl?: string }) => {
@@ -20,42 +21,66 @@ export const LoginForm = async ({ redirectUrl }: { redirectUrl?: string }) => {
           return superAction(async () => {
             const t = await getTranslations()
             if (data.type === 'login') {
-              // LOGIN
               try {
-                await signIn('credentials', data)
+                const result = await auth.api.signInEmail({
+                  body: {
+                    email: data.email,
+                    password: data.password,
+                    callbackURL: redirectUrl || '/',
+                  },
+                  headers: await headers(),
+                })
+                streamDialog(null)
+                redirect(result.url || redirectUrl || '/')
               } catch (error) {
-                if (error instanceof CredentialsSignin) {
+                if (
+                  error instanceof APIError &&
+                  error.body?.code === 'INVALID_EMAIL_OR_PASSWORD'
+                ) {
                   throw new Error(t.auth.invalidCredentials)
-                } else if (error instanceof EmailNotVerifiedAuthorizeError) {
+                }
+
+                if (
+                  error instanceof APIError &&
+                  error.body?.code === 'EMAIL_NOT_VERIFIED'
+                ) {
                   streamDialog({
                     title: t.auth.emailNotVerifiedTitle,
                     content: t.auth.resendVerifyMailDescription(data.email),
                   })
-                  await signIn('nodemailer', {
-                    email: data.email,
-                    redirect: false,
+                  await auth.api.sendVerificationEmail({
+                    body: {
+                      email: data.email,
+                      callbackURL: redirectUrl || '/auth/login',
+                    },
+                    headers: await headers(),
                   })
-                } else {
-                  throw error
+                  return
                 }
+
+                throw error
               }
-              return
             } else if (data.type === 'register') {
-              // REGISTER
               await registerUser(data)
-              await signIn('nodemailer', data)
+              streamDialog(null)
+              redirect('/auth/check-mail')
             } else if (data.type === 'forgotPassword') {
-              // CHANGE PASSWORD
               let redirectTo = '/auth/change-password'
               if (redirectUrl) {
                 redirectTo += `?redirect=${encodeURIComponent(redirectUrl)}`
               }
-              await signIn('nodemailer', {
-                email: data.email,
-                redirectTo,
+              await auth.api.requestPasswordReset({
+                body: {
+                  email: data.email,
+                  redirectTo,
+                },
+                headers: await headers(),
               })
+              streamDialog(null)
+              redirect('/auth/check-mail')
             } else {
               const exhaustiveCheck: never = data
+              return exhaustiveCheck
             }
           })
         }}
@@ -65,7 +90,15 @@ export const LoginForm = async ({ redirectUrl }: { redirectUrl?: string }) => {
               variant={'outline'}
               action={async () => {
                 'use server'
-                await signIn('discord')
+                const result = await auth.api.signInSocial({
+                  body: {
+                    provider: 'discord',
+                    callbackURL: redirectUrl || '/',
+                  },
+                  headers: await headers(),
+                })
+                streamDialog(null)
+                redirect(result.url || redirectUrl || '/')
               }}
             >
               {t.auth.continueWithDiscord}

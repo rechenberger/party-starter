@@ -89,6 +89,8 @@ export const t = {
     ),
     continueWithDiscord: 'Mit Discord anmelden',
     forgotPassword: 'Passwort vergessen?',
+    currentPassword: 'Aktuelles Passwort',
+    currentPasswordRequired: 'Das aktuelle Passwort ist erforderlich',
     confirmPasswordMismatch: 'Passwörter stimmen nicht überein',
     loginTitle: 'Anmelden',
     registerTitle: 'Registrieren',

@@ -84,6 +84,8 @@ export const t = {
     continueWithDiscord: 'Continue with Discord',
 
     forgotPassword: 'Forgot password?',
+    currentPassword: 'Current Password',
+    currentPasswordRequired: 'Current password is required',
     confirmPasswordMismatch: 'Passwords do not match',
     loginTitle: 'Login',
     registerTitle: 'Register',

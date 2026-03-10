@@ -1,78 +1,143 @@
-import type { AdapterAccount } from '@auth/core/adapters'
 import { relations } from 'drizzle-orm'
 import {
   boolean,
+  index,
   integer,
   pgTable,
-  primaryKey,
   text,
   timestamp,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core'
 import { createdUpdatedAtColumns, idColumn } from './commonColumns'
 
-export type SelectUser = typeof users.$inferSelect
+export const user = pgTable(
+  'user',
+  {
+    id: idColumn(),
+    ...createdUpdatedAtColumns(),
+    name: text('name').notNull(),
+    email: text('email').notNull(),
+    emailVerifiedAt: timestamp('emailVerified', { mode: 'date' }),
+    emailVerified: boolean('emailVerifiedState').notNull().default(false),
+    image: text('image'),
+    isAdmin: boolean('isAdmin').notNull().default(false),
+    passwordHash: text('passwordHash'),
+    role: text('role').notNull().default('user'),
+    banned: boolean('banned').notNull().default(false),
+    banReason: text('banReason'),
+    banExpires: timestamp('banExpires', {
+      withTimezone: true,
+      mode: 'date',
+    }),
+  },
+  (table) => [uniqueIndex('user_email_unique').on(table.email)],
+)
 
-export const users = pgTable('user', {
-  id: idColumn(),
-  ...createdUpdatedAtColumns(),
+export const users = user
 
-  name: text('name'),
-  email: text('email').notNull(),
-  emailVerified: timestamp('emailVerified', { mode: 'date' }),
-  image: text('image'),
-  isAdmin: boolean('isAdmin').notNull().default(false),
-  passwordHash: text('passwordHash'),
-})
-
-export const usersRelations = relations(users, ({ many }) => ({
-  accounts: many(accounts),
+export const usersRelations = relations(user, ({ many }) => ({
+  accounts: many(account),
+  sessions: many(session),
 }))
 
-export const accounts = pgTable(
+export const account = pgTable(
   'account',
   {
+    id: idColumn(),
+    ...createdUpdatedAtColumns(),
+    accountId: text('providerAccountId').notNull(),
+    providerId: text('provider').notNull(),
     userId: text('userId')
       .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    type: text('type').$type<AdapterAccount['type']>().notNull(),
-    provider: text('provider').notNull(),
-    providerAccountId: text('providerAccountId').notNull(),
-    refresh_token: text('refresh_token'),
-    access_token: text('access_token'),
-    expires_at: integer('expires_at'),
-    token_type: text('token_type'),
-    scope: text('scope'),
-    id_token: text('id_token'),
-    session_state: text('session_state'),
-  },
-  (account) => [
-    primaryKey({
-      columns: [account.provider, account.providerAccountId],
+      .references(() => user.id, { onDelete: 'cascade' }),
+    type: text('type'),
+    accessToken: text('access_token'),
+    refreshToken: text('refresh_token'),
+    idToken: text('id_token'),
+    legacyExpiresAt: integer('expires_at'),
+    tokenType: text('token_type'),
+    sessionState: text('session_state'),
+    accessTokenExpiresAt: timestamp('accessTokenExpiresAt', {
+      withTimezone: true,
+      mode: 'date',
     }),
+    refreshTokenExpiresAt: timestamp('refreshTokenExpiresAt', {
+      withTimezone: true,
+      mode: 'date',
+    }),
+    scope: text('scope'),
+    password: text('password'),
+  },
+  (table) => [
+    uniqueIndex('account_provider_account_unique').on(
+      table.providerId,
+      table.accountId,
+    ),
+    index('account_user_id_idx').on(table.userId),
   ],
 )
 
-export const accountsRelations = relations(accounts, ({ one }) => ({
-  user: one(users, {
-    fields: [accounts.userId],
-    references: [users.id],
+export const accounts = account
+
+export const accountsRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id],
   }),
 }))
 
-export const sessions = pgTable('session', {
-  sessionToken: text('sessionToken').notNull().primaryKey(),
-  userId: text('userId')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  expires: timestamp('expires', { mode: 'date' }).notNull(),
-})
+export const session = pgTable(
+  'session',
+  {
+    id: idColumn(),
+    ...createdUpdatedAtColumns(),
+    userId: text('userId')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    expiresAt: timestamp('expires', {
+      withTimezone: true,
+      mode: 'date',
+    }).notNull(),
+    token: text('sessionToken').notNull(),
+    ipAddress: text('ipAddress'),
+    userAgent: text('userAgent'),
+    impersonatedBy: text('impersonatedBy'),
+  },
+  (table) => [
+    uniqueIndex('session_token_unique').on(table.token),
+    index('session_user_id_idx').on(table.userId),
+  ],
+)
 
-export const verificationTokens = pgTable(
+export const sessions = session
+
+export const sessionsRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id],
+  }),
+}))
+
+export const verification = pgTable(
   'verificationToken',
   {
+    id: idColumn(),
+    ...createdUpdatedAtColumns(),
     identifier: text('identifier').notNull(),
-    token: text('token').notNull(),
-    expires: timestamp('expires', { mode: 'date' }).notNull(),
+    value: text('token').notNull(),
+    expiresAt: timestamp('expires', {
+      withTimezone: true,
+      mode: 'date',
+    }).notNull(),
   },
-  (vt) => [primaryKey({ columns: [vt.identifier, vt.token] })],
+  (table) => [
+    uniqueIndex('verification_identifier_value_unique').on(
+      table.identifier,
+      table.value,
+    ),
+    index('verification_identifier_idx').on(table.identifier),
+  ],
 )
+
+export const verifications = verification
+export const verificationTokens = verification

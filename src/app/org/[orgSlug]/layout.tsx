@@ -15,9 +15,12 @@ export default async function Layout({
   if (!ORGS.isActive) {
     redirect('/')
   }
+
+  const { orgSlug } = await params
+
   return (
     <RootLayout>
-      <SidebarLayout params={params}>{children}</SidebarLayout>
+      <SidebarLayout routeOrgSlug={orgSlug}>{children}</SidebarLayout>
     </RootLayout>
   )
 }

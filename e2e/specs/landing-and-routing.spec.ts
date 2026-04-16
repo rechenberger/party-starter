@@ -47,6 +47,7 @@ test('logged-in root and login page redirects behave as expected', async ({
 }, testInfo) => {
   const partition = getPartitionForWorker(testInfo)
   const owner = partition.users.owner
+  const activeOrgSlug = partition.orgs.joinEdge
 
   await loginWithCredentials({
     page,
@@ -55,7 +56,10 @@ test('logged-in root and login page redirects behave as expected', async ({
   })
 
   await page.goto('/')
-  await expect(page).toHaveURL(/\/app/)
+  await expect(page).toHaveURL(new RegExp(`/org/${activeOrgSlug}$`))
+
+  await page.goto('/app')
+  await expect(page).toHaveURL(new RegExp(`/org/${activeOrgSlug}$`))
 
   await page.goto('/auth/login?redirect=%2Fusers')
   await expect(page).toHaveURL(/\/users/)

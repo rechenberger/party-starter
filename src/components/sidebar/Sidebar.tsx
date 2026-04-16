@@ -10,7 +10,8 @@ import {
   Sidebar as UiSidebar,
 } from '@/components/ui/sidebar'
 import { Locale } from '@/i18n/locale'
-import { BRAND, ORGS } from '@/lib/starter.config'
+import { BRAND } from '@/lib/starter.config'
+import { CurrentOrgContext } from '@/organization/resolveCurrentOrgContext'
 import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
@@ -23,12 +24,14 @@ import { SidebarOrgSection } from './SidebarOrgSection'
 import { SidebarOrgSwitcher } from './SidebarOrgSwitcher'
 
 export const Sidebar = ({
-  orgSlug,
+  orgContext,
+  canCreateOrg,
   locale,
   isLanding,
   ...props
 }: React.ComponentProps<typeof UiSidebar> & {
-  orgSlug?: string
+  orgContext?: CurrentOrgContext | null
+  canCreateOrg?: boolean
   locale?: Locale
   isLanding?: boolean
 }) => {
@@ -59,20 +62,25 @@ export const Sidebar = ({
           </SidebarMenuButton>
         </SidebarMenu>
 
-        {!!orgSlug && ORGS.isActive && (
-          <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
-            <SidebarOrgSwitcher orgSlug={orgSlug} />
-          </Suspense>
+        {orgContext && (
+          <SidebarOrgSwitcher
+            memberships={orgContext.memberships}
+            activeOrgSlug={orgContext.org.slug}
+            canCreateOrg={canCreateOrg}
+          />
         )}
       </SidebarHeader>
       <SidebarContent>
-        <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
-          {!!orgSlug && ORGS.isActive ? (
-            <SidebarOrgSection orgSlug={orgSlug} />
-          ) : (
+        {orgContext ? (
+          <SidebarOrgSection
+            org={orgContext.org}
+            role={orgContext.membership.role}
+          />
+        ) : (
+          <Suspense fallback={<Skeleton className="w-full h-[48px]" />}>
             <SidebarMainSection isLanding={isLanding} locale={locale} />
-          )}
-        </Suspense>
+          </Suspense>
+        )}
         {!isLanding && (
           <Suspense>
             <SidebarAdminSection />

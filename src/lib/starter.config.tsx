@@ -1,7 +1,15 @@
 import { type ExpirationTime } from '@/organization/inviteCodes/expirationTimes'
 
+/**
+ * Default starter config. The shipped E2E suite assumes this mode:
+ * - ORGS.isActive = true
+ * - LOCALIZATION.isActive = true
+ * - SIDEBAR.activeInMain = 'loggedIn'
+ * - ORGS.forceOrg = true
+ */
 export const ORGS = {
   isActive: true,
+  forceOrg: true, // Affects redirect, sidebar, and active-org-context tests.
   onlyAdminsCanCreateOrgs: false,
   defaultExpirationEmailInvitation: '1d' satisfies ExpirationTime,
 } as const

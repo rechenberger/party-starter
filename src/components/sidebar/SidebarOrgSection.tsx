@@ -4,8 +4,8 @@ import {
   SidebarMenu,
 } from '@/components/ui/sidebar'
 import { getTranslations } from '@/i18n/getTranslations'
-import { getMyMembershipOrNotFound } from '@/organization/getMyMembership'
 import { OrganizationRole } from '@/organization/organizationRoles'
+import { CurrentOrgContext } from '@/organization/resolveCurrentOrgContext'
 import { Building2, Home, Laugh, Users } from 'lucide-react'
 import { NavEntry } from '../layout/nav'
 import { SidebarNavEntry } from './SidebarNavEntry'
@@ -13,8 +13,13 @@ import { SidebarNavEntry } from './SidebarNavEntry'
 const defaultViewRoles: OrganizationRole[] = ['admin', 'member']
 const protectedViewRoles: OrganizationRole[] = ['admin']
 
-export const SidebarOrgSection = async ({ orgSlug }: { orgSlug: string }) => {
-  const { membership, org } = await getMyMembershipOrNotFound({ orgSlug })
+export const SidebarOrgSection = async ({
+  org,
+  role,
+}: {
+  org: CurrentOrgContext['org']
+  role: CurrentOrgContext['membership']['role']
+}) => {
   const t = await getTranslations()
 
   const items: NavEntry[] = [
@@ -36,14 +41,14 @@ export const SidebarOrgSection = async ({ orgSlug }: { orgSlug: string }) => {
       name: t.org.organization,
       href: `/org/${org.slug}/settings`,
       icon: <Building2 />,
-      hidden: !protectedViewRoles.includes(membership.role),
+      hidden: !protectedViewRoles.includes(role),
       exactMatch: true,
     },
     {
       name: t.org.members.title,
       href: `/org/${org.slug}/settings/members`,
       icon: <Users />,
-      hidden: !defaultViewRoles.includes(membership.role),
+      hidden: !defaultViewRoles.includes(role),
     },
   ]
 

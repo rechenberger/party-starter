@@ -115,7 +115,7 @@ test('normal invites and mail invites can be created and consumed', async ({
 
   await page.goto(`/org/${invitesOrgSlug}/settings/members`)
 
-  await page.getByTestId('invite-normal-create-button').click()
+  await page.getByTestId('invite-normal-create-button').first().click()
   await page.getByTestId('invite-create-submit').click()
 
   const normalInviteRow = page
@@ -141,7 +141,7 @@ test('normal invites and mail invites can be created and consumed', async ({
   })
   await candidateContext.close()
 
-  await page.getByTestId('invite-mail-create-button').click()
+  await page.getByTestId('invite-mail-create-button').first().click()
   await page.getByTestId('invite-email-receiver-input').fill(mailUser.email)
   await page.getByTestId('invite-email-receiver-input').press('Enter')
   await page.getByTestId('invite-email-submit').click()

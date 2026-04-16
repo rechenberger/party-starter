@@ -7,11 +7,9 @@ import { useSuperAction } from '@/super-action/action/useSuperAction'
 import { SuperLoadingIcon } from '@/super-action/button/SuperLoadingIcon'
 import { Check, VenetianMask } from 'lucide-react'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 
 export const ImpersonateButton = ({ userId }: { userId: string }) => {
-  const { data: session, update } = useSession()
-  const router = useRouter()
+  const { data: session } = useSession()
   const isCurrentUser = session?.user?.id === userId
   const t = useTranslations()
   const buttonLabel = isCurrentUser
@@ -34,8 +32,7 @@ export const ImpersonateButton = ({ userId }: { userId: string }) => {
           if (isCurrentUser) return
 
           await trigger({ userId })
-          update() // Force update session
-          router.refresh() // Force Reload page and layout
+          window.location.reload()
         }}
       >
         <span className="sr-only">{buttonLabel}</span>

@@ -3,7 +3,7 @@ import { createClient, db } from '@/db/db'
 import { schema } from '@/db/schema-export'
 import { SIDEBAR, ORGS } from '@/lib/starter.config'
 import { superCache } from '@/lib/superCache'
-import { asc, desc, eq } from 'drizzle-orm'
+import { asc, desc, eq, sql } from 'drizzle-orm'
 import { cookies } from 'next/headers'
 import { after } from 'next/server'
 import { canUserCreateOrg } from './canUserCreateOrg'
@@ -38,6 +38,8 @@ type MembershipRow = CurrentOrgContext['memberships'][number] & {
   createdAt: Date
 }
 
+type MembershipQueryDatabase = Pick<typeof db, 'query'>
+
 const assertCurrentOrgConfig = () => {
   if (ORGS.forceOrg && !ORGS.isActive) {
     throw new Error(
@@ -52,8 +54,14 @@ const assertCurrentOrgConfig = () => {
   }
 }
 
-const getMembershipRows = async ({ userId }: { userId: string }) => {
-  return db.query.organizationMemberships.findMany({
+const getMembershipRows = async ({
+  database = db,
+  userId,
+}: {
+  database?: MembershipQueryDatabase
+  userId: string
+}) => {
+  return database.query.organizationMemberships.findMany({
     where: eq(schema.organizationMemberships.userId, userId),
     columns: {
       id: true,
@@ -136,6 +144,22 @@ const createDefaultOrgForUser = async ({
 
   try {
     const context = await transactionDb.transaction(async (tx) => {
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`auto-org:${userId}`})::bigint)`,
+      )
+
+      const existingMemberships = await getMembershipRows({
+        database: tx,
+        userId,
+      })
+
+      if (existingMemberships.length > 0) {
+        return toCurrentOrgContext({
+          activeMembership: existingMemberships[0],
+          memberships: existingMemberships,
+        })
+      }
+
       const existingOrg = await tx.query.organizations.findFirst({
         where: eq(schema.organizations.slug, userId),
         columns: {
@@ -215,9 +239,9 @@ const createDefaultOrgForUser = async ({
     })
 
     after(() => {
-      superCache.org({ id: context.org.id }).update()
-      superCache.orgMembers({ orgId: context.org.id }).update()
-      superCache.userOrgMemberships({ userId }).update()
+      superCache.org({ id: context.org.id }).revalidate()
+      superCache.orgMembers({ orgId: context.org.id }).revalidate()
+      superCache.userOrgMemberships({ userId }).revalidate()
     })
 
     return context

@@ -27,7 +27,7 @@ test('normal invite codes can be deleted and mail invites can be resent and dele
       .filter((id): id is string => !!id)
   })
 
-  await page.getByTestId('invite-normal-create-button').click()
+  await page.getByTestId('invite-normal-create-button').first().click()
   await page.getByTestId('invite-create-submit').click()
 
   let createdCodeId: string | null = null
@@ -60,7 +60,7 @@ test('normal invite codes can be deleted and mail invites can be resent and dele
   await expect(createdCodeRow).toHaveCount(0)
 
   const receiverEmail = `e2e-resend-${partition.index}-${Date.now()}@example.com`
-  await page.getByTestId('invite-mail-create-button').click()
+  await page.getByTestId('invite-mail-create-button').first().click()
   await page.getByTestId('invite-email-receiver-input').fill(receiverEmail)
   await page.getByTestId('invite-email-receiver-input').press('Enter')
 

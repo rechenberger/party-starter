@@ -86,6 +86,15 @@ This template has a dual-mode Playwright setup:
 - `pnpm e2e:dev` is intended for humans doing interactive local debugging.
 - `pnpm neon:dev:*` commands are human workflows and should not be required for agent E2E verification.
 
+### Starter config and E2E assumptions
+
+- The shipped E2E suite covers the default starter mode from [`src/lib/starter.config.tsx`](src/lib/starter.config.tsx):
+- `ORGS.isActive = true`
+- `LOCALIZATION.isActive = true`
+- `SIDEBAR.activeInMain = 'loggedIn'`
+- `ORGS.forceOrg = true`
+- If you change one of these behavior flags, update the affected routing/sidebar tests alongside the config change.
+
 ### Setup
 
 - Install Playwright browser once:

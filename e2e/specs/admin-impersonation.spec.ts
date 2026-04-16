@@ -22,10 +22,10 @@ test('admin can impersonate another admin and switch back', async ({
   await page.getByTestId('users-search-submit').click()
   await expect(main.getByTestId(`user-row-${adminAlt.id}`)).toBeVisible()
 
-  await page.getByTestId(`impersonate-button-${adminAlt.id}`).click()
-  const adminAltImpersonateButton = page.getByTestId(
-    `impersonate-button-${adminAlt.id}`,
-  )
+  await page.getByTestId(`impersonate-button-${adminAlt.id}`).first().click()
+  const adminAltImpersonateButton = page
+    .getByTestId(`impersonate-button-${adminAlt.id}`)
+    .first()
   await expect(adminAltImpersonateButton).toBeDisabled()
   await expect(adminAltImpersonateButton).toHaveAttribute(
     'title',
@@ -36,10 +36,10 @@ test('admin can impersonate another admin and switch back', async ({
   await page.getByTestId('users-search-submit').click()
   await expect(main.getByTestId(`user-row-${owner.id}`)).toBeVisible()
 
-  await page.getByTestId(`impersonate-button-${owner.id}`).click()
-  const ownerImpersonateButton = page.getByTestId(
-    `impersonate-button-${owner.id}`,
-  )
+  await page.getByTestId(`impersonate-button-${owner.id}`).first().click()
+  const ownerImpersonateButton = page
+    .getByTestId(`impersonate-button-${owner.id}`)
+    .first()
   await expect(ownerImpersonateButton).toBeDisabled()
   await expect(ownerImpersonateButton).toHaveAttribute('title', /current user/i)
 })
